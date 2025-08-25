@@ -43,7 +43,7 @@ pub async fn hellodirect(path: web::Path<String>) -> HttpResponse {
 }
 
 pub async fn serve_css() -> Result<HttpResponse, std::io::Error> {
-    let content = std::fs::read_to_string("static/style.css")?;
+    let content = std::fs::read_to_string("./static/style.css")?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/css; charset=utf-8")
