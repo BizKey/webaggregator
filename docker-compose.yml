@@ -1,4 +1,8 @@
 services:
   webaggregator:
     image: ghcr.io/bizkey/webaggregator/webaggregator:latest
+    build: .
+    pull_policy: always
     container_name: webaggregator
+    ports:
+      - "12345:8080"

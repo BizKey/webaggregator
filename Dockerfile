@@ -14,7 +14,6 @@ RUN cargo build --release
 # Копируем реальный код и пересобираем
 COPY src ./src
 COPY templates ./templates
-COPY static ./static
 RUN touch src/main.rs && cargo build --release
 
 # Runtime stage
@@ -34,6 +33,8 @@ RUN chmod +x /app/webaggregator
 # Создаем пользователя для безопасности
 RUN adduser -D -u 1000 myuser
 USER myuser
+
+COPY static ./static
 
 # Токен будет передан через .env файл
 CMD ["/app/webaggregator"]
