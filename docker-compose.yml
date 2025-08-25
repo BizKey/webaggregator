@@ -1,0 +1,4 @@
+services:
+  webaggregator:
+    image: ghcr.io/bizkey/webaggregator/webaggregator:latest
+    container_name: webaggregator

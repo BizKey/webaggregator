@@ -13,6 +13,8 @@ RUN cargo build --release
 
 # Копируем реальный код и пересобираем
 COPY src ./src
+COPY templates ./templates
+COPY static ./static
 RUN touch src/main.rs && cargo build --release
 
 # Runtime stage
