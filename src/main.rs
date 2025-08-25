@@ -12,7 +12,10 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .route("/", web::get().to(handlers::index))
-            .route("/users", web::get().to(handlers::hello))
+            .route("/hello", web::get().to(handlers::hello))
+            .route("/hello/{name}", web::get().to(handlers::hellodirect))
+            .route("/static/style.css", web::get().to(handlers::serve_css))
+            .route("/favicon.png", web::get().to(handlers::favicon))
     })
     .bind("0.0.0.0:8080")?
     .run()
