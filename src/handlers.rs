@@ -7,9 +7,25 @@ use sqlx::PgPool;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Ticket {
-    pub id: i32,
-    pub name: String,
     pub created_at: DateTime<Utc>,
+    pub symbol: String,
+    pub symbol_name: String,
+    pub buy: Option<String>,
+    pub best_bid_size: Option<String>,
+    pub sell: Option<String>,
+    pub best_ask_size: Option<String>,
+    pub change_rate: Option<String>,
+    pub change_price: Option<String>,
+    pub high: Option<String>,
+    pub low: Option<String>,
+    pub vol: Option<String>,
+    pub vol_value: String,
+    pub last: Option<String>,
+    pub average_price: Option<String>,
+    pub taker_fee_rate: Option<String>,
+    pub maker_fee_rate: Option<String>,
+    pub taker_coefficient: Option<String>,
+    pub maker_coefficient: Option<String>,
 }
 
 #[derive(Template)]
@@ -46,7 +62,7 @@ pub async fn hello() -> HttpResponse {
 }
 
 pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let tickets = sqlx::query_as::<_, Ticket>("SELECT id, name, created_at FROM Ticket")
+    let tickets = sqlx::query_as::<_, Ticket>("SELECT symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, created_at FROM Ticker")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -66,7 +82,8 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 pub async fn hellodirect(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let name = path.into_inner();
 
-    let _ = sqlx::query("INSERT INTO Ticket (name) VALUES ($1)")
+    let _ = sqlx::query("INSERT INTO Ticker (symbol, symbol_name) VALUES ($1,$2)")
+        .bind(&name)
         .bind(&name)
         .execute(pool.get_ref())
         .await
