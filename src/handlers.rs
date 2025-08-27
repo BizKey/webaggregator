@@ -19,7 +19,7 @@ pub struct Ticket {
     pub high: Option<String>,
     pub low: Option<String>,
     pub vol: Option<String>,
-    pub vol_value: String,
+    pub vol_value: Option<String>,
     pub last: Option<String>,
     pub average_price: Option<String>,
     pub taker_fee_rate: Option<String>,
