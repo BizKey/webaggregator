@@ -12,6 +12,12 @@ pub struct Ticket {
 }
 
 #[derive(Template)]
+#[template(path = "tickers.html")]
+struct TickersTemplate {
+    tickets: Vec<Ticket>,
+}
+
+#[derive(Template)]
 #[template(path = "index.html")]
 struct IndexTemplate {
     name: String,
@@ -47,7 +53,13 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    Ok(HttpResponse::Ok().json(tickets))
+    let template = TickersTemplate { tickets };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
 }
 
 pub async fn hellodirect(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
