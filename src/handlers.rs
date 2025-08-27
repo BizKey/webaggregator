@@ -1,14 +1,15 @@
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
-use sqlx::PgPool;
-
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use sqlx::PgPool;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Ticket {
     pub id: i32,
     pub name: String,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Template)]
@@ -45,7 +46,7 @@ pub async fn hello() -> HttpResponse {
 }
 
 pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let tickets = sqlx::query_as::<_, Ticket>("SELECT id, name FROM Ticket")
+    let tickets = sqlx::query_as::<_, Ticket>("SELECT id, name, created_at FROM Ticket")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
