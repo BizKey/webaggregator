@@ -13,16 +13,17 @@
     <table border="1">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Symbol</th>
+                <th>created_at</th>
+                <th>symbol</th>
+                <th>symbol_name</th>
             </tr>
         </thead>
         <tbody>
             {% for ticker in tickets %}
             <tr>
+                <td>{{ ticker.created_at }}</td>
                 <td>{{ ticker.symbol }}</td>
                 <td>{{ ticker.symbol_name }}</td>
-                <td>{{ ticker.created_at }}</td>
             </tr>
             {% endfor %}
         </tbody>
