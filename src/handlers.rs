@@ -66,9 +66,9 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 pub async fn hellodirect(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let name = path.into_inner();
 
-    let _ = sqlx::query_as::<_, Ticket>("INSERT INTO Ticket (name) VALUES ($1)")
+    let _ = sqlx::query("INSERT INTO Ticket (name) VALUES ($1)")
         .bind(&name)
-        .fetch_one(pool.get_ref())
+        .execute(pool.get_ref())
         .await
         .map_err(|e| {
             eprintln!("Database error: {}", e);
