@@ -6,7 +6,7 @@ use sqlx::FromRow;
 use sqlx::PgPool;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Ticket {
+pub struct Ticker {
     pub created_at: DateTime<Utc>,
     pub symbol: String,
     pub symbol_name: String,
@@ -27,11 +27,23 @@ pub struct Ticket {
     pub taker_coefficient: Option<String>,
     pub maker_coefficient: Option<String>,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct Currency {
+    pub created_at: DateTime<Utc>,
+    pub currency: String,
+    pub name: String,
+}
 
 #[derive(Template)]
 #[template(path = "tickers.html")]
 struct TickersTemplate {
-    tickets: Vec<Ticket>,
+    tickers: Vec<Ticker>,
+}
+
+#[derive(Template)]
+#[template(path = "currencies.html")]
+struct CurrencyTemplate {
+    currencies: Vec<Currency>,
 }
 
 #[derive(Template)]
@@ -61,8 +73,8 @@ pub async fn hello() -> HttpResponse {
     }
 }
 
-pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let tickets = sqlx::query_as::<_, Ticket>("SELECT symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, created_at FROM Ticker")
+pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    let currencies = sqlx::query_as::<_, Currency>("SELECT created_at FROM Currency")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -70,7 +82,25 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let template = TickersTemplate { tickets };
+    let template = CurrencyTemplate { currencies };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    let tickers = sqlx::query_as::<_, Ticker>("SELECT symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, created_at FROM Ticker")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let template = TickersTemplate { tickers };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
