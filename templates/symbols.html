@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <title>HTML5 Test Page</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>created_at</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for symbol in symbols %}
+            <tr>
+                <td>{{ symbol.created_at }}</td>     
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>

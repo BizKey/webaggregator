@@ -28,6 +28,38 @@ pub struct Ticker {
     pub maker_coefficient: Option<String>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct Symbol {
+    pub created_at: DateTime<Utc>,
+    pub symbol: String,
+    pub name: String,
+    pub base_currency: String,
+    pub quote_currency: String,
+    pub fee_currency: String,
+    pub market: String,
+    pub base_min_size: String,
+    pub quote_min_size: String,
+    pub base_max_size: String,
+    pub quote_max_size: String,
+    pub base_increment: String,
+    pub quote_increment: String,
+    pub price_increment: String,
+    pub price_limit_rate: String,
+    pub min_funds: String,
+    pub is_margin_enabled: bool,
+    pub enable_trading: bool,
+    pub fee_category: u8,
+    pub maker_fee_coefficient: String,
+    pub taker_fee_coefficient: String,
+    pub st: bool,
+    pub callauction_is_enabled: bool,
+    pub callauction_price_floor: Option<String>,
+    pub callauction_price_ceiling: Option<String>,
+    pub callauction_first_stage_start_time: Option<u64>,
+    pub callauction_second_stage_start_time: Option<u64>,
+    pub callauction_third_stage_start_time: Option<u64>,
+    pub trading_start_time: Option<u64>,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Currency {
     pub created_at: DateTime<Utc>,
     pub currency: String,
