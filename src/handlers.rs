@@ -32,6 +32,12 @@ pub struct Currency {
     pub created_at: DateTime<Utc>,
     pub currency: String,
     pub name: String,
+    pub full_name: String,
+    pub precision: i16,
+    pub confirms: Option<i16>,
+    pub contract_address: Option<String>,
+    pub is_margin_enabled: bool,
+    pub is_debit_enabled: bool,
 }
 
 #[derive(Template)]
@@ -74,7 +80,7 @@ pub async fn hello() -> HttpResponse {
 }
 
 pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let currencies = sqlx::query_as::<_, Currency>("SELECT created_at FROM Currency")
+    let currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {

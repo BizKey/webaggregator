@@ -14,12 +14,28 @@
         <thead>
             <tr>
                 <th>created_at</th>
+                <th>currency</th>
+                <th>name</th>
+                <th>full_name</th>
+                <th>precision</th>
+                <th>confirms</th>
+                <th>contract_address</th>
+                <th>is_margin_enabled</th>
+                <th>is_debit_enabled</th>
             </tr>
         </thead>
         <tbody>
             {% for currency in currencies %}
             <tr>
-                <td>{{ currency.created_at }}</td>              
+                <td>{{ currency.created_at }}</td>     
+                <td>{{ currency.currency }}</td>     
+                <td>{{ currency.name }}</td>     
+                <td>{{ currency.full_name }}</td>     
+                <td>{{ currency.precision }}</td>     
+                <td>{% if let Some(confirms) = currency.confirms %}{{ confirms }}{% endif %}</td>                
+                <td>{% if let Some(contract_address) = currency.contract_address %}{{ contract_address }}{% endif %}</td>                
+                <td>{{ currency.is_margin_enabled }}</td>     
+                <td>{{ currency.is_margin_enabled }}</td>     
             </tr>
             {% endfor %}
         </tbody>
