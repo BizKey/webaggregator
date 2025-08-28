@@ -47,17 +47,17 @@ pub struct Symbol {
     pub min_funds: String,
     pub is_margin_enabled: bool,
     pub enable_trading: bool,
-    pub fee_category: u8,
+    pub fee_category: i64,
     pub maker_fee_coefficient: String,
     pub taker_fee_coefficient: String,
     pub st: bool,
     pub callauction_is_enabled: bool,
     pub callauction_price_floor: Option<String>,
     pub callauction_price_ceiling: Option<String>,
-    pub callauction_first_stage_start_time: Option<u64>,
-    pub callauction_second_stage_start_time: Option<u64>,
-    pub callauction_third_stage_start_time: Option<u64>,
-    pub trading_start_time: Option<u64>,
+    pub callauction_first_stage_start_time: Option<i64>,
+    pub callauction_second_stage_start_time: Option<i64>,
+    pub callauction_third_stage_start_time: Option<i64>,
+    pub trading_start_time: Option<i64>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Currency {
@@ -76,6 +76,11 @@ pub struct Currency {
 #[template(path = "tickers.html")]
 struct TickersTemplate {
     tickers: Vec<Ticker>,
+}
+#[derive(Template)]
+#[template(path = "symbols.html")]
+struct SymbolsTemplate {
+    symbols: Vec<Symbol>,
 }
 
 #[derive(Template)]
@@ -108,6 +113,24 @@ pub async fn hello() -> HttpResponse {
             .content_type("text/html; charset=utf-8")
             .body(html),
         Err(_) => HttpResponse::InternalServerError().body("Error template render"),
+    }
+}
+
+pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    let symbols = sqlx::query_as::<_, Symbol>("SELECT created_at FROM Symbol")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let template = SymbolsTemplate { symbols };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
     }
 }
 
