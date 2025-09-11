@@ -11,7 +11,6 @@ async fn main() -> std::io::Result<()> {
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
-    // Создание пула соединений
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&database_url)
@@ -26,6 +25,8 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(handlers::index))
             .route("/hello", web::get().to(handlers::hello))
             .route("/tickers", web::get().to(handlers::tickers))
+            .route("/currencies", web::get().to(handlers::currencies))
+            .route("/symbols", web::get().to(handlers::symbols))
             .route("/hello/{name}", web::get().to(handlers::hellodirect))
             .route("/static/style.css", web::get().to(handlers::serve_css))
             .route("/favicon.png", web::get().to(handlers::favicon))
