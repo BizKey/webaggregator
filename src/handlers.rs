@@ -88,6 +88,11 @@ struct TickersTemplate {
     tickers: Vec<(usize, Ticker)>,
 }
 #[derive(Template)]
+#[template(path = "ticker.html")]
+struct TickerTemplate {
+    tickers: Vec<(usize, Ticker)>,
+}
+#[derive(Template)]
 #[template(path = "symbols.html")]
 struct SymbolsTemplate {
     symbols: Vec<Symbol>,
@@ -162,7 +167,37 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     }
 }
 
+pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // one current ticker
+    let symbol_name = path.into_inner();
+
+    let one_ticker = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1").bind(&symbol_name)
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let tickers_with_index: Vec<(usize, Ticker)> = one_ticker
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
+
+    let template = TickerTemplate {
+        tickers: tickers_with_index,
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
 pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all tickers
     let tickers = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker")
         .fetch_all(pool.get_ref())
         .await

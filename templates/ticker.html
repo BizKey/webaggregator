@@ -40,7 +40,7 @@
             <tr>
                 <td>{{ index }}</td>
                 <td>{{ ticker.created_at.format_date() }}</td>
-                <td><a href="/ticker/{{ ticker.symbol }}">{{ ticker.symbol }}</a></td>
+                <td>{{ ticker.symbol }}</td>
                 <td>{{ ticker.symbol_name }}</td>
                 <td>{% if let Some(buy) = ticker.buy %}{{ buy }}{% endif %}</td>
                 <td>{% if let Some(sell) = ticker.sell %}{{ sell }}{% endif %}</td>

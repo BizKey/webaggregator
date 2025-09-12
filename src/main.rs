@@ -25,6 +25,7 @@ async fn main() -> std::io::Result<()> {
             .route("/", web::get().to(handlers::index))
             .route("/hello", web::get().to(handlers::hello))
             .route("/tickers", web::get().to(handlers::tickers))
+            .route("/ticker/{ticker}", web::get().to(handlers::ticker))
             .route("/currencies", web::get().to(handlers::currencies))
             .route("/symbols", web::get().to(handlers::symbols))
             .route("/hello/{name}", web::get().to(handlers::hellodirect))
