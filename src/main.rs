@@ -23,7 +23,6 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .route("/", web::get().to(handlers::index))
-            .route("/hello", web::get().to(handlers::hello))
             .route("/tickers", web::get().to(handlers::tickers))
             .route("/ticker/{ticker}", web::get().to(handlers::ticker))
             .route("/currencies", web::get().to(handlers::currencies))

@@ -106,22 +106,10 @@ struct CurrencyTemplate {
 
 #[derive(Template)]
 #[template(path = "index.html")]
-struct IndexTemplate {
-    name: String,
-    time: String,
-}
+struct IndexTemplate {}
 
 pub async fn index() -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body("Welcome to rr")
-}
-
-pub async fn hello() -> HttpResponse {
-    let template = IndexTemplate {
-        name: "User".to_string(),
-        time: chrono::Local::now().format("%H:%M:%S").to_string(),
-    };
+    let template = IndexTemplate {};
 
     match template.render() {
         Ok(html) => HttpResponse::Ok()
@@ -236,10 +224,7 @@ pub async fn hellodirect(path: web::Path<String>, pool: web::Data<PgPool>) -> Re
             actix_web::error::ErrorInternalServerError("Failed to create ticket")
         })?;
 
-    let template = IndexTemplate {
-        name: name,
-        time: chrono::Local::now().format("%H:%M:%S").to_string(),
-    };
+    let template = IndexTemplate {};
 
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
