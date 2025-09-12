@@ -165,7 +165,8 @@ td, th {
 thead th {
   position: sticky;
   top: 0; /* Stick to top of container */
-  background-color: #613ff3;
+  background-color: #eb99a1;
+  color: #4e3d3d;
   z-index: 10;
 }
 
