@@ -101,7 +101,7 @@ struct SymbolsTemplate {
 #[derive(Template)]
 #[template(path = "currencies.html")]
 struct CurrencyTemplate {
-    currencies: Vec<Currency>,
+    currencies: Vec<(usize, Currency)>,
 }
 
 #[derive(Template)]
@@ -138,7 +138,7 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 }
 
 pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
+    let all_currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -146,7 +146,44 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let template = CurrencyTemplate { currencies };
+    let currencies_with_index: Vec<(usize, Currency)> = all_currencies
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = CurrencyTemplate {
+        currencies: currencies_with_index,
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // one current currency
+    let currency_name = path.into_inner();
+
+    let currencies_with_one_currency_name = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency WHERE currency = $1  ORDER BY created_at DESC").bind(&currency_name)
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let currencies_with_index: Vec<(usize, Currency)> = currencies_with_one_currency_name
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = CurrencyTemplate {
+        currencies: currencies_with_index,
+    };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
@@ -203,29 +240,6 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let template = TickersTemplate {
         tickers: tickers_with_index,
     };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
-
-pub async fn hellodirect(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let name = path.into_inner();
-
-    let _ = sqlx::query("INSERT INTO Ticker (symbol, symbol_name) VALUES ($1,$2)")
-        .bind(&name)
-        .bind(&name)
-        .execute(pool.get_ref())
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Failed to create ticket")
-        })?;
-
-    let template = IndexTemplate {};
-
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
