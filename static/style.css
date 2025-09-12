@@ -162,6 +162,13 @@ td, th {
   white-space: nowrap;
 }
 
+thead th {
+  position: sticky;
+  top: 0; /* Stick to top of container */
+  background-color: #613ff3;
+  z-index: 10;
+}
+
 /* Buttons, forms and input */
 input, textarea {
   border: 1px solid #d9d8dc;
