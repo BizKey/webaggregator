@@ -4,6 +4,17 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::PgPool;
+use std::time::Instant;
+
+pub trait DateTimeFormat {
+    fn format_date(&self) -> String;
+}
+
+impl DateTimeFormat for DateTime<Utc> {
+    fn format_date(&self) -> String {
+        self.format("%Y-%m-%d %H:%M:%S").to_string()
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Ticker {
@@ -75,7 +86,14 @@ pub struct Currency {
 #[derive(Template)]
 #[template(path = "tickers.html")]
 struct TickersTemplate {
-    tickers: Vec<Ticker>,
+    tickers: Vec<(usize, Ticker)>,
+    elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "ticker.html")]
+struct TickerTemplate {
+    tickers: Vec<(usize, Ticker)>,
+    elapsed_ms: u128,
 }
 #[derive(Template)]
 #[template(path = "symbols.html")]
@@ -86,27 +104,15 @@ struct SymbolsTemplate {
 #[derive(Template)]
 #[template(path = "currencies.html")]
 struct CurrencyTemplate {
-    currencies: Vec<Currency>,
+    currencies: Vec<(usize, Currency)>,
 }
 
 #[derive(Template)]
 #[template(path = "index.html")]
-struct IndexTemplate {
-    name: String,
-    time: String,
-}
+struct IndexTemplate {}
 
 pub async fn index() -> HttpResponse {
-    HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body("Welcome to rr")
-}
-
-pub async fn hello() -> HttpResponse {
-    let template = IndexTemplate {
-        name: "User".to_string(),
-        time: chrono::Local::now().format("%H:%M:%S").to_string(),
-    };
+    let template = IndexTemplate {};
 
     match template.render() {
         Ok(html) => HttpResponse::Ok()
@@ -135,7 +141,7 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 }
 
 pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
+    let all_currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -143,7 +149,80 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let template = CurrencyTemplate { currencies };
+    let currencies_with_index: Vec<(usize, Currency)> = all_currencies
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = CurrencyTemplate {
+        currencies: currencies_with_index,
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // one current currency
+    let currency_name = path.into_inner();
+
+    let currencies_with_one_currency_name = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency WHERE currency = $1  ORDER BY created_at DESC").bind(&currency_name)
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let currencies_with_index: Vec<(usize, Currency)> = currencies_with_one_currency_name
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = CurrencyTemplate {
+        currencies: currencies_with_index,
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // one current ticker
+
+    // time start
+    let start = Instant::now();
+    let symbol_name = path.into_inner();
+
+    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1  ORDER BY created_at DESC").bind(&symbol_name)
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let tickers_with_index: Vec<(usize, Ticker)> = tickers_with_one_symbol_name
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
+
+    // time end
+    let elapsed_ms = start.elapsed().as_millis();
+
+    let template = TickerTemplate {
+        tickers: tickers_with_index,
+        elapsed_ms: elapsed_ms,
+    };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
@@ -153,7 +232,12 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 }
 
 pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let tickers = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker")
+    // all tickers
+
+    // time start
+    let start = Instant::now();
+
+    let tickers = sqlx::query_as::<_, Ticker>("SELECT DISTINCT ON (symbol_name) created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker ORDER BY symbol_name, created_at DESC")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -161,33 +245,19 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let template = TickersTemplate { tickers };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
+    let tickers_with_index: Vec<(usize, Ticker)> = tickers
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
 
-pub async fn hellodirect(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    let name = path.into_inner();
+    // time end
+    let elapsed_ms = start.elapsed().as_millis();
 
-    let _ = sqlx::query("INSERT INTO Ticker (symbol, symbol_name) VALUES ($1,$2)")
-        .bind(&name)
-        .bind(&name)
-        .execute(pool.get_ref())
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Failed to create ticket")
-        })?;
-
-    let template = IndexTemplate {
-        name: name,
-        time: chrono::Local::now().format("%H:%M:%S").to_string(),
+    let template = TickersTemplate {
+        tickers: tickers_with_index,
+        elapsed_ms: elapsed_ms,
     };
-
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")

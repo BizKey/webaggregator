@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <p><a href="/">Home</a></p>
+    <p><a href="/tickers">Tickers</a></p>
     <table border="1">
         <thead>
             <tr>
@@ -20,8 +20,8 @@
                 <th>symbol_name</th>
                 <th>buy</th>
                 <th>sell</th>
-                <th>best_bid_size</th>
-                <th>best_ask_size</th>                                
+                <th>best_bid_size</th>                
+                <th>best_ask_size</th>
                 <th>change_rate</th>
                 <th>change_price</th>
                 <th>high</th>
@@ -42,7 +42,7 @@
                 <td>{{ index }}</td>
                 <td>{{ ticker.created_at.format_date() }}</td>
                 <td>{{ ticker.symbol }}</td>
-                <td><a href="/ticker/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
+                <td>{{ ticker.symbol_name }}</td>
                 <td>{% if let Some(buy) = ticker.buy %}{{ buy }}{% endif %}</td>
                 <td>{% if let Some(sell) = ticker.sell %}{{ sell }}{% endif %}</td>
                 <td>{% if let Some(best_bid_size) = ticker.best_bid_size %}{{ best_bid_size }}{% endif %}</td>
@@ -75,5 +75,4 @@
                 font-size: 12px;
                 z-index: 1000;">{{ elapsed_ms }} ms</div>
 </body>
-
 </html>

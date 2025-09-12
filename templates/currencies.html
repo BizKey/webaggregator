@@ -13,6 +13,7 @@
     <table border="1">
         <thead>
             <tr>
+                <th>№</th>
                 <th>created_at</th>
                 <th>currency</th>
                 <th>name</th>
@@ -25,10 +26,11 @@
             </tr>
         </thead>
         <tbody>
-            {% for currency in currencies %}
+            {% for (index, currency) in currencies %}
             <tr>
-                <td>{{ currency.created_at }}</td>     
-                <td>{{ currency.currency }}</td>     
+                <td>{{ index }}</td>
+                <td>{{ currency.created_at.format_date() }}</td>     
+                <td>{{ currency.currency }}</td>   
                 <td>{{ currency.name }}</td>     
                 <td>{{ currency.full_name }}</td>     
                 <td>{{ currency.precision }}</td>     
