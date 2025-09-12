@@ -5,6 +5,16 @@ use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::PgPool;
 
+pub trait DateTimeFormat {
+    fn format_date(&self) -> String;
+}
+
+impl DateTimeFormat for DateTime<Utc> {
+    fn format_date(&self) -> String {
+        self.format("%Y-%m-%d %H:%M:%S").to_string()
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Ticker {
     pub created_at: DateTime<Utc>,

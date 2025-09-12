@@ -39,7 +39,7 @@
             {% for (index, ticker) in tickers %}
             <tr>
                 <td>{{ index }}</td>
-                <td>{{ ticker.created_at }}</td>
+                <td>{{ ticker.created_at.format_date() }}</td>
                 <td>{{ ticker.symbol }}</td>
                 <td>{{ ticker.symbol_name }}</td>
                 <td>{% if let Some(buy) = ticker.buy %}{{ buy }}{% endif %}</td>
