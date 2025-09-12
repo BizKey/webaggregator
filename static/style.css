@@ -12,8 +12,7 @@ html {
 
 body {
   font-size: 1.8rem;
-  line-height: 1.618;
-  max-width: 38em;
+  line-height: 1;
   margin: auto;
   color: #d9d8dc;
   background-color: #120c0e;
@@ -160,6 +159,7 @@ table {
 td, th {
   padding: 0.5em;
   border-bottom: 1px solid #40363a;
+  white-space: nowrap;
 }
 
 /* Buttons, forms and input */
