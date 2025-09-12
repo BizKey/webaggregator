@@ -215,8 +215,10 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
+
     // time end
     let elapsed = start.elapsed().as_secs();
+
     let template = TickerTemplate {
         tickers: tickers_with_index,
         elapsed: elapsed,
