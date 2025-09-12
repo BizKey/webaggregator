@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    <p><a href="/">Home</a></p>
     <table border="1">
         <thead>
             <tr>
@@ -40,8 +41,8 @@
             <tr>
                 <td>{{ index }}</td>
                 <td>{{ ticker.created_at.format_date() }}</td>
-                <td><a href="/ticker/{{ ticker.symbol }}">{{ ticker.symbol }}</a></td>
-                <td>{{ ticker.symbol_name }}</td>
+                <td>{{ ticker.symbol }}</td>
+                <td><a href="/ticker/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
                 <td>{% if let Some(buy) = ticker.buy %}{{ buy }}{% endif %}</td>
                 <td>{% if let Some(sell) = ticker.sell %}{{ sell }}{% endif %}</td>
                 <td>{% if let Some(best_bid_size) = ticker.best_bid_size %}{{ best_bid_size }}{% endif %}</td>
