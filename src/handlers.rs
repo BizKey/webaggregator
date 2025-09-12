@@ -75,7 +75,7 @@ pub struct Currency {
 #[derive(Template)]
 #[template(path = "tickers.html")]
 struct TickersTemplate {
-    tickers: Vec<Ticker>,
+    tickers: Vec<(usize, Ticker)>,
 }
 #[derive(Template)]
 #[template(path = "symbols.html")]
@@ -161,7 +161,15 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let template = TickersTemplate { tickers };
+    let tickers_with_index: Vec<(usize, Ticker)> = tickers
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
+
+    let template = TickersTemplate {
+        tickers: tickers_with_index,
+    };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
