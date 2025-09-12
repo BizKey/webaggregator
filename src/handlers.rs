@@ -87,13 +87,13 @@ pub struct Currency {
 #[template(path = "tickers.html")]
 struct TickersTemplate {
     tickers: Vec<(usize, Ticker)>,
-    elapsed: u64,
+    elapsed: u128,
 }
 #[derive(Template)]
 #[template(path = "ticker.html")]
 struct TickerTemplate {
     tickers: Vec<(usize, Ticker)>,
-    elapsed: u64,
+    elapsed: u128,
 }
 #[derive(Template)]
 #[template(path = "symbols.html")]
@@ -217,7 +217,7 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         .collect();
 
     // time end
-    let elapsed = start.elapsed().as_secs();
+    let elapsed = start.elapsed().as_millis();
 
     let template = TickerTemplate {
         tickers: tickers_with_index,
@@ -252,7 +252,7 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .collect();
 
     // time end
-    let elapsed = start.elapsed().as_secs();
+    let elapsed = start.elapsed().as_millis();
 
     let template = TickersTemplate {
         tickers: tickers_with_index,
