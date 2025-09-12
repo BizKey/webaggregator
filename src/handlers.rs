@@ -186,7 +186,7 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
 pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // all tickers
-    let tickers = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker")
+    let tickers = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker ORDER BY created_at DESC")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
