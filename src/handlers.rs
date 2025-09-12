@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use sqlx::PgPool;
+use std::time::Instant;
 
 pub trait DateTimeFormat {
     fn format_date(&self) -> String;
@@ -86,11 +87,13 @@ pub struct Currency {
 #[template(path = "tickers.html")]
 struct TickersTemplate {
     tickers: Vec<(usize, Ticker)>,
+    elapsed: u64,
 }
 #[derive(Template)]
 #[template(path = "ticker.html")]
 struct TickerTemplate {
     tickers: Vec<(usize, Ticker)>,
+    elapsed: u64,
 }
 #[derive(Template)]
 #[template(path = "symbols.html")]
@@ -194,6 +197,9 @@ pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
 
 pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // one current ticker
+
+    // time start
+    let start = Instant::now();
     let symbol_name = path.into_inner();
 
     let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1  ORDER BY created_at DESC").bind(&symbol_name)
@@ -209,9 +215,11 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
-
+    // time end
+    let elapsed = start.elapsed().as_secs();
     let template = TickerTemplate {
         tickers: tickers_with_index,
+        elapsed: elapsed,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
@@ -223,6 +231,10 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
 pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // all tickers
+
+    // time start
+    let start = Instant::now();
+
     let tickers = sqlx::query_as::<_, Ticker>("SELECT DISTINCT ON (symbol_name) created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker ORDER BY symbol_name, created_at DESC")
         .fetch_all(pool.get_ref())
         .await
@@ -237,8 +249,12 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
+    // time end
+    let elapsed = start.elapsed().as_secs();
+
     let template = TickersTemplate {
         tickers: tickers_with_index,
+        elapsed: elapsed,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
