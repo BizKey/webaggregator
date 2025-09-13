@@ -17,7 +17,7 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Failed to create pool");
 
-    println!("Sever run on http://0.0.0.0:8080");
+    println!("Server run on http://0.0.0.0:8080");
 
     HttpServer::new(move || {
         App::new()

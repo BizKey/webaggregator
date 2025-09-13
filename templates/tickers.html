@@ -1,71 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <title>HTML5 Test Page</title>
-    <link rel="stylesheet" href="/static/style.css">
-</head>
+{% block title %}Tickers{% endblock %}
 
-<body>
-    <p><a href="/">Home</a></p>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>№</th>
-                <th>created_at</th>
-                <th>symbol</th>
-                <th>symbol_name</th>
-                <th>buy</th>
-                <th>sell</th>
-                <th>best_bid_size</th>
-                <th>best_ask_size</th>
-                <th>change_rate</th>
-                <th>change_price</th>
-                <th>high</th>
-                <th>low</th>
-                <th>vol</th>
-                <th>vol_value</th>
-                <th>last</th>
-                <th>average_price</th>
-                <th>taker_fee_rate</th>
-                <th>maker_fee_rate</th>
-                <th>taker_coefficient</th>
-                <th>maker_coefficient</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for (index, ticker) in tickers %}
-            <tr>
-                <td>{{ index }}</td>
-                <td>{{ ticker.created_at.format_date() }}</td>
-                <td>{{ ticker.symbol }}</td>
-                <td><a href="/ticker/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
-                <td>{% if let Some(buy) = ticker.buy %}{{ buy }}{% endif %}</td>
-                <td>{% if let Some(sell) = ticker.sell %}{{ sell }}{% endif %}</td>
-                <td>{% if let Some(best_bid_size) = ticker.best_bid_size %}{{ best_bid_size }}{% endif %}</td>
-                <td>{% if let Some(best_ask_size) = ticker.best_ask_size %}{{ best_ask_size }}{% endif %}</td>
-                <td>{% if let Some(change_rate) = ticker.change_rate %}{{ change_rate }}{% endif %}</td>
-                <td>{% if let Some(change_price) = ticker.change_price %}{{ change_price }}{% endif %}</td>
-                <td>{% if let Some(high) = ticker.high %}{{ high }}{% endif %}</td>
-                <td>{% if let Some(low) = ticker.low %}{{ low }}{% endif %}</td>
-                <td>{% if let Some(vol) = ticker.vol %}{{ vol }}{% endif %}</td>
-                <td>{% if let Some(vol_value) = ticker.vol_value %}{{ vol_value }}{% endif %}</td>
-                <td>{% if let Some(last) = ticker.last %}{{ last }}{% endif %}</td>
-                <td>{% if let Some(average_price) = ticker.average_price %}{{ average_price }}{% endif %}</td>
-                <td>{% if let Some(taker_fee_rate) = ticker.taker_fee_rate %}{{ taker_fee_rate }}{% endif %}</td>
-                <td>{% if let Some(maker_fee_rate) = ticker.maker_fee_rate %}{{ maker_fee_rate }}{% endif %}</td>
-                <td>{% if let Some(taker_coefficient) = ticker.taker_coefficient %}{{ taker_coefficient }}{% endif %}
-                </td>
-                <td>{% if let Some(maker_coefficient) = ticker.maker_coefficient %}{{ maker_coefficient }}{% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div style="position: fixed;
+{% block content %}
+<p><a href="/">Home</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>created_at</th>
+            <th>symbol</th>
+            <th>symbol_name</th>
+            <th>buy</th>
+            <th>sell</th>
+            <th>best_bid_size</th>
+            <th>best_ask_size</th>
+            <th>change_rate</th>
+            <th>change_price</th>
+            <th>high</th>
+            <th>low</th>
+            <th>vol</th>
+            <th>vol_value</th>
+            <th>last</th>
+            <th>average_price</th>
+            <th>taker_fee_rate</th>
+            <th>maker_fee_rate</th>
+            <th>taker_coefficient</th>
+            <th>maker_coefficient</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, ticker) in tickers %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ ticker.created_at.format_date() }}</td>
+            <td>{{ ticker.symbol }}</td>
+            <td><a href="/ticker/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
+            <td>{% if let Some(buy) = ticker.buy %}{{ buy }}{% endif %}</td>
+            <td>{% if let Some(sell) = ticker.sell %}{{ sell }}{% endif %}</td>
+            <td>{% if let Some(best_bid_size) = ticker.best_bid_size %}{{ best_bid_size }}{% endif %}</td>
+            <td>{% if let Some(best_ask_size) = ticker.best_ask_size %}{{ best_ask_size }}{% endif %}</td>
+            <td>{% if let Some(change_rate) = ticker.change_rate %}{{ change_rate }}{% endif %}</td>
+            <td>{% if let Some(change_price) = ticker.change_price %}{{ change_price }}{% endif %}</td>
+            <td>{% if let Some(high) = ticker.high %}{{ high }}{% endif %}</td>
+            <td>{% if let Some(low) = ticker.low %}{{ low }}{% endif %}</td>
+            <td>{% if let Some(vol) = ticker.vol %}{{ vol }}{% endif %}</td>
+            <td>{% if let Some(vol_value) = ticker.vol_value %}{{ vol_value }}{% endif %}</td>
+            <td>{% if let Some(last) = ticker.last %}{{ last }}{% endif %}</td>
+            <td>{% if let Some(average_price) = ticker.average_price %}{{ average_price }}{% endif %}</td>
+            <td>{% if let Some(taker_fee_rate) = ticker.taker_fee_rate %}{{ taker_fee_rate }}{% endif %}</td>
+            <td>{% if let Some(maker_fee_rate) = ticker.maker_fee_rate %}{{ maker_fee_rate }}{% endif %}</td>
+            <td>{% if let Some(taker_coefficient) = ticker.taker_coefficient %}{{ taker_coefficient }}{% endif %}
+            </td>
+            <td>{% if let Some(maker_coefficient) = ticker.maker_coefficient %}{{ maker_coefficient }}{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div style="position: fixed;
                 bottom: 10px;
                 right: 10px;
                 background: rgba(0,0,0,0.7);
@@ -74,6 +67,4 @@
                 border-radius: 4px;
                 font-size: 12px;
                 z-index: 1000;">{{ elapsed_ms }} ms</div>
-</body>
-
-</html>
+{% endblock %}
