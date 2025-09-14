@@ -1,8 +1,7 @@
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpServer, middleware, web};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-
 mod handlers;
 
 #[actix_web::main]
@@ -22,6 +21,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
+            .wrap(middleware::Compress::default())
             .route("/", web::get().to(handlers::index))
             .route("/tickers", web::get().to(handlers::tickers))
             .route("/ticker/{ticker}", web::get().to(handlers::ticker))
