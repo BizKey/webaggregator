@@ -153,7 +153,7 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let all_currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
+    let all_currencies = sqlx::query_as::<_, Currency>("SELECT DISTINCT ON (currency) created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency ORDER BY currency, created_at DESC")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
