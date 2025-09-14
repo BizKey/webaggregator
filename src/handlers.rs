@@ -103,8 +103,15 @@ struct SymbolsTemplate {
 
 #[derive(Template)]
 #[template(path = "currencies.html")]
-struct CurrencyTemplate {
+struct CurrenciesTemplate {
     currencies: Vec<(usize, Currency)>,
+    elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "currency.html")]
+struct CurrencyTemplate {
+    current_currency: Vec<(usize, Currency)>,
+    elapsed_ms: u128,
 }
 
 #[derive(Template)]
@@ -141,6 +148,11 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 }
 
 pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all currency
+
+    // time start
+    let start = Instant::now();
+
     let all_currencies = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency")
         .fetch_all(pool.get_ref())
         .await
@@ -155,8 +167,12 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
-    let template = CurrencyTemplate {
+    // time end
+    let elapsed_ms = start.elapsed().as_millis();
+
+    let template = CurrenciesTemplate {
         currencies: currencies_with_index,
+        elapsed_ms: elapsed_ms,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
@@ -168,6 +184,10 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
 pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // one current currency
+
+    // time start
+    let start = Instant::now();
+
     let currency_name = path.into_inner();
 
     let currencies_with_one_currency_name = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency WHERE currency = $1  ORDER BY created_at DESC").bind(&currency_name)
@@ -184,8 +204,12 @@ pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
+    // time end
+    let elapsed_ms = start.elapsed().as_millis();
+
     let template = CurrencyTemplate {
-        currencies: currencies_with_index,
+        current_currency: currencies_with_index,
+        elapsed_ms: elapsed_ms,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()

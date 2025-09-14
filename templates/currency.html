@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Currencies{% endblock %}
+{% block title %}Currency{% endblock %}
 
 {% block content %}
-<p><a href="/">Home</a></p>
+<p><a href="/currencies">Currency</a></p>
 <table border="1">
     <thead>
         <tr>
@@ -20,7 +20,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for (index, currency) in currencies %}
+        {% for (index, currency) in current_currency %}
         <tr>
             <td>{{ index }}</td>
             <td>{{ currency.created_at.format_date() }}</td>
