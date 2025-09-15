@@ -34,6 +34,7 @@ async fn main() -> std::io::Result<()> {
             // Working with symbols
             .route("/symbols", web::get().to(handlers::symbols))
             .route("/symbol/{symbol}", web::get().to(handlers::symbol))
+            // System links
             .route("/static/style.css", web::get().to(handlers::serve_css))
             .route("/favicon.png", web::get().to(handlers::favicon))
     })
