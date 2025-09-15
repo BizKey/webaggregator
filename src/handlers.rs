@@ -55,7 +55,7 @@ pub struct Symbol {
     pub quote_increment: String,
     pub price_increment: String,
     pub price_limit_rate: String,
-    pub min_funds: String,
+    pub min_funds: Option<String>,
     pub is_margin_enabled: bool,
     pub enable_trading: bool,
     pub fee_category: i16,
