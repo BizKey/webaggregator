@@ -16,7 +16,7 @@ impl DateTimeFormat for DateTime<Utc> {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Ticker {
     pub created_at: DateTime<Utc>,
     pub symbol: String,
@@ -93,11 +93,18 @@ struct TickersTemplate {
 #[template(path = "ticker.html")]
 struct TickerTemplate {
     tickers: Vec<(usize, Ticker)>,
+    chart_labels: Vec<String>,
+    chart_series: Vec<f64>,
     elapsed_ms: u128,
 }
 #[derive(Template)]
 #[template(path = "symbols.html")]
 struct SymbolsTemplate {
+    symbols: Vec<Symbol>,
+}
+#[derive(Template)]
+#[template(path = "symbol.html")]
+struct SymbolTemplate {
     symbols: Vec<Symbol>,
 }
 
@@ -139,6 +146,24 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         })?;
 
     let template = SymbolsTemplate { symbols };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn symbol(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    let symbols = sqlx::query_as::<_, Symbol>("SELECT created_at FROM Symbol")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let template = SymbolTemplate { symbols };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
@@ -235,6 +260,7 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         })?;
 
     let tickers_with_index: Vec<(usize, Ticker)> = tickers_with_one_symbol_name
+        .clone()
         .into_iter()
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
@@ -243,9 +269,23 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     // time end
     let elapsed_ms = start.elapsed().as_millis();
 
+    let chart_labels: Vec<String> = tickers_with_one_symbol_name
+        .clone()
+        .iter()
+        .map(|t| t.created_at.format("%H:%M:%S").to_string())
+        .collect();
+
+    let chart_series: Vec<f64> = tickers_with_one_symbol_name
+        .clone()
+        .iter()
+        .filter_map(|t| t.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
+        .collect();
+
     let template = TickerTemplate {
         tickers: tickers_with_index,
         elapsed_ms: elapsed_ms,
+        chart_labels: chart_labels,
+        chart_series: chart_series,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()

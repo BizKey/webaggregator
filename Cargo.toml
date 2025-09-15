@@ -8,6 +8,8 @@ actix-web = "4.11"
 sqlx = { version = "0.8.6", features = ["postgres", "runtime-tokio", "chrono"] }
 serde = { version = "1.0.219", features = ["derive"] }
 tokio = { version = "1.47.1", features = ["full"] }
-askama = "0.14"
+askama = { version = "0.14", features = ["serde_json"]}
 dotenv = "0.15"
 chrono = { version = "0.4.41", features = ["serde"]  }
+log = "0.4.28"
+env_logger = "0.11.8"
