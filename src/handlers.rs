@@ -58,7 +58,7 @@ pub struct Symbol {
     pub min_funds: String,
     pub is_margin_enabled: bool,
     pub enable_trading: bool,
-    pub fee_category: i64,
+    pub fee_category: i16,
     pub maker_fee_coefficient: String,
     pub taker_fee_coefficient: String,
     pub st: bool,
