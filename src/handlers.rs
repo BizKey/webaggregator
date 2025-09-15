@@ -100,6 +100,11 @@ struct TickerTemplate {
 struct SymbolsTemplate {
     symbols: Vec<Symbol>,
 }
+#[derive(Template)]
+#[template(path = "symbol.html")]
+struct SymbolTemplate {
+    symbols: Vec<Symbol>,
+}
 
 #[derive(Template)]
 #[template(path = "currencies.html")]
@@ -139,6 +144,24 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         })?;
 
     let template = SymbolsTemplate { symbols };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn symbol(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    let symbols = sqlx::query_as::<_, Symbol>("SELECT created_at FROM Symbol")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let template = SymbolTemplate { symbols };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")

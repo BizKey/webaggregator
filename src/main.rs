@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
             .route("/currencies", web::get().to(handlers::currencies))
             .route("/currency/{currency}", web::get().to(handlers::currency))
             .route("/symbols", web::get().to(handlers::symbols))
+            .route("/symbol/{symbol}", web::get().to(handlers::symbol))
             .route("/static/style.css", web::get().to(handlers::serve_css))
             .route("/favicon.png", web::get().to(handlers::favicon))
     })
