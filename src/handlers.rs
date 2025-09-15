@@ -94,7 +94,7 @@ struct TickersTemplate {
 struct TickerTemplate {
     tickers: Vec<(usize, Ticker)>,
     chart_labels: Vec<String>,
-    // pub chart_series: Vec<f64>,
+    chart_series: Vec<f64>,
     elapsed_ms: u128,
 }
 #[derive(Template)]
@@ -275,16 +275,17 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         .map(|t| t.created_at.format("%H:%M:%S").to_string())
         .collect();
 
-    // let chart_series: Vec<f64> = &tickers_with_one_symbol_name
-    //     .iter()
-    //     .filter_map(|t| t.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
-    //     .collect();
+    let chart_series: Vec<f64> = tickers_with_one_symbol_name
+        .clone()
+        .iter()
+        .filter_map(|t| t.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
+        .collect();
 
     let template = TickerTemplate {
         tickers: tickers_with_index,
         elapsed_ms: elapsed_ms,
         chart_labels: chart_labels,
-        // chart_series: chart_series,
+        chart_series: chart_series,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
