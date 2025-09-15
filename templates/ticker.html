@@ -10,7 +10,7 @@
 
 <script>
   new Chartist.Line('#my-chart', {
-   labels: {{ chart_labels | json }},
+   labels: {{ chart_labels | json | safe }},
     series: []
   }, {
     fullWidth: false,
