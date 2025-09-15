@@ -5,6 +5,21 @@
 
 {% block content %}
 <p><a href="/tickers">Tickers</a></p>
+
+<div id="my-chart"></div>
+
+<script>
+  new Chartist.Line('#my-chart', {
+   labels: {{ chart_labels | json }},
+    series: []
+  }, {
+    fullWidth: false,
+    chartPadding: {
+      right: 40
+    }
+  });
+</script>
+
 <table border="1" style="overflow-x: auto;">
     <thead>
         <tr>
