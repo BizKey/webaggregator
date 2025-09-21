@@ -38,7 +38,7 @@ async fn main() -> std::io::Result<()> {
             .route("/static/style.css", web::get().to(handlers::serve_css))
             .route("/favicon.png", web::get().to(handlers::favicon))
     })
-    .bind("0.0.0.0:8080")?
+    .bind("0.0.0.0:80")?
     .run()
     .await
 }

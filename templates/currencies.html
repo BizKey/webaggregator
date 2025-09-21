@@ -28,8 +28,15 @@
             <td>{{ currency.name }}</td>
             <td>{{ currency.full_name }}</td>
             <td>{{ currency.precision }}</td>
-            <td>{% if let Some(confirms) = currency.confirms %}{{ confirms }}{% endif %}</td>
-            <td>{% if let Some(contract_address) = currency.contract_address %}{{ contract_address }}{% endif %}
+            <td>
+                {% if let Some(confirms) = currency.confirms %}
+                {{ confirms }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(contract_address) = currency.contract_address %}
+                {{ contract_address }}
+                {% endif %}
             </td>
             <td>{{ currency.is_margin_enabled }}</td>
             <td>{{ currency.is_margin_enabled }}</td>
