@@ -11,9 +11,7 @@
 <script>
   new Chartist.Line('#my-chart', {
     labels: {{ chart_labels | json | safe }},
-    series: [
-    {{ chart_series | json | safe }}
-  ]
+    series: [{{ chart_series | json | safe }}]
   }, {
       fullWidth: false,
       chartPadding: {
@@ -22,7 +20,7 @@
     });
 </script>
 
-<table border="1" style="overflow-x: auto;">
+<table border="1">
   <thead>
     <tr>
       <th>№</th>

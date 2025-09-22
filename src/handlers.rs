@@ -192,12 +192,9 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
-    // time end
-    let elapsed_ms = start.elapsed().as_millis();
-
     let template = CurrenciesTemplate {
         currencies: currencies_with_index,
-        elapsed_ms: elapsed_ms,
+        elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
@@ -229,12 +226,9 @@ pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
-    // time end
-    let elapsed_ms = start.elapsed().as_millis();
-
     let template = CurrencyTemplate {
         current_currency: currencies_with_index,
-        elapsed_ms: elapsed_ms,
+        elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
@@ -278,12 +272,9 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         .filter_map(|t| t.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
         .collect();
 
-    // time end
-    let elapsed_ms = start.elapsed().as_millis();
-
     let template: TickerTemplate = TickerTemplate {
         tickers: tickers_with_index,
-        elapsed_ms: elapsed_ms,
+        elapsed_ms: start.elapsed().as_millis(),
         chart_labels: chart_labels,
         chart_series: chart_series,
     };
@@ -315,12 +306,9 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
-    // time end
-    let elapsed_ms = start.elapsed().as_millis();
-
     let template = TickersTemplate {
         tickers: tickers_with_index,
-        elapsed_ms: elapsed_ms,
+        elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
