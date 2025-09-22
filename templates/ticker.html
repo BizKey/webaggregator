@@ -11,9 +11,7 @@
 <script>
   new Chartist.Line('#my-chart', {
     labels: {{ chart_labels | json | safe }},
-    series: [
-    {{ chart_series | json | safe }}
-  ]
+    series: [{{ chart_series | json | safe }}]
   }, {
       fullWidth: false,
       chartPadding: {
@@ -22,7 +20,7 @@
     });
 </script>
 
-<table border="1" style="overflow-x: auto;">
+<table border="1">
   <thead>
     <tr>
       <th>№</th>
@@ -138,13 +136,5 @@
     {% endfor %}
   </tbody>
 </table>
-<div style="position: fixed;
-                bottom: 10px;
-                right: 10px;
-                background: rgba(0,0,0,0.7);
-                color: white;
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 12px;
-                z-index: 1000;">{{ elapsed_ms }} ms</div>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
 {% endblock %}

@@ -4,18 +4,18 @@
 
 {% block content %}
 <p><a href="/symbols">Symbols</a></p>
-<table border="1" style="overflow-x: auto;">
-        <thead>
-            <tr>
-                <th>created_at</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for symbol in symbols %}
-            <tr>
-                <td>{{ symbol.created_at }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table border="1">
+    <thead>
+        <tr>
+            <th>created_at</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for symbol in symbols %}
+        <tr>
+            <td>{{ symbol.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
