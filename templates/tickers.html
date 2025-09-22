@@ -38,70 +38,70 @@
             <td><a href="/ticker/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
             <td>
                 {% if let Some(buy) = ticker.buy %}
-                {{ buy }}
+                    {{ buy }}
                 {% endif %}
             </td>
             <td>
                 {% if let Some(sell) = ticker.sell %}
-                {{ sell }}
+                    {{ sell }}
                 {% endif %}
             </td>
             <td>
                 {% if let Some(best_bid_size) = ticker.best_bid_size %}
-                {{ best_bid_size }}
+                    {{ best_bid_size }}
                 {% endif %}</td>
             <td>
                 {% if let Some(best_ask_size) = ticker.best_ask_size %}
-                {{ best_ask_size }}
+                    {{ best_ask_size }}
                 {% endif %}</td>
             <td>
                 {% if let Some(change_rate) = ticker.change_rate %}
-                {{ change_rate }}
+                    {{ change_rate }}
                 {% endif %}</td>
             <td>
                 {% if let Some(change_price) = ticker.change_price %}
-                {{ change_price }}
+                    {{ change_price }}
                 {% endif %}</td>
             <td>
                 {% if let Some(high) = ticker.high %}
-                {{ high }}
+                    {{ high }}
                 {% endif %}</td>
             <td>
                 {% if let Some(low) = ticker.low %}
-                {{ low }}
+                    {{ low }}
                 {% endif %}</td>
             <td>
                 {% if let Some(vol) = ticker.vol %}
-                {{ vol }}
+                    {{ vol }}
                 {% endif %}</td>
             <td>
                 {% if let Some(vol_value) = ticker.vol_value %}
-                {{ vol_value }}
+                    {{ vol_value }}
                 {% endif %}</td>
             <td>
                 {% if let Some(last) = ticker.last %}
-                {{ last }}
+                    {{ last }}
                 {% endif %}</td>
             <td>
                 {% if let Some(average_price) = ticker.average_price %}
-                {{ average_price }}
+                    {{ average_price }}
                 {% endif %}</td>
             <td>
                 {% if let Some(taker_fee_rate) = ticker.taker_fee_rate %}
-                {{ taker_fee_rate }}
+                    {{ taker_fee_rate }}
                 {% endif %}</td>
             <td>
                 {% if let Some(maker_fee_rate) = ticker.maker_fee_rate %}
-                {{ maker_fee_rate }}
+                    {{ maker_fee_rate }}
                 {% endif %}</td>
             <td>
                 {% if let Some(taker_coefficient) = ticker.taker_coefficient %}
-                {{ taker_coefficient }}
+                    {{ taker_coefficient }}
                 {% endif %}
             </td>
             <td>
                 {% if let Some(maker_coefficient) = ticker.maker_coefficient %}
-                {{ maker_coefficient }}
+                    {{ maker_coefficient }}
                 {% endif %}
             </td>
         </tr>
