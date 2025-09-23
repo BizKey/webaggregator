@@ -53,14 +53,18 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 pub async fn symbol(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
+    let symbol_name = path.into_inner();
 
-    let symbols = sqlx::query_as::<_, Symbol>("SELECT created_at FROM Symbol")
-        .fetch_all(pool.get_ref())
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
-        })?;
+    let symbols = sqlx::query_as::<_, Symbol>(
+        "SELECT created_at, symbol, name, base_currency, quote_currency, fee_currency, market, base_min_size, quote_min_size, base_max_size, quote_max_size, base_increment, quote_increment, price_increment, price_limit_rate, min_funds, is_margin_enabled, enable_trading, fee_category, maker_fee_coefficient, taker_fee_coefficient, st, callauction_is_enabled, callauction_price_floor, callauction_price_ceiling, callauction_first_stage_start_time, callauction_second_stage_start_time, callauction_third_stage_start_time, trading_start_time FROM Symbol WHERE symbol = $1 Order BY created_at DESC",
+    )
+    .bind(&symbol_name)
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
 
     let template = SymbolTemplate {
         symbols: symbols,
@@ -106,7 +110,7 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     }
 }
 
-pub async fn lend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn lends(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // all lend
 
     // time start
@@ -137,8 +141,40 @@ pub async fn lend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
     }
 }
+pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all lend
 
-pub async fn borrow(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // time start
+    let start = Instant::now();
+    let currency_name = path.into_inner();
+
+    let all_lend = sqlx::query_as::<_, Lend>("SELECT DISTINCT ON (currency) created_at, currency, purchase_enable, redeem_enable, increment, min_purchase_size, max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, max_interest_rate, auto_purchase_enable FROM Lend WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&currency_name)
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let lend_with_index: Vec<(usize, Lend)> = all_lend
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = LendTemplate {
+        lends: lend_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn borrows(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // all borrow
 
     // time start
@@ -172,6 +208,40 @@ pub async fn borrow(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     }
 }
 
+pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all borrow
+
+    // time start
+    let start = Instant::now();
+    let currency_name = path.into_inner();
+
+    let all_borrow = sqlx::query_as::<_, Borrow>(
+        "SELECT DISTINCT ON (currency) created_at, currency, hourly_borrow_rate, annualized_borrow_rate FROM Borrow WHERE currency_name = $1 ORDER BY currency, created_at DESC"    ).bind(&currency_name)
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+    let borrow_with_index: Vec<(usize, Borrow)> = all_borrow
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = BorrowTemplate {
+        borrows: borrow_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
 pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // one current currency
 
@@ -180,7 +250,7 @@ pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
 
     let currency_name = path.into_inner();
 
-    let currencies_with_one_currency_name = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency WHERE currency = $1  ORDER BY created_at DESC").bind(&currency_name)
+    let currencies_with_one_currency_name = sqlx::query_as::<_, Currency>("SELECT created_at, currency, name, full_name, precision, confirms, contract_address, is_margin_enabled, is_debit_enabled FROM Currency WHERE currency = $1 ORDER BY created_at DESC").bind(&currency_name)
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -211,9 +281,9 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     // time start
     let start = Instant::now();
-    let symbol_name = path.into_inner();
+    let ticker_name = path.into_inner();
 
-    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1  ORDER BY created_at DESC").bind(&symbol_name)
+    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1 ORDER BY created_at DESC").bind(&ticker_name)
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -231,12 +301,14 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let chart_labels: Vec<String> = tickers_with_one_symbol_name
         .clone()
         .iter()
+        .rev()
         .map(|t| t.created_at.format("%H:%M:%S").to_string())
         .collect();
 
     let chart_series: Vec<f64> = tickers_with_one_symbol_name
         .clone()
         .iter()
+        .rev()
         .filter_map(|t| t.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
         .collect();
 

@@ -37,10 +37,12 @@ async fn main() -> std::io::Result<()> {
                             .route("/symbol/{symbol}", web::get().to(handlers::symbol))
                             //
                             // Working with lend
-                            .route("/lend", web::get().to(handlers::lend))
+                            .route("/lend", web::get().to(handlers::lends))
+                            .route("/lend/{currency}", web::get().to(handlers::lend))
                             //
                             // Working with borrow
-                            .route("/borrow", web::get().to(handlers::borrow))
+                            .route("/borrow", web::get().to(handlers::borrows))
+                            .route("/borrow/{currency}", web::get().to(handlers::borrow))
                             //
                             // System links
                             .route("/static/style.css", web::get().to(handlers::serve_css))
