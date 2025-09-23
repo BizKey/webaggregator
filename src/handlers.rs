@@ -148,7 +148,7 @@ pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<Ht
     let start = Instant::now();
     let currency_name = path.into_inner();
 
-    let all_lend = sqlx::query_as::<_, Lend>("SELECT DISTINCT ON (currency) created_at, currency, purchase_enable, redeem_enable, increment, min_purchase_size, max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, max_interest_rate, auto_purchase_enable FROM Lend WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&currency_name)
+    let all_lend = sqlx::query_as::<_, Lend>("SELECT created_at, currency, purchase_enable, redeem_enable, increment, min_purchase_size, max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, max_interest_rate, auto_purchase_enable FROM Lend WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&currency_name)
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -216,7 +216,7 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let currency_name = path.into_inner();
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
-        "SELECT DISTINCT ON (currency) created_at, currency, hourly_borrow_rate, annualized_borrow_rate FROM Borrow WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&currency_name)
+        "SELECT created_at, currency, hourly_borrow_rate, annualized_borrow_rate FROM Borrow WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&currency_name)
     .fetch_all(pool.get_ref())
     .await
     .map_err(|e| {
