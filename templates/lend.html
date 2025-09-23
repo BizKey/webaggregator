@@ -26,7 +26,7 @@
         {% for (index, lend) in lends %}
         <tr>
             <td>{{ index }}</td>
-            <td>{{ lend.created_at }}</td>
+            <td>{{ lend.created_at.format_date() }}</td>
             <td>{{ lend.currency }}</td>
             <td>{{ lend.purchase_enable }}</td>
             <td>{{ lend.redeem_enable }}</td>
