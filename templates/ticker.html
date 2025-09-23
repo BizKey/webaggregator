@@ -10,13 +10,9 @@
 
 <script>
   new Chartist.Line('#my-chart', {
-    labels: {{ chart_labels | json | safe }},
     series: [{{ chart_series | json | safe }}]
   }, {
-      fullWidth: false,
-      chartPadding: {
-        right: 40
-      }
+      fullWidth: false
     });
 </script>
 

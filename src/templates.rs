@@ -22,7 +22,6 @@ pub struct TickersTemplate {
 #[template(path = "ticker.html")]
 pub struct TickerTemplate {
     pub tickers: Vec<(usize, Ticker)>,
-    pub chart_labels: Vec<String>,
     pub chart_series: Vec<f64>,
     pub elapsed_ms: u128,
 }
