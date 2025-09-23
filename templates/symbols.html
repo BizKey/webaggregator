@@ -45,6 +45,7 @@
             <td>{{ index }}</td>
             <td>{{ symbol.created_at.format_date() }}</td>
             <td>{{ symbol.symbol }}</td>
+            <td><a href="/currency/{{ symbol.symbol }}">{{ symbol.symbol }}</a></td>
             <td>{{ symbol.name }}</td>
             <td>{{ symbol.base_currency }}</td>
             <td>{{ symbol.quote_currency }}</td>

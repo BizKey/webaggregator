@@ -19,7 +19,7 @@
         <tr>
             <td>{{ index }}</td>
             <td>{{ borrow.created_at.format_date() }}</td>
-            <td>{{ borrow.currency }}</td>
+            <td><a href="/borrow/{{ borrow.currency }}">{{ borrow.currency }}</a></td>
             <td>{{ borrow.hourly_borrow_rate }}</td>
             <td>{{ borrow.annualized_borrow_rate }}</td>
         </tr>

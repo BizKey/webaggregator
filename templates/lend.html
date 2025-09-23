@@ -27,7 +27,7 @@
         <tr>
             <td>{{ index }}</td>
             <td>{{ lend.created_at.format_date() }}</td>
-            <td>{{ lend.currency }}</td>
+            <td><a href="/lend/{{ lend.currency }}">{{ lend.currency }}</a></td>
             <td>{{ lend.purchase_enable }}</td>
             <td>{{ lend.redeem_enable }}</td>
             <td>{{ lend.increment }}</td>

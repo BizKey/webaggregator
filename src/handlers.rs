@@ -298,13 +298,6 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
-    let chart_labels: Vec<String> = tickers_with_one_symbol_name
-        .clone()
-        .iter()
-        .rev()
-        .map(|t| t.created_at.format("%H:%M:%S").to_string())
-        .collect();
-
     let chart_series: Vec<f64> = tickers_with_one_symbol_name
         .clone()
         .iter()
@@ -315,7 +308,6 @@ pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let template: TickerTemplate = TickerTemplate {
         tickers: tickers_with_index,
         elapsed_ms: start.elapsed().as_millis(),
-        chart_labels: chart_labels,
         chart_series: chart_series,
     };
     match template.render() {
