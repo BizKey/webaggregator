@@ -32,8 +32,14 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
+    let symbols_with_index: Vec<(usize, Symbol)> = symbols
+        .into_iter()
+        .enumerate()
+        .map(|(i, symbol)| (i + 1, symbol))
+        .collect();
+
     let template = SymbolsTemplate {
-        symbols: symbols,
+        symbols: symbols_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {

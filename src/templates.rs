@@ -29,7 +29,7 @@ pub struct TickerTemplate {
 #[derive(Template)]
 #[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
-    pub symbols: Vec<Symbol>,
+    pub symbols: Vec<(usize, Symbol)>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
