@@ -7,6 +7,7 @@
 <table border="1">
     <thead>
         <tr>
+            <th>№</th>
             <th>created_at</th>
             <th>symbol</th>
             <th>name</th>
@@ -39,8 +40,9 @@
         </tr>
     </thead>
     <tbody>
-        {% for symbol in symbols %}
+        {% for (index, symbol) in symbols %}
         <tr>
+            <td>{{ index }}</td>
             <td>{{ symbol.created_at.format_date() }}</td>
             <td>{{ symbol.symbol }}</td>
             <td>{{ symbol.name }}</td>
