@@ -1,7 +1,7 @@
 use crate::models::{Borrow, Currency, Lend, Symbol, Ticker};
 use crate::templates::{
-    BorrowTemplate, CurrenciesTemplate, CurrencyTemplate, IndexTemplate, LendTemplate,
-    SymbolTemplate, SymbolsTemplate, TickerTemplate, TickersTemplate,
+    BorrowTemplate, BorrowsTemplate, CurrenciesTemplate, CurrencyTemplate, IndexTemplate,
+    LendTemplate, LendsTemplate, SymbolTemplate, SymbolsTemplate, TickerTemplate, TickersTemplate,
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -130,7 +130,7 @@ pub async fn lends(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
-    let template = LendTemplate {
+    let template = LendsTemplate {
         lends: lend_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
@@ -196,7 +196,7 @@ pub async fn borrows(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
-    let template = BorrowTemplate {
+    let template = BorrowsTemplate {
         borrows: borrow_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
@@ -216,7 +216,7 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let currency_name = path.into_inner();
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
-        "SELECT DISTINCT ON (currency) created_at, currency, hourly_borrow_rate, annualized_borrow_rate FROM Borrow WHERE currency_name = $1 ORDER BY currency, created_at DESC"    ).bind(&currency_name)
+        "SELECT DISTINCT ON (currency) created_at, currency, hourly_borrow_rate, annualized_borrow_rate FROM Borrow WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&currency_name)
     .fetch_all(pool.get_ref())
     .await
     .map_err(|e| {
