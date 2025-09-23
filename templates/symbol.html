@@ -13,9 +13,10 @@
     <tbody>
         {% for symbol in symbols %}
         <tr>
-            <td>{{ symbol.created_at }}</td>
+            <td>{{ symbol.created_at.format_date() }}</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
 {% endblock %}
