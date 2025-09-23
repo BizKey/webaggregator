@@ -45,6 +45,12 @@ pub struct CurrenciesTemplate {
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
+#[template(path = "borrows.html")]
+pub struct BorrowsTemplate {
+    pub borrows: Vec<(usize, Borrow)>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
 #[template(path = "borrow.html")]
 pub struct BorrowTemplate {
     pub borrows: Vec<(usize, Borrow)>,
@@ -53,6 +59,12 @@ pub struct BorrowTemplate {
 #[derive(Template)]
 #[template(path = "lend.html")]
 pub struct LendTemplate {
+    pub lends: Vec<(usize, Lend)>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "lends.html")]
+pub struct LendsTemplate {
     pub lends: Vec<(usize, Lend)>,
     pub elapsed_ms: u128,
 }
