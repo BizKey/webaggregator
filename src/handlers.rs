@@ -106,7 +106,7 @@ pub async fn lend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let all_lend = sqlx::query_as::<_, Lend>("SELECT DISTINCT ON (currency) created_at, purchase_enable, redeem_enable, increment, min_purchase_size, max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, max_interest_rate, auto_purchase_enable FROM Lend ORDER BY currency, created_at DESC")
+    let all_lend = sqlx::query_as::<_, Lend>("SELECT DISTINCT ON (currency) created_at, currency, purchase_enable, redeem_enable, increment, min_purchase_size, max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, max_interest_rate, auto_purchase_enable FROM Lend ORDER BY currency, created_at DESC")
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -139,7 +139,7 @@ pub async fn borrow(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
-        "SELECT DISTINCT ON (currency) created_at FROM Borrow ORDER BY currency, created_at DESC",
+        "SELECT DISTINCT ON (currency) created_at, currency, hourly_borrow_rate, annualized_borrow_rate  FROM Borrow ORDER BY currency, created_at DESC",
     )
     .fetch_all(pool.get_ref())
     .await
