@@ -30,11 +30,13 @@ pub struct TickerTemplate {
 #[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<Symbol>,
+    pub elapsed_ms: u128,
 }
 #[derive(Template)]
 #[template(path = "symbol.html")]
 pub struct SymbolTemplate {
     pub symbols: Vec<Symbol>,
+    pub elapsed_ms: u128,
 }
 
 #[derive(Template)]
