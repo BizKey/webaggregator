@@ -1,129 +1,13 @@
+use crate::models::{Borrow, Currency, Lend, Symbol, Ticker};
+use crate::templates::{
+    BorrowTemplate, CurrenciesTemplate, CurrencyTemplate, IndexTemplate, LendTemplate,
+    SymbolTemplate, SymbolsTemplate, TickerTemplate, TickersTemplate,
+};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
+
 use sqlx::PgPool;
 use std::time::Instant;
-
-pub trait DateTimeFormat {
-    fn format_date(&self) -> String;
-}
-
-impl DateTimeFormat for DateTime<Utc> {
-    fn format_date(&self) -> String {
-        self.format("%Y-%m-%d %H:%M:%S").to_string()
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
-pub struct Ticker {
-    pub created_at: DateTime<Utc>,
-    pub symbol: String,
-    pub symbol_name: String,
-    pub buy: Option<String>,
-    pub best_bid_size: Option<String>,
-    pub sell: Option<String>,
-    pub best_ask_size: Option<String>,
-    pub change_rate: Option<String>,
-    pub change_price: Option<String>,
-    pub high: Option<String>,
-    pub low: Option<String>,
-    pub vol: Option<String>,
-    pub vol_value: Option<String>,
-    pub last: Option<String>,
-    pub average_price: Option<String>,
-    pub taker_fee_rate: Option<String>,
-    pub maker_fee_rate: Option<String>,
-    pub taker_coefficient: Option<String>,
-    pub maker_coefficient: Option<String>,
-}
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Symbol {
-    pub created_at: DateTime<Utc>,
-    pub symbol: String,
-    pub name: String,
-    pub base_currency: String,
-    pub quote_currency: String,
-    pub fee_currency: String,
-    pub market: String,
-    pub base_min_size: String,
-    pub quote_min_size: String,
-    pub base_max_size: String,
-    pub quote_max_size: String,
-    pub base_increment: String,
-    pub quote_increment: String,
-    pub price_increment: String,
-    pub price_limit_rate: String,
-    pub min_funds: Option<String>,
-    pub is_margin_enabled: bool,
-    pub enable_trading: bool,
-    pub fee_category: i16,
-    pub maker_fee_coefficient: String,
-    pub taker_fee_coefficient: String,
-    pub st: bool,
-    pub callauction_is_enabled: bool,
-    pub callauction_price_floor: Option<String>,
-    pub callauction_price_ceiling: Option<String>,
-    pub callauction_first_stage_start_time: Option<i64>,
-    pub callauction_second_stage_start_time: Option<i64>,
-    pub callauction_third_stage_start_time: Option<i64>,
-    pub trading_start_time: Option<i64>,
-}
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Currency {
-    pub created_at: DateTime<Utc>,
-    pub currency: String,
-    pub name: String,
-    pub full_name: String,
-    pub precision: i16,
-    pub confirms: Option<i16>,
-    pub contract_address: Option<String>,
-    pub is_margin_enabled: bool,
-    pub is_debit_enabled: bool,
-}
-
-#[derive(Template)]
-#[template(path = "tickers.html")]
-struct TickersTemplate {
-    tickers: Vec<(usize, Ticker)>,
-    elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "ticker.html")]
-struct TickerTemplate {
-    tickers: Vec<(usize, Ticker)>,
-    chart_labels: Vec<String>,
-    chart_series: Vec<f64>,
-    elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "symbols.html")]
-struct SymbolsTemplate {
-    symbols: Vec<Symbol>,
-}
-#[derive(Template)]
-#[template(path = "symbol.html")]
-struct SymbolTemplate {
-    symbols: Vec<Symbol>,
-}
-
-#[derive(Template)]
-#[template(path = "currencies.html")]
-struct CurrenciesTemplate {
-    currencies: Vec<(usize, Currency)>,
-    elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "currency.html")]
-struct CurrencyTemplate {
-    current_currency: Vec<(usize, Currency)>,
-    elapsed_ms: u128,
-}
-
-#[derive(Template)]
-#[template(path = "index.html")]
-struct IndexTemplate {}
 
 pub async fn index() -> HttpResponse {
     let template = IndexTemplate {};
@@ -194,6 +78,72 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let template = CurrenciesTemplate {
         currencies: currencies_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn lend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all lend
+
+    // time start
+    let start = Instant::now();
+
+    let all_lend = sqlx::query_as::<_, Lend>("SELECT DISTINCT ON (currency) created_at, purchase_enable, redeem_enable, increment, min_purchase_size, max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, max_interest_rate, auto_purchase_enable FROM Lend ORDER BY currency, created_at DESC")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let lend_with_index: Vec<(usize, Lend)> = all_lend
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = LendTemplate {
+        lends: lend_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn borrow(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all borrow
+
+    // time start
+    let start = Instant::now();
+
+    let all_borrow = sqlx::query_as::<_, Borrow>(
+        "SELECT DISTINCT ON (currency) created_at FROM Borrow ORDER BY currency, created_at DESC",
+    )
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+    let borrow_with_index: Vec<(usize, Borrow)> = all_borrow
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = BorrowTemplate {
+        borrows: borrow_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {

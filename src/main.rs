@@ -3,7 +3,8 @@ use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 mod handlers;
-
+mod models;
+mod templates;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
@@ -22,15 +23,25 @@ async fn main() -> std::io::Result<()> {
                             .app_data(web::Data::new(pool.clone()))
                             .wrap(middleware::Compress::default())
                             .route("/", web::get().to(handlers::index))
+                            //
                             // Working with tickers
                             .route("/tickers", web::get().to(handlers::tickers))
                             .route("/ticker/{ticker}", web::get().to(handlers::ticker))
+                            //
                             // Working with currencies
                             .route("/currencies", web::get().to(handlers::currencies))
                             .route("/currency/{currency}", web::get().to(handlers::currency))
+                            //
                             // Working with symbols
                             .route("/symbols", web::get().to(handlers::symbols))
                             .route("/symbol/{symbol}", web::get().to(handlers::symbol))
+                            //
+                            // Working with lend
+                            .route("/lend", web::get().to(handlers::lend))
+                            //
+                            // Working with borrow
+                            .route("/borrow", web::get().to(handlers::borrow))
+                            //
                             // System links
                             .route("/static/style.css", web::get().to(handlers::serve_css))
                             .route("/favicon.png", web::get().to(handlers::favicon))

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Borrow{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>created_at</th>
+            <th>currency</th>
+            <th>hourly_borrow_rate</th>
+            <th>annualized_borrow_rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, borrow) in borrows %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ borrow.created_at }}</td>
+            <td>{{ borrow.currency }}</td>
+            <td>{{ borrow.hourly_borrow_rate }}</td>
+            <td>{{ borrow.annualized_borrow_rate }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
