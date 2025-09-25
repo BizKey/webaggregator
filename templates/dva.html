@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Tickers{% endblock %}
+
+{% block content %}
+<p><a href="/similardva">Dva</a></p>
+
+println!("=== Результаты Dollar Value Averaging (DVA) ===");
+println!("Периодов: ");
+println!("Целевой прирост за период: ${:.2}", );
+println!("Комиссия: {:.2}%", );
+println!();
+println!(
+"Общая сумма покупок: ${:.2}",
+{{ data.total_gross_spent }}
+);
+println!(
+"Общая сумма продаж: ${:.2}",
+{{ data.total_gross_received }}
+);
+println!("Чисто инвестировано (нетто): ${:.2}", {{ data.net_invested }});
+println!();
+println!(
+"Конечное количество актива: {:.4}",
+{{ data.final_asset_amount }}
+);
+println!("Конечная цена: ${:.4}", {{ data.final_price }});
+println!("Конечная стоимость: ${:.2}", {{ data.final_value }});
+println!();
+println!("Чистая прибыль/убыток: ${:.2}", {{ data.profit }});
+println!("Доходность (ROI): {:+.2}%", {{ data.roi }} * 100.0);
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

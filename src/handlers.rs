@@ -1,7 +1,8 @@
 use crate::models::{Borrow, Currency, Lend, Symbol, Ticker};
 use crate::templates::{
-    BorrowTemplate, BorrowsTemplate, CurrenciesTemplate, CurrencyTemplate, IndexTemplate,
-    LendTemplate, LendsTemplate, SymbolTemplate, SymbolsTemplate, TickerTemplate, TickersTemplate,
+    BorrowTemplate, BorrowsTemplate, CurrenciesTemplate, CurrencyTemplate, DvaResult, DvaTemplate,
+    DvasTemplate, IndexTemplate, LendTemplate, LendsTemplate, SymbolTemplate, SymbolsTemplate,
+    TickerTemplate, TickersTemplate,
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -339,6 +340,128 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .collect();
 
     let template = TickersTemplate {
+        tickers: tickers_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+fn simulate_dva(prices: &[f64], target_increment: f64, commission_rate: f64) -> DvaResult {
+    let n = prices.len();
+    let mut target_value = 0.0;
+    let mut asset_amount = 0.0;
+    let mut total_gross_spent = 0.0;
+    let mut total_gross_received = 0.0;
+
+    for (i, &price) in prices.iter().enumerate() {
+        target_value += target_increment;
+
+        let current_value = asset_amount * price;
+
+        let delta = target_value - current_value;
+
+        if delta > 0.0 {
+            let gross_amount = delta;
+            let net_amount = gross_amount / (1.0 + commission_rate);
+            let bought = net_amount / price;
+            asset_amount += bought;
+            total_gross_spent += gross_amount;
+        } else if delta < 0.0 {
+            let gross_amount = -delta;
+            let net_amount = gross_amount * (1.0 - commission_rate);
+            let sold = gross_amount / price;
+            asset_amount -= sold;
+
+            if asset_amount < 0.0 {
+                asset_amount = 0.0;
+            }
+            total_gross_received += net_amount;
+        }
+    }
+
+    let final_price = *prices.last().unwrap();
+    let final_value = asset_amount * final_price;
+    let net_invested = total_gross_spent - total_gross_received;
+    let profit = final_value - net_invested;
+    let roi = if net_invested != 0.0 {
+        profit / net_invested
+    } else {
+        0.0
+    };
+
+    DvaResult {
+        total_gross_spent,
+        total_gross_received,
+        net_invested,
+        final_asset_amount: asset_amount,
+        final_price,
+        final_value,
+        profit,
+        roi,
+    }
+}
+
+pub async fn simdva(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // time start
+    let start = Instant::now();
+    let ticker_name = path.into_inner();
+
+    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1 ORDER BY created_at DESC").bind(&ticker_name)
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let prices: Vec<f64> = tickers_with_one_symbol_name
+        .iter()
+        .filter_map(|ticker| ticker.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
+        .collect();
+
+    let target_increment = 10.0;
+    let commission_rate = 0.001;
+
+    let result = simulate_dva(&prices, target_increment, commission_rate);
+
+    let template: DvaTemplate = DvaTemplate {
+        elapsed_ms: start.elapsed().as_millis(),
+        data: result,
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn simsdva(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // test dva
+
+    // time start
+    let start = Instant::now();
+
+    let tickers = sqlx::query_as::<_, Ticker>("SELECT DISTINCT ON (symbol_name) created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker ORDER BY symbol_name, created_at DESC")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let tickers_with_index: Vec<(usize, Ticker)> = tickers
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
+
+    let template = DvasTemplate {
         tickers: tickers_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
