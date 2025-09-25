@@ -12,11 +12,35 @@ impl DateTimeFormat for DateTime<Utc> {
     }
 }
 
+#[derive(Debug)]
+pub struct DvaResult {
+    pub total_gross_spent: f64,
+    pub total_gross_received: f64,
+    pub net_invested: f64,
+    pub final_asset_amount: f64,
+    pub final_price: f64,
+    pub final_value: f64,
+    pub profit: f64,
+    pub roi: f64,
+}
+
 #[derive(Template)]
 #[template(path = "tickers.html")]
 pub struct TickersTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "dvas.html")]
+pub struct DvasTemplate {
+    pub tickers: Vec<(usize, Ticker)>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "dva.html")]
+pub struct DvaTemplate {
+    pub elapsed_ms: u128,
+    pub data: DvaResult,
 }
 #[derive(Template)]
 #[template(path = "ticker.html")]

@@ -44,6 +44,10 @@ async fn main() -> std::io::Result<()> {
                             .route("/borrow", web::get().to(handlers::borrows))
                             .route("/borrow/{currency}", web::get().to(handlers::borrow))
                             //
+                            // Similar dva
+                            .route("/similardva", web::get().to(handlers::simsdva))
+                            .route("/similardva/{ticker}", web::get().to(handlers::simdva))
+                            //
                             // System links
                             .route("/static/style.css", web::get().to(handlers::serve_css))
                             .route("/favicon.png", web::get().to(handlers::favicon))
