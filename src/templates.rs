@@ -22,6 +22,7 @@ pub struct DvaResult {
     pub final_asset_amount: String,
     pub final_price: String,
     pub final_value: String,
+    pub target_increment: String,
     pub profit: String,
     pub roi: String,
 }
