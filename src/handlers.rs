@@ -373,7 +373,7 @@ pub async fn dvatiker(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
     let target_increment = 10.0;
     let commission_rate = 0.001;
 
-    let result = simulate_dva(&prices, target_increment, commission_rate);
+    let result = simulate_dva(prices, target_increment, commission_rate);
 
     let template: DvaTemplate = DvaTemplate {
         elapsed_ms: start.elapsed().as_millis(),

@@ -1,13 +1,13 @@
 use crate::templates::DvaResult;
 
-pub fn simulate_dva(prices: &[f64], target_increment: f64, commission_rate: f64) -> DvaResult {
+pub fn simulate_dva(prices: Vec<f64>, target_increment: f64, commission_rate: f64) -> DvaResult {
     let n = prices.len();
     let mut target_value = 0.0;
     let mut asset_amount = 0.0;
     let mut total_gross_spent = 0.0;
     let mut total_gross_received = 0.0;
 
-    for (i, &price) in prices.iter().enumerate() {
+    for price in prices.iter() {
         target_value += target_increment;
 
         let current_value = asset_amount * price;
