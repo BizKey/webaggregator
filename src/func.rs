@@ -58,5 +58,6 @@ pub fn simulate_dva(prices: Vec<f64>, target_increment: f64, commission_rate: f6
         final_value: format!("{:.2}", final_value),
         profit: format!("{:.2}", profit),
         roi: format!("{:.2}", roi),
+        target_increment: format!("{:.2}", target_increment),
     }
 }
