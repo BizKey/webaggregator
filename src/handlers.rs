@@ -395,14 +395,14 @@ fn simulate_dva(prices: &[f64], target_increment: f64, commission_rate: f64) -> 
     };
 
     DvaResult {
-        total_gross_spent,
-        total_gross_received,
-        net_invested,
-        final_asset_amount: asset_amount,
-        final_price,
-        final_value,
-        profit,
-        roi,
+        total_gross_spent: format!("{:.2}", total_gross_spent),
+        total_gross_received: format!("{:.2}", total_gross_received),
+        net_invested: format!("{:.2}", net_invested),
+        final_asset_amount: format!("{:.4}", asset_amount),
+        final_price: format!("{}", final_price),
+        final_value: format!("{}", final_value),
+        profit: format!("{:.2}", profit),
+        roi: format!("{:.2}", roi),
     }
 }
 

@@ -14,14 +14,14 @@ impl DateTimeFormat for DateTime<Utc> {
 
 #[derive(Debug)]
 pub struct DvaResult {
-    pub total_gross_spent: f64,
-    pub total_gross_received: f64,
-    pub net_invested: f64,
-    pub final_asset_amount: f64,
-    pub final_price: f64,
-    pub final_value: f64,
-    pub profit: f64,
-    pub roi: f64,
+    pub total_gross_spent: String,
+    pub total_gross_received: String,
+    pub net_invested: String,
+    pub final_asset_amount: String,
+    pub final_price: String,
+    pub final_value: String,
+    pub profit: String,
+    pub roi: String,
 }
 
 // Tickers template
