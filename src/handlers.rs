@@ -1,4 +1,4 @@
-use crate::func::simulate_dva;
+use crate::func::{parse_f64_opt, simulate_dva};
 use crate::models::{Borrow, Currency, Lend, Symbol, Ticker};
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CurrenciesTemplate, CurrencyTemplate, DvaTemplate,
@@ -357,7 +357,7 @@ pub async fn dvatiker(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
     let start = Instant::now();
     let ticker_name = path.into_inner();
 
-    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1 ORDER BY created_at DESC").bind(&ticker_name)
+    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>("SELECT created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient FROM Ticker WHERE symbol_name = $1 ORDER BY created_at ASC").bind(&ticker_name)
         .fetch_all(pool.get_ref())
         .await
         .map_err(|e| {
@@ -365,13 +365,21 @@ pub async fn dvatiker(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
+    if tickers_with_one_symbol_name.is_empty() {
+        return Ok(HttpResponse::InternalServerError().body("Error template render"));
+    }
+
     let prices: Vec<f64> = tickers_with_one_symbol_name
         .iter()
-        .filter_map(|ticker| ticker.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
+        .filter_map(|ticker| parse_f64_opt(&ticker.sell))
         .collect();
 
     let target_increment = 10.0;
-    let commission_rate = 0.001;
+
+    let commission_rate = tickers_with_one_symbol_name
+        .last()
+        .and_then(|ticker| parse_f64_opt(&ticker.taker_fee_rate))
+        .unwrap_or(0.001);
 
     let result = simulate_dva(prices, target_increment, commission_rate);
 

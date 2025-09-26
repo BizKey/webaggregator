@@ -1,5 +1,9 @@
 use crate::templates::DvaResult;
 
+pub fn parse_f64_opt(s: &Option<String>) -> Option<f64> {
+    s.as_ref().and_then(|v| v.parse::<f64>().ok())
+}
+
 pub fn simulate_dva(prices: Vec<f64>, target_increment: f64, commission_rate: f64) -> DvaResult {
     let n = prices.len();
     let mut target_value = 0.0;
