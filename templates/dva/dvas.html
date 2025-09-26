@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Dva's{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>created_at</th>
+            <th>symbol_name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, ticker) in tickers %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ ticker.created_at.format_date() }}</td>
+            <td><a href="/dva/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
