@@ -395,6 +395,8 @@ fn simulate_dva(prices: &[f64], target_increment: f64, commission_rate: f64) -> 
     };
 
     DvaResult {
+        commission_rate: commission_rate,
+        periods: n,
         total_gross_spent: format!("{:.2}", total_gross_spent),
         total_gross_received: format!("{:.2}", total_gross_received),
         net_invested: format!("{:.2}", net_invested),

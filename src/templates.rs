@@ -14,6 +14,8 @@ impl DateTimeFormat for DateTime<Utc> {
 
 #[derive(Debug)]
 pub struct DvaResult {
+    pub commission_rate: f64,
+    pub periods: usize,
     pub total_gross_spent: String,
     pub total_gross_received: String,
     pub net_invested: String,

@@ -4,18 +4,39 @@
 
 {% block content %}
 <p><a href="/dva">Dva</a></p>
-
 <p>=== Результаты Dollar Value Averaging (DVA) ===</p>
-<p>Периодов:</p>
-<p>Целевой прирост за период:</p>
-<p>Комиссия:</p>
-<p>Общая сумма покупок:{{ data.total_gross_spent }}</p>
-<p>Общая сумма продаж:{{ data.total_gross_received }}</p>
-<p>Чисто инвестировано (нетто):{{ data.net_invested }}</p>
-<p>Конечное количество актива:{{ data.final_asset_amount }}</p>
-<p>Конечная цена:{{ data.final_price }}</p>
-<p>Конечная стоимость:{{ data.final_value }}</p>
-<p>Чистая прибыль/убыток:{{ data.profit }}</p>
-<p>Доходность (ROI):{{ data.roi }}</p>
+<table>
+    <thead>
+        <tr>
+            <th>Периодов</th>
+            <th>Целевой прирост за период</th>
+            <th>Комиссия</th>
+            <th>Общая сумма покупок</th>
+            <th>Общая сумма продаж</th>
+            <th>Чисто инвестировано (нетто)</th>
+            <th>Конечное количество актива</th>
+            <th>Конечная цена</th>
+            <th>Конечная стоимость</th>
+            <th>Чистая прибыль/убыток</th>
+            <th>Доходность (ROI)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ data.periods }}</td>
+            <td></td>
+            <td>{{ data.commission_rate }}</td>
+            <td>{{ data.total_gross_spent }}</td>
+            <td>{{ data.total_gross_received }}</td>
+            <td>{{ data.net_invested }}</td>
+            <td>{{ data.final_asset_amount }}</td>
+            <td>{{ data.final_price }}</td>
+            <td>{{ data.final_value }}</td>
+            <td>{{ data.profit }}</td>
+            <td>{{ data.roi }}</td>
+        </tr>
+
+    </tbody>
+</table>
 <div class="pin_time">{{ elapsed_ms }} ms</div>
 {% endblock %}
