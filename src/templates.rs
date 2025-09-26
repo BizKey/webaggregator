@@ -26,26 +26,26 @@ pub struct DvaResult {
 
 // Tickers template
 #[derive(Template)]
-#[template(path = "dvas.html")]
+#[template(path = "dva/dvas.html")]
 pub struct DvasTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
-#[template(path = "dva.html")]
+#[template(path = "dva/dva.html")]
 pub struct DvaTemplate {
     pub elapsed_ms: u128,
     pub data: DvaResult,
 }
 #[derive(Template)]
-#[template(path = "ticker.html")]
+#[template(path = "ticker/ticker.html")]
 pub struct TickerTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub chart_series: Vec<f64>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
-#[template(path = "tickers.html")]
+#[template(path = "ticker/tickers.html")]
 pub struct TickersTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub elapsed_ms: u128,
@@ -53,13 +53,13 @@ pub struct TickersTemplate {
 //
 // Symbols template
 #[derive(Template)]
-#[template(path = "symbol.html")]
+#[template(path = "symbol/symbol.html")]
 pub struct SymbolTemplate {
     pub symbols: Vec<Symbol>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
-#[template(path = "symbols.html")]
+#[template(path = "symbol/symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<(usize, Symbol)>,
     pub elapsed_ms: u128,
@@ -67,13 +67,13 @@ pub struct SymbolsTemplate {
 //
 // Currency template
 #[derive(Template)]
-#[template(path = "currency.html")]
+#[template(path = "currency/currency.html")]
 pub struct CurrencyTemplate {
     pub current_currency: Vec<(usize, Currency)>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
-#[template(path = "currencies.html")]
+#[template(path = "currency/currencies.html")]
 pub struct CurrenciesTemplate {
     pub currencies: Vec<(usize, Currency)>,
     pub elapsed_ms: u128,
@@ -81,13 +81,13 @@ pub struct CurrenciesTemplate {
 //
 // Borrow template
 #[derive(Template)]
-#[template(path = "borrow.html")]
+#[template(path = "borrow/borrow.html")]
 pub struct BorrowTemplate {
     pub borrows: Vec<(usize, Borrow)>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
-#[template(path = "borrows.html")]
+#[template(path = "borrow/borrows.html")]
 pub struct BorrowsTemplate {
     pub borrows: Vec<(usize, Borrow)>,
     pub elapsed_ms: u128,
@@ -95,13 +95,13 @@ pub struct BorrowsTemplate {
 //
 // Lend template
 #[derive(Template)]
-#[template(path = "lend.html")]
+#[template(path = "lend/lend.html")]
 pub struct LendTemplate {
     pub lends: Vec<(usize, Lend)>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
-#[template(path = "lends.html")]
+#[template(path = "lend/lends.html")]
 pub struct LendsTemplate {
     pub lends: Vec<(usize, Lend)>,
     pub elapsed_ms: u128,
@@ -109,5 +109,5 @@ pub struct LendsTemplate {
 //
 // Index template
 #[derive(Template)]
-#[template(path = "index.html")]
+#[template(path = "index/index.html")]
 pub struct IndexTemplate {}
