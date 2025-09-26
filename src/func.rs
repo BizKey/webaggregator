@@ -38,6 +38,7 @@ pub fn simulate_dva(prices: Vec<f64>, target_increment: f64, commission_rate: f6
     }
 
     let final_price = *prices.last().unwrap();
+    let start_price = *prices.first().unwrap();
     let final_value = asset_amount * final_price;
     let net_invested = total_gross_spent - total_gross_received;
     let profit = final_value - net_invested;
@@ -54,7 +55,9 @@ pub fn simulate_dva(prices: Vec<f64>, target_increment: f64, commission_rate: f6
         total_gross_received: format!("{:.2}", total_gross_received),
         net_invested: format!("{:.2}", net_invested),
         final_asset_amount: format!("{:.4}", asset_amount),
+        start_price: format!("{}", start_price),
         final_price: format!("{}", final_price),
+        bnh: format!("{}", start_price * 100.0 / final_price),
         final_value: format!("{:.2}", final_value),
         profit: format!("{:.2}", profit),
         roi: format!("{:.2}", roi),
