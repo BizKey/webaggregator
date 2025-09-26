@@ -389,7 +389,7 @@ fn simulate_dva(prices: &[f64], target_increment: f64, commission_rate: f64) -> 
     let net_invested = total_gross_spent - total_gross_received;
     let profit = final_value - net_invested;
     let roi = if net_invested != 0.0 {
-        profit / net_invested
+        (profit / net_invested) * 100.0
     } else {
         0.0
     };
