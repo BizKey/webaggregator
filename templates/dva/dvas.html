@@ -35,7 +35,7 @@
             <td>{{ index }}</td>
             <td>{{ ticker.created_at.format_date() }}</td>
             <td>{{ ticker.symbol }}</td>
-            <td><a href="/similardva/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
+            <td><a href="/dva/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
             <td>
                 {% if let Some(buy) = ticker.buy %}
                 {{ buy }}

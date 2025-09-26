@@ -406,7 +406,7 @@ fn simulate_dva(prices: &[f64], target_increment: f64, commission_rate: f64) -> 
     }
 }
 
-pub async fn simdva(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn dvatiker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
     let ticker_name = path.into_inner();
@@ -441,7 +441,7 @@ pub async fn simdva(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     }
 }
 
-pub async fn simsdva(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn dva(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // test dva
 
     // time start
