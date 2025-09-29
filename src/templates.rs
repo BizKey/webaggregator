@@ -40,6 +40,7 @@ pub struct DvasTemplate {
 #[template(path = "dva/dva.html")]
 pub struct DvaTemplate {
     pub elapsed_ms: u128,
+    pub ticker:String,
     pub data: DvaResult,
 }
 #[derive(Template)]

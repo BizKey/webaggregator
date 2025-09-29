@@ -389,6 +389,7 @@ pub async fn dvatiker(path: web::Path<String>, pool: web::Data<PgPool>) -> Resul
 
     let template: DvaTemplate = DvaTemplate {
         elapsed_ms: start.elapsed().as_millis(),
+        ticker: ticker_name,
         data: result,
     };
     match template.render() {
