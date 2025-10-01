@@ -3,41 +3,37 @@
 {% block title %}Lend{% endblock %}
 
 {% block content %}
-<p><a href="/lend">Lend</a></p>
+<p><a href="/candle">Candles</a></p>
 <table border="1">
     <thead>
         <tr>
             <th>№</th>
-            <th>created_at</th>
-            <th>currency</th>
-            <th>purchase_enable</th>
-            <th>redeem_enable</th>
-            <th>increment</th>
-            <th>min_purchase_size</th>
-            <th>max_purchase_size</th>
-            <th>interest_increment</th>
-            <th>min_interest_rate</th>
-            <th>market_interest_rate</th>
-            <th>max_interest_rate</th>
-            <th>auto_purchase_enable</th>
+            <th>exchange</th>
+            <th>symbol</th>
+            <th>interval</th>
+            <th>timestamp</th>
+            <th>open</th>
+            <th>high</th>
+            <th>low</th>
+            <th>close</th>
+            <th>volume</th>
+            <th>quote_volume</th>
         </tr>
     </thead>
     <tbody>
-        {% for (index, lend) in lends %}
+        {% for (index, candle) in candles %}
         <tr>
             <td>{{ index }}</td>
-            <td>{{ lend.created_at.format_date() }}</td>
-            <td>{{ lend.currency }}</td>
-            <td>{{ lend.purchase_enable }}</td>
-            <td>{{ lend.redeem_enable }}</td>
-            <td>{{ lend.increment }}</td>
-            <td>{{ lend.min_purchase_size }}</td>
-            <td>{{ lend.max_purchase_size }}</td>
-            <td>{{ lend.interest_increment }}</td>
-            <td>{{ lend.min_interest_rate }}</td>
-            <td>{{ lend.market_interest_rate }}</td>
-            <td>{{ lend.max_interest_rate }}</td>
-            <td>{{ lend.auto_purchase_enable }}</td>
+            <td>{{ candle.exchange }}</td>
+            <td>{{ candle.symbol }}</td>
+            <td>{{ candle.interval }}</td>
+            <td>{{ candle.timestamp }}</td>
+            <td>{{ candle.open }}</td>
+            <td>{{ candle.high }}</td>
+            <td>{{ candle.low }}</td>
+            <td>{{ candle.close }}</td>
+            <td>{{ candle.volume }}</td>
+            <td>{{ candle.quote_volume }}</td>
         </tr>
         {% endfor %}
     </tbody>
