@@ -91,3 +91,17 @@ pub struct Borrow {
     pub hourly_borrow_rate: String,
     pub annualized_borrow_rate: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct Candle {
+    pub exchange: String,
+    pub symbol: String,
+    pub interval: String,
+    pub timestamp: String,
+    pub open: String,
+    pub high: String,
+    pub low: String,
+    pub close: String,
+    pub volume: String,
+    pub quote_volume: String,
+}

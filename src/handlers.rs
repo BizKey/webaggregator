@@ -1,9 +1,9 @@
 use crate::func::{parse_f64_opt, simulate_dva};
-use crate::models::{Borrow, Currency, Lend, Symbol, Ticker};
+use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
 use crate::templates::{
-    BorrowTemplate, BorrowsTemplate, CurrenciesTemplate, CurrencyTemplate, DvaTemplate,
-    DvasTemplate, IndexTemplate, LendTemplate, LendsTemplate, SymbolTemplate, SymbolsTemplate,
-    TickerTemplate, TickersTemplate,
+    BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
+    CurrencyTemplate, DvaTemplate, DvasTemplate, IndexTemplate, LendTemplate, LendsTemplate,
+    SymbolTemplate, SymbolsTemplate, TickerTemplate, TickersTemplate,
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -176,6 +176,38 @@ pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<Ht
     }
 }
 
+pub async fn candles(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all candle
+
+    // time start
+    let start = Instant::now();
+
+    let all_candles = sqlx::query_as::<_, Candle>("SELECT DISTINCT ON (symbol) exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume FROM Candle ORDER BY symbol, timestamp::BIGINT DESC")
+        .fetch_all(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let candles_with_index: Vec<(usize, Candle)> = all_candles
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
+
+    let template = CandlesTemplate {
+        candles: candles_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
 pub async fn borrows(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // all borrow
 
@@ -234,6 +266,40 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     let template = BorrowTemplate {
         borrows: borrow_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // all borrow
+
+    // time start
+    let start = Instant::now();
+    let ticker_name = path.into_inner();
+
+    let all_candle = sqlx::query_as::<_, Candle>(
+        "SELECT created_at, currency, hourly_borrow_rate, annualized_borrow_rate FROM Borrow WHERE currency = $1 ORDER BY currency, created_at DESC").bind(&ticker_name)
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+    let candle_with_index: Vec<(usize, Candle)> = all_candle
+        .into_iter()
+        .enumerate()
+        .map(|(i, currency)| (i + 1, currency))
+        .collect();
+
+    let template = CandleTemplate {
+        candles: candle_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {

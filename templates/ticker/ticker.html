@@ -6,16 +6,6 @@
 {% block content %}
 <p><a href="/tickers">Tickers</a></p>
 
-<div id="my-chart" style="background-color: aquamarine;"></div>
-
-<script>
-  new Chartist.Line('#my-chart', {
-    series: [{{ chart_series | json | safe }}]
-  }, {
-      fullWidth: false
-    });
-</script>
-
 <table border="1">
   <thead>
     <tr>

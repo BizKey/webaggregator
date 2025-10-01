@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Candle{% endblock %}
+
+{% block content %}
+<p><a href="/candle">Candles</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>exchange</th>
+            <th>symbol</th>
+            <th>interval</th>
+            <th>timestamp</th>
+            <th>open</th>
+            <th>high</th>
+            <th>low</th>
+            <th>close</th>
+            <th>volume</th>
+            <th>quote_volume</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, candle) in candles %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ candle.exchange }}</td>
+            <td>{{ candle.symbol }}</td>
+            <td>{{ candle.interval }}</td>
+            <td>{{ candle.timestamp }}</td>
+            <td>{{ candle.open }}</td>
+            <td>{{ candle.high }}</td>
+            <td>{{ candle.low }}</td>
+            <td>{{ candle.close }}</td>
+            <td>{{ candle.volume }}</td>
+            <td>{{ candle.quote_volume }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

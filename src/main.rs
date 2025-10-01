@@ -45,6 +45,10 @@ async fn main() -> std::io::Result<()> {
                             .route("/borrow", web::get().to(handlers::borrows))
                             .route("/borrow/{currency}", web::get().to(handlers::borrow))
                             //
+                            // Working with candles
+                            .route("/candle", web::get().to(handlers::candles))
+                            .route("/candle/{ticker}", web::get().to(handlers::candle))
+                            //
                             // Similar dva
                             .route("/dva", web::get().to(handlers::dva))
                             .route("/dva/{ticker}", web::get().to(handlers::dvatiker))
