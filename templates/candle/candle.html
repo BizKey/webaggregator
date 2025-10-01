@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Lend{% endblock %}
+
+{% block content %}
+<p><a href="/lend">Lend</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>created_at</th>
+            <th>currency</th>
+            <th>purchase_enable</th>
+            <th>redeem_enable</th>
+            <th>increment</th>
+            <th>min_purchase_size</th>
+            <th>max_purchase_size</th>
+            <th>interest_increment</th>
+            <th>min_interest_rate</th>
+            <th>market_interest_rate</th>
+            <th>max_interest_rate</th>
+            <th>auto_purchase_enable</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, lend) in lends %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ lend.created_at.format_date() }}</td>
+            <td>{{ lend.currency }}</td>
+            <td>{{ lend.purchase_enable }}</td>
+            <td>{{ lend.redeem_enable }}</td>
+            <td>{{ lend.increment }}</td>
+            <td>{{ lend.min_purchase_size }}</td>
+            <td>{{ lend.max_purchase_size }}</td>
+            <td>{{ lend.interest_increment }}</td>
+            <td>{{ lend.min_interest_rate }}</td>
+            <td>{{ lend.market_interest_rate }}</td>
+            <td>{{ lend.max_interest_rate }}</td>
+            <td>{{ lend.auto_purchase_enable }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

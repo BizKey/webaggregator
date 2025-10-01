@@ -1,4 +1,4 @@
-use crate::models::{Borrow, Currency, Lend, Symbol, Ticker};
+use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
 use askama::Template;
 use chrono::{DateTime, Utc};
 
@@ -96,6 +96,12 @@ pub struct BorrowTemplate {
 #[template(path = "borrow/borrows.html")]
 pub struct BorrowsTemplate {
     pub borrows: Vec<(usize, Borrow)>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "candle/candles.html")]
+pub struct CandlesTemplate {
+    pub candles: Vec<(usize, Candle)>,
     pub elapsed_ms: u128,
 }
 //
