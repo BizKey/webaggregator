@@ -28,38 +28,14 @@ pub struct DvaResult {
     pub profit: String,
     pub roi: String,
 }
-//
-//
-// DVA template
-//
-//
-#[derive(Template)]
-#[template(path = "dva/dvas.html")]
-pub struct DvasTemplate {
-    pub tickers: Vec<(usize, Ticker)>,
-    pub elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "dva/dva.html")]
-pub struct DvaTemplate {
-    pub elapsed_ms: u128,
-    pub ticker: String,
-    pub data: DvaResult,
-}
+
 //
 //
 // Tickers template
 //
 //
 #[derive(Template)]
-#[template(path = "ticker/ticker.html")]
-pub struct TickerTemplate {
-    pub tickers: Vec<(usize, Ticker)>,
-    pub chart_series: Vec<f64>,
-    pub elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "ticker/tickers.html")]
+#[template(path = "tickers.html")]
 pub struct TickersTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub elapsed_ms: u128,
@@ -70,13 +46,7 @@ pub struct TickersTemplate {
 //
 //
 #[derive(Template)]
-#[template(path = "symbol/symbol.html")]
-pub struct SymbolTemplate {
-    pub symbols: Vec<Symbol>,
-    pub elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "symbol/symbols.html")]
+#[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<(usize, Symbol)>,
     pub elapsed_ms: u128,
@@ -87,13 +57,7 @@ pub struct SymbolsTemplate {
 //
 //
 #[derive(Template)]
-#[template(path = "currency/currency.html")]
-pub struct CurrencyTemplate {
-    pub current_currency: Vec<(usize, Currency)>,
-    pub elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "currency/currencies.html")]
+#[template(path = "currencies.html")]
 pub struct CurrenciesTemplate {
     pub currencies: Vec<(usize, Currency)>,
     pub elapsed_ms: u128,

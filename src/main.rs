@@ -27,15 +27,12 @@ async fn main() -> std::io::Result<()> {
                             //
                             // Working with tickers
                             .route("/tickers", web::get().to(handlers::tickers))
-                            .route("/ticker/{ticker}", web::get().to(handlers::ticker))
                             //
                             // Working with currencies
                             .route("/currencies", web::get().to(handlers::currencies))
-                            .route("/currency/{currency}", web::get().to(handlers::currency))
                             //
                             // Working with symbols
                             .route("/symbols", web::get().to(handlers::symbols))
-                            .route("/symbol/{symbol}", web::get().to(handlers::symbol))
                             //
                             // Working with lend
                             .route("/lend", web::get().to(handlers::lends))
@@ -48,10 +45,6 @@ async fn main() -> std::io::Result<()> {
                             // Working with candles
                             .route("/candle", web::get().to(handlers::candles))
                             .route("/candle/{ticker}", web::get().to(handlers::candle))
-                            //
-                            // Similar dva
-                            .route("/dva", web::get().to(handlers::dva))
-                            .route("/dva/{ticker}", web::get().to(handlers::dvatiker))
                             //
                             // System links
                             .route("/static/style.css", web::get().to(handlers::serve_css))
