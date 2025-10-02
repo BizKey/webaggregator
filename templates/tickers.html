@@ -21,7 +21,7 @@
         <tr>
             <td>{{ index }}</td>
             <td>{{ ticker.symbol }}</td>
-            <td><a href="/ticker/{{ ticker.symbol_name }}">{{ ticker.symbol_name }}</a></td>
+            <td>{{ ticker.symbol_name }}</td>
             <td>
                 {% if let Some(taker_fee_rate) = ticker.taker_fee_rate %}
                 {{ taker_fee_rate }}
