@@ -28,24 +28,7 @@ pub struct DvaResult {
     pub profit: String,
     pub roi: String,
 }
-//
-//
-// DVA template
-//
-//
-#[derive(Template)]
-#[template(path = "dva/dvas.html")]
-pub struct DvasTemplate {
-    pub tickers: Vec<(usize, Ticker)>,
-    pub elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "dva/dva.html")]
-pub struct DvaTemplate {
-    pub elapsed_ms: u128,
-    pub ticker: String,
-    pub data: DvaResult,
-}
+
 //
 //
 // Tickers template

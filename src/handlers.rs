@@ -1,9 +1,7 @@
-use crate::func::{parse_f64_opt, simulate_dva};
 use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
-    DvaTemplate, DvasTemplate, IndexTemplate, LendTemplate, LendsTemplate, SymbolsTemplate,
-    TickersTemplate,
+    IndexTemplate, LendTemplate, LendsTemplate, SymbolsTemplate, TickersTemplate,
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -364,102 +362,6 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .collect();
 
     let template = TickersTemplate {
-        tickers: tickers_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
-
-pub async fn dvatiker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // time start
-    let start = Instant::now();
-    let ticker_name = path.into_inner();
-
-    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>(
-        "SELECT 
-                created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, 
-                change_rate, change_price, high, low, vol, vol_value, last, average_price, 
-                taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient 
-            FROM ticker 
-            WHERE symbol_name = $1 
-            ORDER BY created_at ASC",
-    )
-    .bind(&ticker_name)
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    if tickers_with_one_symbol_name.is_empty() {
-        return Ok(HttpResponse::InternalServerError().body("Error template render"));
-    }
-
-    let prices: Vec<f64> = tickers_with_one_symbol_name
-        .iter()
-        .filter_map(|ticker| parse_f64_opt(&ticker.sell))
-        .collect();
-
-    let target_increment = 10.0;
-
-    let taker_fee = tickers_with_one_symbol_name
-        .last()
-        .and_then(|ticker| parse_f64_opt(&ticker.taker_fee_rate))
-        .unwrap_or(0.001);
-    let taker_coof_fee = tickers_with_one_symbol_name
-        .last()
-        .and_then(|ticker| parse_f64_opt(&ticker.taker_coefficient))
-        .unwrap_or(1.0);
-
-    let result = simulate_dva(prices, target_increment, taker_coof_fee * taker_fee);
-
-    let template: DvaTemplate = DvaTemplate {
-        elapsed_ms: start.elapsed().as_millis(),
-        ticker: ticker_name,
-        data: result,
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
-
-pub async fn dva(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // test dva
-
-    // time start
-    let start = Instant::now();
-
-    let tickers = sqlx::query_as::<_, Ticker>(
-        "SELECT DISTINCT ON (symbol_name) 
-                created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, 
-                change_rate, change_price, high, low, vol, vol_value, last, average_price, 
-                taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient 
-            FROM ticker 
-            ORDER BY symbol_name, created_at DESC",
-    )
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let tickers_with_index: Vec<(usize, Ticker)> = tickers
-        .into_iter()
-        .enumerate()
-        .map(|(i, ticker)| (i + 1, ticker))
-        .collect();
-
-    let template = DvasTemplate {
         tickers: tickers_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
