@@ -289,19 +289,19 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 }
 
 pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // all borrow
+    // all candle
 
     // time start
     let start = Instant::now();
-    let ticker_name = path.into_inner();
+    let symbol_name = path.into_inner();
 
     let all_candle = sqlx::query_as::<_, Candle>(
         "SELECT 
-                currency, hourly_borrow_rate, annualized_borrow_rate 
-            FROM borrow 
-            WHERE currency = $1",
+                exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+            FROM candle 
+            WHERE symbol = $1",
     )
-    .bind(&ticker_name)
+    .bind(&symbol_name)
     .fetch_all(pool.get_ref())
     .await
     .map_err(|e| {
@@ -335,9 +335,8 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let tickers = sqlx::query_as::<_, Ticker>(
         "SELECT
-                symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, 
-                change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, 
-                maker_fee_rate, taker_coefficient, maker_coefficient 
+                symbol, symbol_name, taker_fee_rate, maker_fee_rate, 
+                taker_coefficient, maker_coefficient 
             FROM ticker",
     )
     .fetch_all(pool.get_ref())
