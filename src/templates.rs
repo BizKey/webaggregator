@@ -52,7 +52,7 @@ pub struct DvaTemplate {
 //
 //
 #[derive(Template)]
-#[template(path = "ticker/tickers.html")]
+#[template(path = "tickers.html")]
 pub struct TickersTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub elapsed_ms: u128,
@@ -63,7 +63,7 @@ pub struct TickersTemplate {
 //
 //
 #[derive(Template)]
-#[template(path = "symbol/symbols.html")]
+#[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<(usize, Symbol)>,
     pub elapsed_ms: u128,
@@ -74,7 +74,7 @@ pub struct SymbolsTemplate {
 //
 //
 #[derive(Template)]
-#[template(path = "currency/currencies.html")]
+#[template(path = "currencies.html")]
 pub struct CurrenciesTemplate {
     pub currencies: Vec<(usize, Currency)>,
     pub elapsed_ms: u128,
