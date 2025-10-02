@@ -2,18 +2,12 @@
 <html lang="en">
 
 <head>
-    <title>
-        {% block title %}
-        {{ title }}
-        {% endblock %}
-    </title>
+    <title>{% block title %}{{ title }}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body>
-    {% block content %}{% endblock %}
-</body>
+<body>{% block content %}{% endblock %}</body>
 
 </html>
