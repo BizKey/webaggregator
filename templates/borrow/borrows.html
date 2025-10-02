@@ -8,7 +8,6 @@
     <thead>
         <tr>
             <th>№</th>
-            <th>created_at</th>
             <th>currency</th>
             <th>hourly_borrow_rate</th>
             <th>annualized_borrow_rate</th>
@@ -18,7 +17,6 @@
         {% for (index, borrow) in borrows %}
         <tr>
             <td>{{ index }}</td>
-            <td>{{ borrow.created_at.format_date() }}</td>
             <td><a href="/borrow/{{ borrow.currency }}">{{ borrow.currency }}</a></td>
             <td>{{ borrow.hourly_borrow_rate }}</td>
             <td>{{ borrow.annualized_borrow_rate }}</td>
