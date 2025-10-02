@@ -2,8 +2,8 @@ use crate::func::{parse_f64_opt, simulate_dva};
 use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
-    CurrencyTemplate, DvaTemplate, DvasTemplate, IndexTemplate, LendTemplate, LendsTemplate,
-    SymbolTemplate, SymbolsTemplate, TickerTemplate, TickersTemplate,
+    DvaTemplate, DvasTemplate, IndexTemplate, LendTemplate, LendsTemplate, SymbolsTemplate,
+    TickersTemplate,
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -54,45 +54,6 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let template = SymbolsTemplate {
         symbols: symbols_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
-
-pub async fn symbol(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // time start
-    let start = Instant::now();
-    let symbol_name = path.into_inner();
-
-    let symbols = sqlx::query_as::<_, Symbol>(
-        "SELECT 
-                created_at, symbol, name, base_currency, quote_currency, fee_currency, 
-                market, base_min_size, quote_min_size, base_max_size, quote_max_size, 
-                base_increment, quote_increment, price_increment, price_limit_rate, 
-                min_funds, is_margin_enabled, enable_trading, fee_category, 
-                maker_fee_coefficient, taker_fee_coefficient, st, callauction_is_enabled, 
-                callauction_price_floor, callauction_price_ceiling, 
-                callauction_first_stage_start_time, callauction_second_stage_start_time, 
-                callauction_third_stage_start_time, trading_start_time 
-            FROM symbol 
-            WHERE symbol = $1 
-            ORDER BY created_at DESC",
-    )
-    .bind(&symbol_name)
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let template = SymbolTemplate {
-        symbols: symbols,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
@@ -366,99 +327,6 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let template = CandleTemplate {
         candles: candle_with_index,
         elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
-
-pub async fn currency(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // one current currency
-
-    // time start
-    let start = Instant::now();
-
-    let currency_name = path.into_inner();
-
-    let currencies_with_one_currency_name = sqlx::query_as::<_, Currency>(
-        "SELECT 
-                created_at, currency, name, full_name, precision, confirms, contract_address, 
-                is_margin_enabled, is_debit_enabled 
-            FROM currency 
-            WHERE currency = $1 
-            ORDER BY created_at DESC",
-    )
-    .bind(&currency_name)
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let currencies_with_index: Vec<(usize, Currency)> = currencies_with_one_currency_name
-        .into_iter()
-        .enumerate()
-        .map(|(i, currency)| (i + 1, currency))
-        .collect();
-
-    let template = CurrencyTemplate {
-        current_currency: currencies_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-}
-
-pub async fn ticker(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // one current ticker
-
-    // time start
-    let start = Instant::now();
-    let ticker_name = path.into_inner();
-
-    let tickers_with_one_symbol_name = sqlx::query_as::<_, Ticker>(
-        "SELECT 
-                created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, 
-                change_rate, change_price, high, low, vol, vol_value, last, average_price, 
-                taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient 
-            FROM ticker 
-            WHERE symbol_name = $1 
-            ORDER BY created_at DESC",
-    )
-    .bind(&ticker_name)
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let tickers_with_index: Vec<(usize, Ticker)> = tickers_with_one_symbol_name
-        .clone()
-        .into_iter()
-        .enumerate()
-        .map(|(i, ticker)| (i + 1, ticker))
-        .collect();
-
-    let chart_series: Vec<f64> = tickers_with_one_symbol_name
-        .clone()
-        .iter()
-        .rev()
-        .filter_map(|t| t.sell.as_ref().and_then(|s| s.parse::<f64>().ok()))
-        .collect();
-
-    let template: TickerTemplate = TickerTemplate {
-        tickers: tickers_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-        chart_series: chart_series,
     };
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
