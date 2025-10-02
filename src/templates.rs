@@ -2,16 +2,6 @@ use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
 use askama::Template;
 use chrono::{DateTime, Utc};
 
-pub trait DateTimeFormat {
-    fn format_date(&self) -> String;
-}
-
-impl DateTimeFormat for DateTime<Utc> {
-    fn format_date(&self) -> String {
-        self.format("%Y-%m-%d %H:%M:%S").to_string()
-    }
-}
-
 #[derive(Debug)]
 pub struct DvaResult {
     pub commission_rate: f64,

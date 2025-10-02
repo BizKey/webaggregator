@@ -25,17 +25,16 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let symbols = sqlx::query_as::<_, Symbol>(
-        "SELECT DISTINCT ON (symbol) 
-                created_at, symbol, name, base_currency, quote_currency, fee_currency, 
-                market, base_min_size, quote_min_size, base_max_size, quote_max_size, 
+        "SELECT 
+                symbol, name, base_currency, quote_currency, fee_currency, market, 
+                base_min_size, quote_min_size, base_max_size, quote_max_size, 
                 base_increment, quote_increment, price_increment, price_limit_rate, 
                 min_funds, is_margin_enabled, enable_trading, fee_category, 
                 maker_fee_coefficient, taker_fee_coefficient, st, callauction_is_enabled, 
                 callauction_price_floor, callauction_price_ceiling, 
                 callauction_first_stage_start_time, callauction_second_stage_start_time, 
                 callauction_third_stage_start_time, trading_start_time 
-            FROM symbol 
-            ORDER BY symbol, created_at DESC",
+            FROM symbol",
     )
     .fetch_all(pool.get_ref())
     .await
@@ -69,11 +68,10 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_currencies = sqlx::query_as::<_, Currency>(
-        "SELECT DISTINCT ON (currency) 
-                created_at, currency, name, full_name, precision, confirms, contract_address, 
-                is_margin_enabled, is_debit_enabled 
-            FROM currency 
-            ORDER BY currency, created_at DESC",
+        "SELECT 
+                currency, name, full_name, precision, confirms, 
+                contract_address, is_margin_enabled, is_debit_enabled 
+            FROM currency",
     )
     .fetch_all(pool.get_ref())
     .await
@@ -107,12 +105,11 @@ pub async fn lends(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_lend = sqlx::query_as::<_, Lend>(
-        "SELECT DISTINCT ON (currency) 
-                created_at, currency, purchase_enable, redeem_enable, increment, min_purchase_size, 
+        "SELECT 
+                currency, purchase_enable, redeem_enable, increment, min_purchase_size, 
                 max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, 
                 max_interest_rate, auto_purchase_enable 
-            FROM lend 
-            ORDER BY currency, created_at DESC",
+            FROM lend",
     )
     .fetch_all(pool.get_ref())
     .await
@@ -147,12 +144,11 @@ pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<Ht
 
     let all_lend = sqlx::query_as::<_, Lend>(
         "SELECT 
-                created_at, currency, purchase_enable, redeem_enable, increment, min_purchase_size, 
+                currency, purchase_enable, redeem_enable, increment, min_purchase_size, 
                 max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, 
                 max_interest_rate, auto_purchase_enable 
             FROM lend 
-            WHERE currency = $1 
-            ORDER BY currency, created_at DESC",
+            WHERE currency = $1",
     )
     .bind(&currency_name)
     .fetch_all(pool.get_ref())
@@ -224,10 +220,9 @@ pub async fn borrows(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
-        "SELECT DISTINCT ON (currency) 
-        created_at, currency, hourly_borrow_rate, annualized_borrow_rate 
-        FROM borrow 
-        ORDER BY currency, created_at DESC",
+        "SELECT 
+                currency, hourly_borrow_rate, annualized_borrow_rate 
+            FROM borrow",
     )
     .fetch_all(pool.get_ref())
     .await
@@ -263,10 +258,9 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
         "SELECT 
-                created_at, currency, hourly_borrow_rate, annualized_borrow_rate 
+                currency, hourly_borrow_rate, annualized_borrow_rate 
             FROM borrow 
-            WHERE currency = $1 
-            ORDER BY currency, created_at DESC",
+            WHERE currency = $1",
     )
     .bind(&currency_name)
     .fetch_all(pool.get_ref())
@@ -303,10 +297,9 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     let all_candle = sqlx::query_as::<_, Candle>(
         "SELECT 
-                created_at, currency, hourly_borrow_rate, annualized_borrow_rate 
+                currency, hourly_borrow_rate, annualized_borrow_rate 
             FROM borrow 
-            WHERE currency = $1 
-            ORDER BY currency, created_at DESC",
+            WHERE currency = $1",
     )
     .bind(&ticker_name)
     .fetch_all(pool.get_ref())
@@ -341,12 +334,11 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let tickers = sqlx::query_as::<_, Ticker>(
-        "SELECT DISTINCT ON (symbol_name) 
-                created_at, symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, 
-                change_rate, change_price, high, low, vol, vol_value, last, average_price, 
-                taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient 
-            FROM ticker 
-            ORDER BY symbol_name, created_at DESC",
+        "SELECT
+                symbol, symbol_name, buy, best_bid_size, sell, best_ask_size, change_rate, 
+                change_price, high, low, vol, vol_value, last, average_price, taker_fee_rate, 
+                maker_fee_rate, taker_coefficient, maker_coefficient 
+            FROM ticker",
     )
     .fetch_all(pool.get_ref())
     .await
