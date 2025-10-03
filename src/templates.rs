@@ -1,23 +1,5 @@
 use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
 use askama::Template;
-use chrono::{DateTime, Utc};
-
-#[derive(Debug)]
-pub struct DvaResult {
-    pub commission_rate: f64,
-    pub periods: usize,
-    pub total_gross_spent: String,
-    pub total_gross_received: String,
-    pub net_invested: String,
-    pub final_asset_amount: String,
-    pub bnh: String,
-    pub final_price: String,
-    pub start_price: String,
-    pub final_value: String,
-    pub target_increment: String,
-    pub profit: String,
-    pub roi: String,
-}
 
 //
 //

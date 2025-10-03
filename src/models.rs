@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
@@ -58,6 +57,7 @@ pub struct Currency {
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Lend {
+    pub exchange: String,
     pub currency: String,
     pub purchase_enable: bool,
     pub redeem_enable: bool,
@@ -73,6 +73,7 @@ pub struct Lend {
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Borrow {
+    pub exchange: String,
     pub currency: String,
     pub hourly_borrow_rate: String,
     pub annualized_borrow_rate: String,

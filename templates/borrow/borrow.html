@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>exchange</th>
             <th>currency</th>
             <th>hourly_borrow_rate</th>
             <th>annualized_borrow_rate</th>
@@ -17,6 +18,7 @@
         {% for (index, borrow) in borrows %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ borrow.exchange }}</td>
             <td>{{ borrow.currency }}</td>
             <td>{{ borrow.hourly_borrow_rate }}</td>
             <td>{{ borrow.annualized_borrow_rate }}</td>
