@@ -4,6 +4,7 @@
 
 {% block content %}
 <p><a href="/candle">Candles</a></p>
+<div id="chart"></div>
 <table border="1">
     <thead>
         <tr>
@@ -39,4 +40,161 @@
     </tbody>
 </table>
 <div class="pin_time">{{ elapsed_ms }} ms</div>
+<script>
+    // Ваши исходные данные
+    const priceData = [0.806, 0.805, 0.802, 0.799, 0.804, 0.802, 0.803, 0.8, 0.805, 0.807, 0.805, 0.809, 0.813, 0.809, 0.818, 0.828, 0.827, 0.832, 0.833, 0.825, 0.824, 0.817, 0.82, 0.82, 0.82, 0.824, 0.825, 0.823, 0.821, 0.813, 0.814, 0.818, 0.805, 0.807, 0.814, 0.809, 0.805, 0.804, 0.807, 0.805, 0.79, 0.787, 0.78, 0.776, 0.776, 0.781, 0.788, 0.785, 0.785, 0.789, 0.79, 0.795, 0.786, 0.785, 0.788, 0.787, 0.799, 0.798, 0.804, 0.786, 0.774, 0.748, 0.756, 0.753, 0.751, 0.746, 0.748, 0.742, 0.74, 0.734, 0.741, 0.74, 0.741, 0.744, 0.745, 0.743, 0.744, 0.743, 0.74, 0.74, 0.741, 0.741, 0.749, 0.746, 0.753, 0.761, 0.761, 0.755, 0.757, 0.757, 0.758, 0.758, 0.768, 0.764, 0.771, 0.775, 0.778, 0.778, 0.781, 0.786, 0.779, 0.778, 0.778, 0.783, 0.778, 0.773, 0.779, 0.784, 0.778, 0.775, 0.766, 0.764, 0.768, 0.768, 0.767, 0.764, 0.763, 0.768, 0.765, 0.768, 0.794, 0.794, 0.811, 0.815, 0.812, 0.813, 0.815, 0.815, 0.82, 0.824, 0.819, 0.811, 0.813, 0.814, 0.814, 0.809, 0.816, 0.816, 0.82, 0.82, 0.822, 0.826, 0.834, 0.837, 0.831, 0.833, 0.837, 0.834, 0.832, 0.85, 0.847, 0.846, 0.835, 0.836, 0.833, 0.825, 0.832, 0.828, 0.825, 0.82, 0.811, 0.811, 0.813, 0.807, 0.803, 0.806, 0.798, 0.796, 0.795, 0.795, 0.799, 0.797, 0.792, 0.799, 0.793, 0.794, 0.796, 0.8, 0.804, 0.807, 0.808, 0.8, 0.797, 0.796, 0.802, 0.804, 0.804, 0.817, 0.818, 0.82, 0.815, 0.806, 0.805, 0.81, 0.813, 0.814, 0.809, 0.813, 0.809, 0.815, 0.816, 0.807, 0.814, 0.815, 0.813, 0.805, 0.796, 0.792, 0.796, 0.797, 0.798, 0.79, 0.788, 0.782, 0.787, 0.789, 0.786, 0.781, 0.782, 0.785, 0.779, 0.756, 0.755, 0.741, 0.747, 0.748, 0.733, 0.717, 0.71, 0.709, 0.701, 0.712, 0.706, 0.706, 0.709, 0.699, 0.694, 0.695, 0.699, 0.695, 0.689, 0.697, 0.701, 0.701, 0.704, 0.699, 0.695, 0.69, 0.703, 0.699, 0.699, 0.712, 0.708, 0.706, 0.701, 0.705, 0.703, 0.703, 0.703, 0.701, 0.701, 0.705, 0.694, 0.691, 0.689, 0.694, 0.693, 0.688, 0.683, 0.69, 0.699, 0.697, 0.685, 0.691, 0.705, 0.704, 0.703, 0.701, 0.704, 0.706, 0.707, 0.707, 0.701, 0.706, 0.696, 0.696, 0.695, 0.692, 0.69, 0.689, 0.682, 0.681, 0.683, 0.677, 0.678, 0.683, 0.679, 0.669, 0.674, 0.667, 0.668, 0.671, 0.67, 0.671, 0.669, 0.669, 0.669, 0.67, 0.67, 0.655, 0.638, 0.657, 0.653, 0.645, 0.647, 0.644, 0.642, 0.652, 0.651, 0.649, 0.652, 0.65, 0.649, 0.647, 0.651, 0.652, 0.647, 0.643, 0.644, 0.649, 0.656, 0.651, 0.655, 0.662, 0.666, 0.667, 0.664, 0.665, 0.67, 0.67, 0.67, 0.67, 0.668, 0.667, 0.666, 0.668, 0.672, 0.673, 0.67, 0.664, 0.671, 0.675, 0.676, 0.674, 0.67, 0.67, 0.674, 0.669, 0.669, 0.669, 0.67, 0.67, 0.674, 0.677, 0.673, 0.669, 0.666, 0.667, 0.668, 0.666, 0.664, 0.661, 0.659, 0.657, 0.658, 0.66, 0.657, 0.655, 0.666, 0.665, 0.665, 0.666, 0.671, 0.672, 0.672, 0.674, 0.674, 0.684, 0.683, 0.68, 0.678, 0.68, 0.681, 0.677, 0.676, 0.671, 0.674, 0.678, 0.676, 0.671, 0.671, 0.663, 0.675, 0.683, 0.674, 0.667, 0.669, 0.667, 0.675, 0.683, 0.681, 0.678, 0.675, 0.667, 0.666, 0.664, 0.665, 0.667, 0.669, 0.667, 0.664, 0.662, 0.661, 0.664, 0.667, 0.663, 0.664, 0.664, 0.657, 0.656, 0.655];
+
+    // Функция для создания свечных данных на основе линейных данных
+    function createCandleData(lineData) {
+        const candleData = [];
+
+        for (let i = 0; i < lineData.length; i++) {
+            const close = lineData[i];
+
+            // Создаем реалистичные HLOC на основе close цены
+            let open, high, low;
+
+            if (i === 0) {
+                // Для первой свечи открытие равно закрытию
+                open = close;
+            } else {
+                // Открытие - это закрытие предыдущей свечи
+                open = lineData[i - 1];
+            }
+
+            // Случайные колебания для high/low (0.1-0.8% от цены)
+            const volatility = 0.008; // 0.8% волатильность
+            const randomFactor = (Math.random() * volatility * 2 - volatility) * close;
+
+            high = Math.max(open, close) + Math.abs(randomFactor * 0.8);
+            low = Math.min(open, close) - Math.abs(randomFactor * 0.8);
+
+            // Убедимся, что high всегда выше low
+            if (high <= low) {
+                high = low + 0.001;
+            }
+
+            // Округляем до 3 знаков после запятой
+            candleData.push({
+                time: Math.floor(new Date('2024-01-01T00:00:00').getTime() / 1000) + i * 3600, // Каждый час
+                open: Math.round(open * 1000) / 1000,
+                high: Math.round(high * 1000) / 1000,
+                low: Math.round(low * 1000) / 1000,
+                close: Math.round(close * 1000) / 1000
+            });
+        }
+
+        return candleData;
+    }
+
+    // Создаем свечные данные
+    const candleData = createCandleData(priceData);
+
+    // Создаем график
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+        width: 1200,
+        height: 650,
+        layout: {
+            backgroundColor: '#ffffff',
+            textColor: '#333333',
+        },
+        grid: {
+            vertLines: {
+                color: '#f0f0f0',
+            },
+            horzLines: {
+                color: '#f0f0f0',
+            },
+        },
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+            borderColor: '#cccccc',
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.1,
+            },
+        },
+        timeScale: {
+            borderColor: '#cccccc',
+            timeVisible: true,
+            secondsVisible: false,
+            barSpacing: 4,
+        },
+    });
+
+    // Добавляем свечной график
+    const candlestickSeries = chart.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderUpColor: '#26a69a',
+        borderDownColor: '#ef5350',
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+    });
+
+    // Устанавливаем данные
+    candlestickSeries.setData(candleData);
+
+    // Автоматическое масштабирование
+    chart.timeScale().fitContent();
+
+    // Добавляем обработчик для отображения информации о свече (ИСПРАВЛЕННЫЙ)
+    const priceInfo = document.getElementById('priceInfo');
+
+    // Создаем Map для быстрого поиска свечей по времени
+    const candleMap = new Map();
+    candleData.forEach(candle => {
+        candleMap.set(candle.time, candle);
+    });
+
+    chart.subscribeCrosshairMove(param => {
+        if (param.time && param.seriesPrices) {
+            const seriesPrices = param.seriesPrices.get(candlestickSeries);
+            if (seriesPrices) {
+                const candle = candleMap.get(param.time);
+                if (candle) {
+                    const change = ((candle.close - candle.open) / candle.open * 100).toFixed(2);
+                    const changeColor = candle.close >= candle.open ? '#26a69a' : '#ef5350';
+                    const changeSymbol = candle.close >= candle.open ? '↗' : '↘';
+
+                    priceInfo.innerHTML = `
+                    <strong>Время:</strong> ${new Date(param.time * 1000).toLocaleString()} |
+                    <strong>O:</strong> ${candle.open} |
+                    <strong>H:</strong> ${candle.high} |
+                    <strong>L:</strong> ${candle.low} |
+                    <strong>C:</strong> ${candle.close} |
+                    <strong style="color: ${changeColor}">${changeSymbol} ${change}%</strong>
+                `;
+                    return;
+                }
+            }
+        }
+        priceInfo.textContent = 'Наведите на свечу для просмотра деталей';
+    });
+
+    // Выводим статистику
+    console.log('Статистика свечного графика:');
+    console.log(`Всего свечей: ${candleData.length}`);
+    console.log(`Период: с ${new Date(candleData[0].time * 1000).toLocaleString()} по ${new Date(candleData[candleData.length - 1].time * 1000).toLocaleString()}`);
+
+    // Анализ трендов
+    const bullishCandles = candleData.filter(c => c.close > c.open).length;
+    const bearishCandles = candleData.filter(c => c.close < c.open).length;
+    const dojiCandles = candleData.filter(c => Math.abs(c.close - c.open) < 0.001).length;
+
+    console.log(`Бычьи свечи: ${bullishCandles} (${(bullishCandles / candleData.length * 100).toFixed(1)}%)`);
+    console.log(`Медвежьи свечи: ${bearishCandles} (${(bearishCandles / candleData.length * 100).toFixed(1)}%)`);
+    console.log(`Доджи: ${dojiCandles} (${(dojiCandles / candleData.length * 100).toFixed(1)}%)`);
+
+    // Находим самую большую свечу
+    const largestCandle = candleData.reduce((max, candle) => {
+        const range = Math.abs(candle.high - candle.low);
+        const maxRange = Math.abs(max.high - max.low);
+        return range > maxRange ? candle : max;
+    });
+
+    console.log(`Самая большая свеча: диапазон ${(largestCandle.high - largestCandle.low).toFixed(3)}`);
+</script>
 {% endblock %}
