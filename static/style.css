@@ -295,3 +295,11 @@ fieldset {
   font-size: 12px;
   z-index: 1000;
 }
+
+#chart {
+  width: 1200px;
+  height: 700px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
