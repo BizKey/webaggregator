@@ -26,8 +26,8 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let symbols = sqlx::query_as::<_, Symbol>(
         "SELECT 
-                symbol, name, base_currency, quote_currency, fee_currency, market, 
-                base_min_size, quote_min_size, base_max_size, quote_max_size, 
+                exchange, symbol, name, base_currency, quote_currency, fee_currency, 
+                market, base_min_size, quote_min_size, base_max_size, quote_max_size, 
                 base_increment, quote_increment, price_increment, price_limit_rate, 
                 min_funds, is_margin_enabled, enable_trading, fee_category, 
                 maker_fee_coefficient, taker_fee_coefficient, st, callauction_is_enabled, 
@@ -69,7 +69,7 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let all_currencies = sqlx::query_as::<_, Currency>(
         "SELECT 
-                currency, name, full_name, precision, confirms, 
+                exchange, currency, name, full_name, precision, confirms, 
                 contract_address, is_margin_enabled, is_debit_enabled 
             FROM currency",
     )
@@ -106,9 +106,10 @@ pub async fn lends(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let all_lend = sqlx::query_as::<_, Lend>(
         "SELECT 
-                currency, purchase_enable, redeem_enable, increment, min_purchase_size, 
-                max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, 
-                max_interest_rate, auto_purchase_enable 
+                exchange, currency, purchase_enable, redeem_enable, increment, 
+                min_purchase_size, max_purchase_size, interest_increment, 
+                min_interest_rate, market_interest_rate, max_interest_rate, 
+                auto_purchase_enable 
             FROM lend",
     )
     .fetch_all(pool.get_ref())
@@ -144,9 +145,10 @@ pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<Ht
 
     let all_lend = sqlx::query_as::<_, Lend>(
         "SELECT 
-                currency, purchase_enable, redeem_enable, increment, min_purchase_size, 
-                max_purchase_size, interest_increment, min_interest_rate, market_interest_rate, 
-                max_interest_rate, auto_purchase_enable 
+                exchange, currency, purchase_enable, redeem_enable, increment, 
+                min_purchase_size, max_purchase_size, interest_increment, 
+                min_interest_rate, market_interest_rate, max_interest_rate, 
+                auto_purchase_enable 
             FROM lend 
             WHERE currency = $1",
     )
@@ -221,7 +223,7 @@ pub async fn borrows(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
         "SELECT 
-                currency, hourly_borrow_rate, annualized_borrow_rate 
+                exchange, currency, hourly_borrow_rate, annualized_borrow_rate 
             FROM borrow",
     )
     .fetch_all(pool.get_ref())
@@ -258,7 +260,7 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
         "SELECT 
-                currency, hourly_borrow_rate, annualized_borrow_rate 
+                exchange, currency, hourly_borrow_rate, annualized_borrow_rate 
             FROM borrow 
             WHERE currency = $1",
     )
@@ -335,7 +337,7 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let tickers = sqlx::query_as::<_, Ticker>(
         "SELECT
-                symbol, symbol_name, taker_fee_rate, maker_fee_rate, 
+                exchange, symbol, symbol_name, taker_fee_rate, maker_fee_rate, 
                 taker_coefficient, maker_coefficient 
             FROM ticker",
     )
