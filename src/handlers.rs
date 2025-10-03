@@ -297,11 +297,11 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let start = Instant::now();
     let symbol_name = path.into_inner();
 
-    let all_candle = sqlx::query_as::<_, Candle>(
-        "SELECT 
-                exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+    let candles = sqlx::query_as::<_, Candle>(
+        "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
             FROM candle 
-            WHERE symbol = $1",
+            WHERE symbol = $1
+            ORDER BY symbol, timestamp::BIGINT DESC",
     )
     .bind(&symbol_name)
     .fetch_all(pool.get_ref())
@@ -311,14 +311,8 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let candle_with_index: Vec<(usize, Candle)> = all_candle
-        .into_iter()
-        .enumerate()
-        .map(|(i, currency)| (i + 1, currency))
-        .collect();
-
     let template = CandleTemplate {
-        candles: candle_with_index,
+        candles: candles,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {

@@ -11,7 +11,6 @@
 <table border="1">
     <thead>
         <tr>
-            <th>№</th>
             <th>exchange</th>
             <th>symbol</th>
             <th>interval</th>
@@ -25,9 +24,8 @@
         </tr>
     </thead>
     <tbody>
-        {% for (index, candle) in candles %}
+        {% for candle in candles %}
         <tr>
-            <td>{{ index }}</td>
             <td>{{ candle.exchange }}</td>
             <td>{{ candle.symbol }}</td>
             <td>{{ candle.interval }}</td>
@@ -87,8 +85,7 @@
         wickDownColor: '#ef5350',
     });
 
-    const candleData = JSON.parse('{{ candles | json | safe }}').map(item => {
-        const candle = item[1];
+    const candleData = JSON.parse('{{ candles | json | safe }}').map(candle => {
         return {
             time: parseInt(candle.timestamp),
             open: parseFloat(candle.open),
