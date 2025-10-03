@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>exchange</th>
             <th>symbol</th>
             <th>name</th>
             <th>base_currency</th>
@@ -42,7 +43,8 @@
         {% for (index, symbol) in symbols %}
         <tr>
             <td>{{ index }}</td>
-            <td><a href="/currency/{{ symbol.symbol }}">{{ symbol.symbol }}</a></td>
+            <td>{{ symbol.exchange }}</td>
+            <td>{{ symbol.symbol }}</td>
             <td>{{ symbol.name }}</td>
             <td>{{ symbol.base_currency }}</td>
             <td>{{ symbol.quote_currency }}</td>

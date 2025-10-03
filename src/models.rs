@@ -4,6 +4,7 @@ use sqlx::FromRow;
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Ticker {
+    pub exchange: String,
     pub symbol: String,
     pub symbol_name: String,
     pub taker_fee_rate: Option<String>,
@@ -13,6 +14,7 @@ pub struct Ticker {
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Symbol {
+    pub exchange: String,
     pub symbol: String,
     pub name: String,
     pub base_currency: String,
@@ -44,6 +46,7 @@ pub struct Symbol {
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Currency {
+    pub exchange: String,
     pub currency: String,
     pub name: String,
     pub full_name: String,

@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>exchange</th>
             <th>currency</th>
             <th>name</th>
             <th>full_name</th>
@@ -22,6 +23,7 @@
         {% for (index, currency) in currencies %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ currency.exchange }}</td>
             <td>{{ currency.currency }}</td>
             <td>{{ currency.name }}</td>
             <td>{{ currency.full_name }}</td>
