@@ -65,7 +65,7 @@ pub struct CandlesTemplate {
 #[derive(Template)]
 #[template(path = "candle/candle.html")]
 pub struct CandleTemplate {
-    pub candles: Vec<(usize, Candle)>,
+    pub candles: Vec<Candle>,
     pub elapsed_ms: u128,
 }
 //
