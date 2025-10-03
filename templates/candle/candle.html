@@ -87,14 +87,18 @@
         wickDownColor: '#ef5350',
     });
 
-    const candleData = JSON.parse('{{ candles | json | safe }}').map(candle => ({
-        time: candle.timestamp,
-        open: parseFloat(candle.open),
-        high: parseFloat(candle.high),
-        low: parseFloat(candle.low),
-        close: parseFloat(candle.close),
-        volume: parseFloat(candle.volume)
-    }));
+    const candleData = JSON.parse('{{ candles | json | safe }}').map(item => {
+        const candle = item[1];
+        return {
+            time: parseInt(candle.timestamp),
+            open: parseFloat(candle.open),
+            high: parseFloat(candle.high),
+            low: parseFloat(candle.low),
+            close: parseFloat(candle.close),
+            volume: parseFloat(candle.volume)
+        };
+    })
+        .sort((a, b) => a.time - b.time);
 
     candlestickSeries.setData(candleData);
 
