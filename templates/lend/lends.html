@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>exchange</th>
             <th>currency</th>
             <th>purchase_enable</th>
             <th>redeem_enable</th>
@@ -25,6 +26,7 @@
         {% for (index, lend) in lends %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ lend.exchange }}</td>
             <td><a href="/lend/{{ lend.currency }}">{{ lend.currency }}</a></td>
             <td>{{ lend.purchase_enable }}</td>
             <td>{{ lend.redeem_enable }}</td>
