@@ -85,6 +85,20 @@
         wickDownColor: '#ef5350',
     });
 
+    const highLineSeries = chart.addLineSeries({
+        color: '#ff6b6b',
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        title: 'Max 20',
+    });
+
+    const lowLineSeries = chart.addLineSeries({
+        color: '#48cae4',
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        title: 'Min 20',
+    });
+
     const candleData = {{ candles | tojson | safe }}.map(c => ({
         time: +c.timestamp,
         open: +c.open,
@@ -99,6 +113,39 @@
     chart.timeScale().fitContent();
 
     const priceInfo = document.getElementById('priceInfo');
+
+    function calculateExtremes(data, period = 20) {
+        const result = [];
+
+        for (let i = period - 1; i < data.length; i++) {
+            const slice = data.slice(i - period + 1, i + 1);
+            const maxHigh = Math.max(...slice.map(c => c.high));
+            const minLow = Math.min(...slice.map(c => c.low));
+
+            result.push({
+                time: data[i].time,
+                maxHigh: maxHigh,
+                minLow: minLow
+            });
+        }
+
+        return result;
+    }
+
+    const extremes = calculateExtremes(candleData, 20);
+
+    const highLineData = extremes.map(e => ({
+        time: e.time,
+        value: e.maxHigh
+    }));
+
+    const lowLineData = extremes.map(e => ({
+        time: e.time,
+        value: e.minLow
+    }));
+
+    highLineSeries.setData(highLineData);
+    lowLineSeries.setData(lowLineData);
 
     const candleMap = new Map();
     candleData.forEach(candle => {
