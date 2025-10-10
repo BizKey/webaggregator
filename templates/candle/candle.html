@@ -21,6 +21,7 @@
             <th>close</th>
             <th>volume</th>
             <th>quote_volume</th>
+            <th>atr</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +37,9 @@
             <td>{{ candle.close }}</td>
             <td>{{ candle.volume }}</td>
             <td>{{ candle.quote_volume }}</td>
+            <td> {% if let Some(atr) = candle.atr %}
+                {{ atr }}
+                {% endif %}</td>
         </tr>
         {% endfor %}
     </tbody>

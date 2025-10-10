@@ -1,4 +1,4 @@
-use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
+use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker, calculate_atr};
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
     IndexTemplate, LendTemplate, LendsTemplate, SymbolsTemplate, TickersTemplate,
@@ -312,7 +312,7 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     })?;
 
     let template = CandleTemplate {
-        candles: candles,
+        candles: calculate_atr(&candles, 20),
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
