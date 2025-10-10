@@ -148,14 +148,12 @@ pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
     let mut result: Vec<CandleWithAtr> = Vec::new();
     let mut true_ranges: Vec<f64> = Vec::new();
 
-    // Рассчитываем True Range для всех свечей
     for i in 0..candles.len() {
         let previous = if i > 0 { Some(&candles[i - 1]) } else { None };
         let tr = calculate_true_range(&candles[i], previous);
         true_ranges.push(tr);
     }
 
-    // Рассчитываем ATR
     for i in 0..candles.len() {
         let atr = if i < period - 1 {
             None
