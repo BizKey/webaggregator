@@ -103,6 +103,20 @@
         title: 'Min 20',
     });
 
+    const atrSeries = chart.addLineSeries({
+        color: '#9c27b0',
+        lineWidth: 2,
+        title: 'ATR 20',
+        priceScaleId: 'atr',
+    });
+
+    chart.priceScale('atr').applyOptions({
+        scaleMargins: {
+            top: 0.7,
+            bottom: 0.05,
+        },
+    });
+
     const candleData = {{ candles | tojson | safe }}.map(c => ({
         time: +c.timestamp,
         open: +c.open,
@@ -113,6 +127,15 @@
     })).sort((a, b) => a.time - b.time);
 
     candlestickSeries.setData(candleData);
+
+    const atrData = candleData
+        .filter(c => c.atr !== null)
+        .map(c => ({
+            time: c.time,
+            value: c.atr
+        }));
+
+    atrSeries.setData(atrData);
 
     chart.timeScale().fitContent();
 
