@@ -105,7 +105,7 @@ pub async fn lends(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_lend = sqlx::query_as::<_, Lend>(
-        "SELECT 
+        "SELECT DISTINCT ON (currency) 
                 exchange, currency, purchase_enable, redeem_enable, increment, 
                 min_purchase_size, max_purchase_size, interest_increment, 
                 min_interest_rate, market_interest_rate, max_interest_rate, 
@@ -222,7 +222,7 @@ pub async fn borrows(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_borrow = sqlx::query_as::<_, Borrow>(
-        "SELECT 
+        "SELECT DISTINCT ON (currency) 
                 exchange, currency, hourly_borrow_rate, annualized_borrow_rate 
             FROM borrow",
     )
