@@ -297,7 +297,7 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
     let start = Instant::now();
     let symbol_name = path.into_inner();
 
-    let candles = sqlx::query_as::<_, Candle>(
+    let mut candles = sqlx::query_as::<_, Candle>(
         "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
             FROM candle 
             WHERE symbol = $1
@@ -311,8 +311,14 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
+    candles.reverse();
+
+    let mut candles = calculate_atr(&candles, 20);
+
+    candles.reverse();
+
     let template = CandleTemplate {
-        candles: calculate_atr(&candles, 20),
+        candles: candles,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
