@@ -1,4 +1,4 @@
-use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker};
+use crate::models::{Borrow, Candle, CandleWithAtr, Currency, Lend, Symbol, Ticker};
 use askama::Template;
 
 //
@@ -65,7 +65,7 @@ pub struct CandlesTemplate {
 #[derive(Template)]
 #[template(path = "candle/candle.html")]
 pub struct CandleTemplate {
-    pub candles: Vec<Candle>,
+    pub candles: Vec<CandleWithAtr>,
     pub elapsed_ms: u128,
 }
 //
