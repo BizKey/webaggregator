@@ -123,7 +123,8 @@
         high: +c.high,
         low: +c.low,
         close: +c.close,
-        volume: +c.volume
+        volume: +c.volume,
+        atr: c.atr !== null ? +c.atr : null
     })).sort((a, b) => a.time - b.time);
 
     candlestickSeries.setData(candleData);
@@ -179,6 +180,11 @@
         candleMap.set(candle.time, candle);
     });
 
+    const atrMap = new Map();
+    atrData.forEach(item => {
+        atrMap.set(item.time, item.value);
+    });
+
     chart.subscribeCrosshairMove(param => {
         if (param.time && param.seriesPrices) {
             const seriesPrices = param.seriesPrices.get(candlestickSeries);
@@ -189,6 +195,10 @@
                     const changeColor = candle.close >= candle.open ? '#26a69a' : '#ef5350';
                     const changeSymbol = candle.close >= candle.open ? '↗' : '↘';
 
+                    // Получаем значение ATR для текущего времени
+                    const atrValue = atrMap.get(param.time);
+                    const atrText = atrValue !== undefined ? ` | <strong>ATR:</strong> ${atrValue.toFixed(4)}` : '';
+
                     priceInfo.innerHTML = `
                     <strong>Время:</strong> ${new Date(param.time * 1000).toLocaleString()} |
                     <strong>O:</strong> ${candle.open} |
@@ -196,6 +206,7 @@
                     <strong>L:</strong> ${candle.low} |
                     <strong>C:</strong> ${candle.close} |
                     <strong style="color: ${changeColor}">${changeSymbol} ${change}%</strong>
+                    ${atrText}
                 `;
                     return;
                 }
@@ -203,5 +214,22 @@
         }
         priceInfo.textContent = 'Наведите на свечу для просмотра деталей';
     });
+
+    // Добавляем легенду для ATR
+    const legend = document.createElement('div');
+    legend.style.position = 'absolute';
+    legend.style.top = '10px';
+    legend.style.left = '10px';
+    legend.style.backgroundColor = 'white';
+    legend.style.padding = '5px';
+    legend.style.border = '1px solid #ccc';
+    legend.style.borderRadius = '3px';
+    legend.style.fontSize = '12px';
+    legend.innerHTML = `
+        <div style="color: #9c27b0">● ATR 20</div>
+        <div style="color: #ff6b6b">--- Max 20</div>
+        <div style="color: #48cae4">--- Min 20</div>
+    `;
+    document.getElementById('chart').appendChild(legend);
 </script>
 {% endblock %}
