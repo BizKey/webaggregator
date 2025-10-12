@@ -1,4 +1,4 @@
-use crate::models::{Borrow, Candle, Currency, Lend, Symbol, Ticker, calculate_atr};
+use crate::models::{Borrow, Candle, CandleWithAtr, Currency, Lend, Symbol, Ticker, calculate_atr};
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
     IndexTemplate, LendTemplate, LendsTemplate, SymbolsTemplate, TickersTemplate,
@@ -313,12 +313,28 @@ pub async fn candle(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     candles.reverse();
 
-    let mut candles = calculate_atr(&candles, 20);
+    let candles_with_atr = calculate_atr(&candles, 20);
 
-    candles.reverse();
+    let mut processed_candles: Vec<CandleWithAtr> = candles_with_atr
+        .into_iter()
+        .map(|mut c| {
+            if let Some(atr) = c.atr {
+                let close: f64 = c.close.parse().unwrap_or(0.0);
+                if close > 0.0 {
+                    c.atr_percent = Some((atr / close) * 100.0);
+                } else {
+                    c.atr_percent = None;
+                }
+                c.atr = None; // Убираем обычное значение ATR если нужно
+            }
+            c
+        })
+        .collect::<Vec<CandleWithAtr>>();
+
+    processed_candles.reverse();
 
     let template = CandleTemplate {
-        candles: candles,
+        candles: processed_candles,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
