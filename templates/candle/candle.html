@@ -124,7 +124,7 @@
         low: +c.low,
         close: +c.close,
         volume: +c.volume,
-        atrPercent: c.atr_percent !== null ? +c.atr_percent : null < !--Исправлено: atr_percent вместо atrPercent -- >
+        atrPercent: c.atr_percent !== null ? +c.atr_percent : null
     })).sort((a, b) => a.time - b.time);
 
     candlestickSeries.setData(candleData);
@@ -215,9 +215,9 @@
 
                     // Получаем значение ATR для текущего времени
                     const atrValue = atrMap.get(param.time);
-                    const atrText = atrValue !== undefined ? ` | <strong>ATR %:</strong> ${atrValue.toFixed(2)}%` : '';  < !--Обновлено отображение-- >
+                    const atrText = atrValue !== undefined ? ` | <strong>ATR %:</strong> ${atrValue.toFixed(2)}%` : '';
 
-                        priceInfo.innerHTML = `
+                    priceInfo.innerHTML = `
                     <strong>Время:</strong> ${new Date(param.time * 1000).toLocaleString()} |
                     <strong>O:</strong> ${candle.open.toFixed(4)} |
                     <strong>H:</strong> ${candle.high.toFixed(4)} |
