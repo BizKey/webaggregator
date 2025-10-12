@@ -71,6 +71,8 @@
                 top: 0.1,
                 bottom: 0.1,
             },
+            minimumWidth: 80,
+            entireTextOnly: false,
         },
         timeScale: {
             borderColor: '#cccccc',
@@ -87,6 +89,11 @@
         borderDownColor: '#ef5350',
         wickUpColor: '#26a69a',
         wickDownColor: '#ef5350',
+        priceFormat: {
+            type: 'price',
+            precision: 8, // Увеличиваем точность до 8 знаков
+            minMove: 0.00000001, // Минимальное движение цены
+        },
     });
 
     const highLineSeries = chart.addLineSeries({
