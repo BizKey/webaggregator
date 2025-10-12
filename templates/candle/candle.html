@@ -37,8 +37,8 @@
             <td>{{ candle.close }}</td>
             <td>{{ candle.volume }}</td>
             <td>{{ candle.quote_volume }}</td>
-            <td> {% if let Some(atr_percent) = candle.atr_percent %}
-                {{ atr_percent }}
+            <td>{% if let Some(atr_percent) = candle.atr_percent %}
+                {{ atr_percent }} <!-- Добавлено форматирование и символ % -->
                 {% endif %}</td>
         </tr>
         {% endfor %}
@@ -106,7 +106,7 @@
     const atrSeries = chart.addLineSeries({
         color: '#9c27b0',
         lineWidth: 2,
-        title: 'ATR 20',
+        title: 'ATR % 20',  <!-- Обновлен заголовок -->
         priceScaleId: 'atr',
     });
 
@@ -124,7 +124,7 @@
         low: +c.low,
         close: +c.close,
         volume: +c.volume,
-        atrPercent: c.atrPercent !== null ? +c.atrPercent : null
+        atrPercent: c.atr_percent !== null ? +c.atr_percent : null < !--Исправлено: atr_percent вместо atrPercent -- >
     })).sort((a, b) => a.time - b.time);
 
     candlestickSeries.setData(candleData);
@@ -185,6 +185,24 @@
         atrMap.set(item.time, item.value);
     });
 
+    // Добавляем легенду
+    const legend = document.createElement('div');
+    legend.style.position = 'absolute';
+    legend.style.top = '10px';
+    legend.style.left = '10px';
+    legend.style.backgroundColor = 'white';
+    legend.style.padding = '8px';
+    legend.style.border = '1px solid #ccc';
+    legend.style.borderRadius = '4px';
+    legend.style.fontSize = '12px';
+    legend.style.zIndex = '1000';
+    legend.innerHTML = `
+        <div style="color: #9c27b0; margin-bottom: 4px;">● ATR % 20</div>
+        <div style="color: #ff6b6b; margin-bottom: 4px;">--- Max 20</div>
+        <div style="color: #48cae4;">--- Min 20</div>
+    `;
+    document.getElementById('chart').appendChild(legend);
+
     chart.subscribeCrosshairMove(param => {
         if (param.time && param.seriesPrices) {
             const seriesPrices = param.seriesPrices.get(candlestickSeries);
@@ -197,14 +215,14 @@
 
                     // Получаем значение ATR для текущего времени
                     const atrValue = atrMap.get(param.time);
-                    const atrText = atrValue !== undefined ? ` | <strong>ATR:</strong> ${atrValue.toFixed(4)}` : '';
+                    const atrText = atrValue !== undefined ? ` | <strong>ATR %:</strong> ${atrValue.toFixed(2)}%` : '';  < !--Обновлено отображение-- >
 
-                    priceInfo.innerHTML = `
+                        priceInfo.innerHTML = `
                     <strong>Время:</strong> ${new Date(param.time * 1000).toLocaleString()} |
-                    <strong>O:</strong> ${candle.open} |
-                    <strong>H:</strong> ${candle.high} |
-                    <strong>L:</strong> ${candle.low} |
-                    <strong>C:</strong> ${candle.close} |
+                    <strong>O:</strong> ${candle.open.toFixed(4)} |
+                    <strong>H:</strong> ${candle.high.toFixed(4)} |
+                    <strong>L:</strong> ${candle.low.toFixed(4)} |
+                    <strong>C:</strong> ${candle.close.toFixed(4)} |
                     <strong style="color: ${changeColor}">${changeSymbol} ${change}%</strong>
                     ${atrText}
                 `;
