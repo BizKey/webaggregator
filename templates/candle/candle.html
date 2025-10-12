@@ -21,7 +21,7 @@
             <th>close</th>
             <th>volume</th>
             <th>quote_volume</th>
-            <th>atr</th>
+            <th>atrPercent</th>
         </tr>
     </thead>
     <tbody>
@@ -37,8 +37,8 @@
             <td>{{ candle.close }}</td>
             <td>{{ candle.volume }}</td>
             <td>{{ candle.quote_volume }}</td>
-            <td> {% if let Some(atr) = candle.atr %}
-                {{ atr }}
+            <td> {% if let Some(atr_percent) = candle.atr_percent %}
+                {{ atr_percent }}
                 {% endif %}</td>
         </tr>
         {% endfor %}
@@ -124,16 +124,16 @@
         low: +c.low,
         close: +c.close,
         volume: +c.volume,
-        atr: c.atr !== null ? +c.atr : null
+        atrPercent: c.atrPercent !== null ? +c.atrPercent : null
     })).sort((a, b) => a.time - b.time);
 
     candlestickSeries.setData(candleData);
 
     const atrData = candleData
-        .filter(c => c.atr !== null)
+        .filter(c => c.atrPercent !== null)
         .map(c => ({
             time: c.time,
-            value: c.atr
+            value: c.atrPercent
         }));
 
     atrSeries.setData(atrData);
@@ -215,21 +215,5 @@
         priceInfo.textContent = 'Наведите на свечу для просмотра деталей';
     });
 
-    // Добавляем легенду для ATR
-    const legend = document.createElement('div');
-    legend.style.position = 'absolute';
-    legend.style.top = '10px';
-    legend.style.left = '10px';
-    legend.style.backgroundColor = 'white';
-    legend.style.padding = '5px';
-    legend.style.border = '1px solid #ccc';
-    legend.style.borderRadius = '3px';
-    legend.style.fontSize = '12px';
-    legend.innerHTML = `
-        <div style="color: #9c27b0">● ATR 20</div>
-        <div style="color: #ff6b6b">--- Max 20</div>
-        <div style="color: #48cae4">--- Min 20</div>
-    `;
-    document.getElementById('chart').appendChild(legend);
 </script>
 {% endblock %}

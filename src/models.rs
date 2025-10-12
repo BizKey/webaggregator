@@ -106,6 +106,7 @@ pub struct CandleWithAtr {
     pub volume: String,
     pub quote_volume: String,
     pub atr: Option<f64>,
+    pub atr_percent: Option<f64>,
 }
 
 fn calculate_true_range(current: &Candle, previous: Option<&Candle>) -> f64 {
@@ -141,6 +142,7 @@ pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
                 volume: c.volume.clone(),
                 quote_volume: c.quote_volume.clone(),
                 atr: None,
+                atr_percent: None,
             })
             .collect();
     }
@@ -177,7 +179,8 @@ pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
             close: candles[i].close.clone(),
             volume: candles[i].volume.clone(),
             quote_volume: candles[i].quote_volume.clone(),
-            atr,
+            atr: atr,
+            atr_percent: None,
         });
     }
 
