@@ -141,10 +141,20 @@ fn calculate_true_range(current: &Candle, previous: Option<&Candle>) -> f64 {
 }
 
 pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
-    return candles
-        .iter()
-        .map(|c| Strategy {
-            position: String::from("Long"),
+    let mut strategies = Vec::new();
+    let mut is_long = true;
+
+    for c in candles {
+        let position = if is_long {
+            String::from("Long")
+        } else {
+            String::from("Short")
+        };
+
+        is_long = !is_long;
+
+        strategies.push(Strategy {
+            position,
             exchange: c.exchange.clone(),
             symbol: c.symbol.clone(),
             interval: c.interval.clone(),
@@ -155,8 +165,10 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             close: c.close.clone(),
             volume: c.volume.clone(),
             quote_volume: c.quote_volume.clone(),
-        })
-        .collect();
+        });
+    }
+
+    strategies
 }
 
 pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
