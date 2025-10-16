@@ -212,7 +212,7 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             profit_point: profit_point,
             loss_point: loss_point,
             position_size: position_size,
-            result_trade, // Добавляем результат сделки
+            result_trade,
         });
 
         is_long = !is_long;
