@@ -343,7 +343,7 @@ pub async fn tickerstrategy(
         "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
             FROM candle 
             WHERE symbol = $1
-            ORDER BY symbol, timestamp::BIGINT DESC",
+            ORDER BY symbol, timestamp::BIGINT ASC",
     )
     .bind(&symbol_name)
     .fetch_all(pool.get_ref())
