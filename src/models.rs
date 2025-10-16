@@ -92,6 +92,20 @@ pub struct Candle {
     pub volume: String,
     pub quote_volume: String,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct Strategy {
+    pub position: String,
+    pub exchange: String,
+    pub symbol: String,
+    pub interval: String,
+    pub timestamp: String,
+    pub open: String,
+    pub high: String,
+    pub low: String,
+    pub close: String,
+    pub volume: String,
+    pub quote_volume: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CandleWithAtr {
@@ -124,6 +138,25 @@ fn calculate_true_range(current: &Candle, previous: Option<&Candle>) -> f64 {
     } else {
         high - low
     }
+}
+
+pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
+    return candles
+        .iter()
+        .map(|c| Strategy {
+            position: String::from("Long"),
+            exchange: c.exchange.clone(),
+            symbol: c.symbol.clone(),
+            interval: c.interval.clone(),
+            timestamp: c.timestamp.clone(),
+            open: c.open.clone(),
+            high: c.high.clone(),
+            low: c.low.clone(),
+            close: c.close.clone(),
+            volume: c.volume.clone(),
+            quote_volume: c.quote_volume.clone(),
+        })
+        .collect();
 }
 
 pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {

@@ -1,7 +1,11 @@
-use crate::models::{Borrow, Candle, CandleWithAtr, Currency, Lend, Symbol, Ticker, calculate_atr};
+use crate::models::{
+    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker, calc_strategy,
+    calculate_atr,
+};
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
-    IndexTemplate, LendTemplate, LendsTemplate, StrategyTemplate, SymbolsTemplate, TickersTemplate,
+    IndexTemplate, LendTemplate, LendsTemplate, OneStrategyTemplate, StrategyTemplate,
+    SymbolsTemplate, TickersTemplate,
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -317,6 +321,42 @@ pub async fn borrow(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<
 
     let template = BorrowTemplate {
         borrows: borrow_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+
+pub async fn tickerstrategy(
+    path: web::Path<String>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse> {
+    // time start
+    let start = Instant::now();
+    let symbol_name = path.into_inner();
+
+    let candles = sqlx::query_as::<_, Candle>(
+        "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+            FROM candle 
+            WHERE symbol = $1
+            ORDER BY symbol, timestamp::BIGINT DESC",
+    )
+    .bind(&symbol_name)
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+    let processed_candles: Vec<Strategy> = calc_strategy(candles);
+
+    let template = OneStrategyTemplate {
+        candles: processed_candles,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {

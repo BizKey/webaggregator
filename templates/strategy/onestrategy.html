@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Candle{% endblock %}
+
+{% block content %}
+<p><a href="/candle">Candles</a></p>
+<div class="info">
+    <div id="priceInfo"></div>
+</div>
+<div id="chart"></div>
+<table border="1">
+    <thead>
+        <tr>
+            <th>position</th>
+            <th>exchange</th>
+            <th>symbol</th>
+            <th>interval</th>
+            <th>timestamp</th>
+            <th>open</th>
+            <th>high</th>
+            <th>low</th>
+            <th>close</th>
+            <th>volume</th>
+            <th>quote_volume</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for candle in candles %}
+        <tr>
+            <td>{{ candle.position }}</td>
+            <td>{{ candle.exchange }}</td>
+            <td>{{ candle.symbol }}</td>
+            <td>{{ candle.interval }}</td>
+            <td>{{ candle.timestamp }}</td>
+            <td>{{ candle.open }}</td>
+            <td>{{ candle.high }}</td>
+            <td>{{ candle.low }}</td>
+            <td>{{ candle.close }}</td>
+            <td>{{ candle.volume }}</td>
+            <td>{{ candle.quote_volume }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+<script>
+
+    const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+        width: 1200,
+        height: 650,
+        layout: {
+            backgroundColor: '#ffffff',
+            textColor: '#333333',
+        },
+        grid: {
+            vertLines: {
+                color: '#f0f0f0',
+            },
+            horzLines: {
+                color: '#f0f0f0',
+            },
+        },
+        crosshair: {
+            mode: LightweightCharts.CrosshairMode.Normal,
+        },
+        rightPriceScale: {
+            borderColor: '#cccccc',
+            scaleMargins: {
+                top: 0.1,
+                bottom: 0.1,
+            },
+            minimumWidth: 80,
+            entireTextOnly: false,
+        },
+        timeScale: {
+            borderColor: '#cccccc',
+            timeVisible: true,
+            secondsVisible: false,
+            barSpacing: 4,
+        },
+    });
+
+    const candlestickSeries = chart.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderUpColor: '#26a69a',
+        borderDownColor: '#ef5350',
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+        priceFormat: {
+            type: 'price',
+            precision: 8, // Увеличиваем точность до 8 знаков
+            minMove: 0.00000001, // Минимальное движение цены
+        },
+    });
+
+    const highLineSeries = chart.addLineSeries({
+        color: '#ff6b6b',
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        title: 'Max 20',
+    });
+
+    const lowLineSeries = chart.addLineSeries({
+        color: '#48cae4',
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Dashed,
+        title: 'Min 20',
+    });
+
+    const atrSeries = chart.addLineSeries({
+        color: '#9c27b0',
+        lineWidth: 2,
+        title: 'ATR % 20',  <!-- Обновлен заголовок -->
+        priceScaleId: 'atr',
+    });
+
+    chart.priceScale('atr').applyOptions({
+        scaleMargins: {
+            top: 0.7,
+            bottom: 0.05,
+        },
+    });
+
+    const candleData = {{ candles | tojson | safe }}.map(c => ({
+        time: +c.timestamp,
+        open: +c.open,
+        high: +c.high,
+        low: +c.low,
+        close: +c.close,
+        volume: +c.volume,
+        atrPercent: c.atr_percent !== null ? +c.atr_percent : null
+    })).sort((a, b) => a.time - b.time);
+
+    candlestickSeries.setData(candleData);
+
+    const atrData = candleData
+        .filter(c => c.atrPercent !== null)
+        .map(c => ({
+            time: c.time,
+            value: c.atrPercent
+        }));
+
+    atrSeries.setData(atrData);
+
+    chart.timeScale().fitContent();
+
+    const priceInfo = document.getElementById('priceInfo');
+
+    function calculateExtremes(data, period = 20) {
+        const result = [];
+
+        for (let i = period - 1; i < data.length; i++) {
+            const slice = data.slice(i - period + 1, i + 1);
+            const maxHigh = Math.max(...slice.map(c => c.high));
+            const minLow = Math.min(...slice.map(c => c.low));
+
+            result.push({
+                time: data[i].time,
+                maxHigh: maxHigh,
+                minLow: minLow
+            });
+        }
+
+        return result;
+    }
+
+    const extremes = calculateExtremes(candleData, 20);
+
+    const highLineData = extremes.map(e => ({
+        time: e.time,
+        value: e.maxHigh
+    }));
+
+    const lowLineData = extremes.map(e => ({
+        time: e.time,
+        value: e.minLow
+    }));
+
+    highLineSeries.setData(highLineData);
+    lowLineSeries.setData(lowLineData);
+
+    const candleMap = new Map();
+    candleData.forEach(candle => {
+        candleMap.set(candle.time, candle);
+    });
+
+    const atrMap = new Map();
+    atrData.forEach(item => {
+        atrMap.set(item.time, item.value);
+    });
+
+    // Добавляем легенду
+    const legend = document.createElement('div');
+    legend.style.position = 'absolute';
+    legend.style.top = '10px';
+    legend.style.left = '10px';
+    legend.style.backgroundColor = 'white';
+    legend.style.padding = '8px';
+    legend.style.border = '1px solid #ccc';
+    legend.style.borderRadius = '4px';
+    legend.style.fontSize = '12px';
+    legend.style.zIndex = '1000';
+    legend.innerHTML = `
+        <div style="color: #9c27b0; margin-bottom: 4px;">● ATR % 20</div>
+        <div style="color: #ff6b6b; margin-bottom: 4px;">--- Max 20</div>
+        <div style="color: #48cae4;">--- Min 20</div>
+    `;
+    document.getElementById('chart').appendChild(legend);
+
+    chart.subscribeCrosshairMove(param => {
+        if (param.time && param.seriesPrices) {
+            const seriesPrices = param.seriesPrices.get(candlestickSeries);
+            if (seriesPrices) {
+                const candle = candleMap.get(param.time);
+                if (candle) {
+                    const change = ((candle.close - candle.open) / candle.open * 100).toFixed(2);
+                    const changeColor = candle.close >= candle.open ? '#26a69a' : '#ef5350';
+                    const changeSymbol = candle.close >= candle.open ? '↗' : '↘';
+
+                    // Получаем значение ATR для текущего времени
+                    const atrValue = atrMap.get(param.time);
+                    const atrText = atrValue !== undefined ? ` | <strong>ATR %:</strong> ${atrValue.toFixed(2)}%` : '';
+
+                    priceInfo.innerHTML = `
+                    <strong>Время:</strong> ${new Date(param.time * 1000).toLocaleString()} |
+                    <strong>O:</strong> ${candle.open.toFixed(4)} |
+                    <strong>H:</strong> ${candle.high.toFixed(4)} |
+                    <strong>L:</strong> ${candle.low.toFixed(4)} |
+                    <strong>C:</strong> ${candle.close.toFixed(4)} |
+                    <strong style="color: ${changeColor}">${changeSymbol} ${change}%</strong>
+                    ${atrText}
+                `;
+                    return;
+                }
+            }
+        }
+        priceInfo.textContent = 'Наведите на свечу для просмотра деталей';
+    });
+
+</script>
+{% endblock %}
