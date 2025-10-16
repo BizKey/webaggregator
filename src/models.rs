@@ -110,6 +110,8 @@ pub struct Strategy {
     pub loss_point: f64,
     pub position_size: f64,
     pub result_trade: String,
+    pub tp_per: f64,
+    pub sl_per: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -149,8 +151,8 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     let mut strategies = Vec::new();
     let mut is_long = true;
     let position_size: f64 = 100.0;
-    let tp: f64 = 5.0;
-    let sl: f64 = 1.5;
+    let tp: f64 = 6.0;
+    let sl: f64 = 2.0;
 
     // Преобразуем все close значения заранее для эффективности
     let close_values: Vec<f64> = candles
@@ -213,6 +215,8 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             loss_point: loss_point,
             position_size: position_size,
             result_trade,
+            tp_per: tp,
+            sl_per: sl,
         });
 
         is_long = !is_long;
@@ -236,19 +240,19 @@ fn determine_trade_result(
 
         if is_long {
             // Для лонга: TP - когда high достиг profit_point, SL - когда low достиг loss_point
-            if high >= profit_point {
-                return String::from("TP");
-            }
             if low <= loss_point {
                 return String::from("SL");
             }
-        } else {
-            // Для шорта: TP - когда low достиг profit_point, SL - когда high достиг loss_point
-            if low <= profit_point {
+            if high >= profit_point {
                 return String::from("TP");
             }
+        } else {
+            // Для шорта: TP - когда low достиг profit_point, SL - когда high достиг loss_point
             if high >= loss_point {
                 return String::from("SL");
+            }
+            if low <= profit_point {
+                return String::from("TP");
             }
         }
     }
