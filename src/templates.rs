@@ -53,7 +53,18 @@ pub struct BorrowsTemplate {
 }
 //
 //
-// Cnadle template
+//
+//
+//
+#[derive(Template)]
+#[template(path = "strategy/strategy.html")]
+pub struct StrategyTemplate {
+    pub candles: Vec<(usize, Candle)>,
+    pub elapsed_ms: u128,
+}
+//
+//
+// Candle template
 //
 //
 #[derive(Template)]
