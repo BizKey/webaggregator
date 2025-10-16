@@ -110,6 +110,8 @@ pub struct Strategy {
     pub loss_point: f64,
     pub position_size: f64,
     pub result_trade: String,
+    pub tp_per: f64,
+    pub sl_per: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -213,6 +215,8 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             loss_point: loss_point,
             position_size: position_size,
             result_trade,
+            tp_per: tp,
+            sl_per: sl,
         });
 
         is_long = !is_long;
