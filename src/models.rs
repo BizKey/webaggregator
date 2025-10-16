@@ -105,6 +105,7 @@ pub struct Strategy {
     pub close: String,
     pub volume: String,
     pub quote_volume: String,
+    pub entry_point: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -158,6 +159,7 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
                 close: c.close.clone(),
                 volume: c.volume.clone(),
                 quote_volume: c.quote_volume.clone(),
+                entry_point: c.close.clone(),
             })
         } else {
             strategies.push(Strategy {
@@ -172,6 +174,7 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
                 close: c.close.clone(),
                 volume: c.volume.clone(),
                 quote_volume: c.quote_volume.clone(),
+                entry_point: c.close.clone(),
             })
         };
 
