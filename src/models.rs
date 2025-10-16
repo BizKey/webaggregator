@@ -145,27 +145,37 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     let mut is_long = true;
 
     for c in candles {
-        let position = if is_long {
-            String::from("Long")
+        if is_long {
+            strategies.push(Strategy {
+                position: String::from("Long"),
+                exchange: c.exchange.clone(),
+                symbol: c.symbol.clone(),
+                interval: c.interval.clone(),
+                timestamp: c.timestamp.clone(),
+                open: c.open.clone(),
+                high: c.high.clone(),
+                low: c.low.clone(),
+                close: c.close.clone(),
+                volume: c.volume.clone(),
+                quote_volume: c.quote_volume.clone(),
+            })
         } else {
-            String::from("Short")
+            strategies.push(Strategy {
+                position: String::from("Short"),
+                exchange: c.exchange.clone(),
+                symbol: c.symbol.clone(),
+                interval: c.interval.clone(),
+                timestamp: c.timestamp.clone(),
+                open: c.open.clone(),
+                high: c.high.clone(),
+                low: c.low.clone(),
+                close: c.close.clone(),
+                volume: c.volume.clone(),
+                quote_volume: c.quote_volume.clone(),
+            })
         };
 
         is_long = !is_long;
-
-        strategies.push(Strategy {
-            position,
-            exchange: c.exchange.clone(),
-            symbol: c.symbol.clone(),
-            interval: c.interval.clone(),
-            timestamp: c.timestamp.clone(),
-            open: c.open.clone(),
-            high: c.high.clone(),
-            low: c.low.clone(),
-            close: c.close.clone(),
-            volume: c.volume.clone(),
-            quote_volume: c.quote_volume.clone(),
-        });
     }
 
     strategies
