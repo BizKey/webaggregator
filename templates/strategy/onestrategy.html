@@ -11,6 +11,7 @@
 <table border="1">
     <thead>
         <tr>
+            <th>position</th>
             <th>exchange</th>
             <th>symbol</th>
             <th>interval</th>
@@ -26,6 +27,7 @@
     <tbody>
         {% for candle in candles %}
         <tr>
+            <td>{{ candle.position }}</td>
             <td>{{ candle.exchange }}</td>
             <td>{{ candle.symbol }}</td>
             <td>{{ candle.interval }}</td>

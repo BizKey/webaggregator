@@ -1,5 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker, calculate_atr,
+    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker, calc_strategy,
+    calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -352,21 +353,7 @@ pub async fn tickerstrategy(
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let processed_candles: Vec<Strategy> = candles
-        .iter()
-        .map(|c| Strategy {
-            exchange: c.exchange.clone(),
-            symbol: c.symbol.clone(),
-            interval: c.interval.clone(),
-            timestamp: c.timestamp.clone(),
-            open: c.open.clone(),
-            high: c.high.clone(),
-            low: c.low.clone(),
-            close: c.close.clone(),
-            volume: c.volume.clone(),
-            quote_volume: c.quote_volume.clone(),
-        })
-        .collect();
+    let processed_candles: Vec<Strategy> = calc_strategy(candles);
 
     let template = OneStrategyTemplate {
         candles: processed_candles,
