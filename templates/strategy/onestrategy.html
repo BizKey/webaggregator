@@ -20,6 +20,9 @@
             <th>volume</th>
             <th>quote_volume</th>
             <th>entry_point</th>
+            <th>profit_point</th>
+            <th>loss_point</th>
+            <th>position_size</th>
         </tr>
     </thead>
     <tbody>
@@ -37,6 +40,9 @@
             <td>{{ candle.volume }}</td>
             <td>{{ candle.quote_volume }}</td>
             <td>{{ candle.entry_point }}</td>
+            <td>{{ candle.profit_point }}</td>
+            <td>{{ candle.loss_point }}</td>
+            <td>{{ candle.position_size }}</td>
         </tr>
         {% endfor %}
     </tbody>

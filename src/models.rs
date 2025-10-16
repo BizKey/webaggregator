@@ -106,6 +106,9 @@ pub struct Strategy {
     pub volume: String,
     pub quote_volume: String,
     pub entry_point: String,
+    pub profit_point: f64,
+    pub loss_point: f64,
+    pub position_size: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -144,6 +147,9 @@ fn calculate_true_range(current: &Candle, previous: Option<&Candle>) -> f64 {
 pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     let mut strategies = Vec::new();
     let mut is_long = true;
+    let position_size: f64 = 100.0;
+    let tp: f64 = 5.0;
+    let sl: f64 = 1.5;
 
     for c in candles {
         if is_long {
@@ -160,6 +166,15 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
                 volume: c.volume.clone(),
                 quote_volume: c.quote_volume.clone(),
                 entry_point: c.close.clone(),
+                profit_point: {
+                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
+                    close_value * (1.0 + tp / 100.0)
+                },
+                loss_point: {
+                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
+                    close_value * (1.0 - sl / 100.0)
+                },
+                position_size: position_size,
             })
         } else {
             strategies.push(Strategy {
@@ -175,6 +190,15 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
                 volume: c.volume.clone(),
                 quote_volume: c.quote_volume.clone(),
                 entry_point: c.close.clone(),
+                profit_point: {
+                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
+                    close_value * (1.0 - tp / 100.0)
+                },
+                loss_point: {
+                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
+                    close_value * (1.0 + sl / 100.0)
+                },
+                position_size: position_size,
             })
         };
 
