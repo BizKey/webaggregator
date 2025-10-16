@@ -109,6 +109,7 @@ pub struct Strategy {
     pub profit_point: f64,
     pub loss_point: f64,
     pub position_size: f64,
+    pub result_trade: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -151,61 +152,109 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     let tp: f64 = 5.0;
     let sl: f64 = 1.5;
 
-    for c in candles {
-        if is_long {
-            strategies.push(Strategy {
-                position: String::from("Long"),
-                exchange: c.exchange.clone(),
-                symbol: c.symbol.clone(),
-                interval: c.interval.clone(),
-                timestamp: c.timestamp.clone(),
-                open: c.open.clone(),
-                high: c.high.clone(),
-                low: c.low.clone(),
-                close: c.close.clone(),
-                volume: c.volume.clone(),
-                quote_volume: c.quote_volume.clone(),
-                entry_point: c.close.clone(),
-                profit_point: {
-                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
-                    close_value * (1.0 + tp / 100.0)
-                },
-                loss_point: {
-                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
-                    close_value * (1.0 - sl / 100.0)
-                },
-                position_size: position_size,
-            })
+    // Преобразуем все close значения заранее для эффективности
+    let close_values: Vec<f64> = candles
+        .iter()
+        .map(|c| c.close.parse().unwrap_or(0.0))
+        .collect();
+
+    let high_values: Vec<f64> = candles
+        .iter()
+        .map(|c| c.high.parse().unwrap_or(0.0))
+        .collect();
+
+    let low_values: Vec<f64> = candles
+        .iter()
+        .map(|c| c.low.parse().unwrap_or(0.0))
+        .collect();
+
+    for (i, c) in candles.iter().enumerate() {
+        let close_value = close_values[i];
+        let (profit_point, loss_point) = if is_long {
+            (
+                close_value * (1.0 + tp / 100.0),
+                close_value * (1.0 - sl / 100.0),
+            )
         } else {
-            strategies.push(Strategy {
-                position: String::from("Short"),
-                exchange: c.exchange.clone(),
-                symbol: c.symbol.clone(),
-                interval: c.interval.clone(),
-                timestamp: c.timestamp.clone(),
-                open: c.open.clone(),
-                high: c.high.clone(),
-                low: c.low.clone(),
-                close: c.close.clone(),
-                volume: c.volume.clone(),
-                quote_volume: c.quote_volume.clone(),
-                entry_point: c.close.clone(),
-                profit_point: {
-                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
-                    close_value * (1.0 - tp / 100.0)
-                },
-                loss_point: {
-                    let close_value: f64 = c.close.parse().unwrap_or(0.0);
-                    close_value * (1.0 + sl / 100.0)
-                },
-                position_size: position_size,
-            })
+            (
+                close_value * (1.0 - tp / 100.0),
+                close_value * (1.0 + sl / 100.0),
+            )
         };
+
+        // Определяем результат сделки
+        let result_trade = determine_trade_result(
+            i,
+            is_long,
+            profit_point,
+            loss_point,
+            &high_values,
+            &low_values,
+        );
+
+        strategies.push(Strategy {
+            position: if is_long {
+                String::from("Long")
+            } else {
+                String::from("Short")
+            },
+            exchange: c.exchange.clone(),
+            symbol: c.symbol.clone(),
+            interval: c.interval.clone(),
+            timestamp: c.timestamp.clone(),
+            open: c.open.clone(),
+            high: c.high.clone(),
+            low: c.low.clone(),
+            close: c.close.clone(),
+            volume: c.volume.clone(),
+            quote_volume: c.quote_volume.clone(),
+            entry_point: c.close.clone(),
+            profit_point: profit_point,
+            loss_point: loss_point,
+            position_size: position_size,
+            result_trade, // Добавляем результат сделки
+        });
 
         is_long = !is_long;
     }
 
     strategies
+}
+
+fn determine_trade_result(
+    entry_index: usize,
+    is_long: bool,
+    profit_point: f64,
+    loss_point: f64,
+    high_values: &[f64],
+    low_values: &[f64],
+) -> String {
+    // Ищем в последующих свечах, что сработало первое - TP или SL
+    for i in (entry_index + 1)..high_values.len() {
+        let high = high_values[i];
+        let low = low_values[i];
+
+        if is_long {
+            // Для лонга: TP - когда high достиг profit_point, SL - когда low достиг loss_point
+            if high >= profit_point {
+                return String::from("TP");
+            }
+            if low <= loss_point {
+                return String::from("SL");
+            }
+        } else {
+            // Для шорта: TP - когда low достиг profit_point, SL - когда high достиг loss_point
+            if low <= profit_point {
+                return String::from("TP");
+            }
+            if high >= loss_point {
+                return String::from("SL");
+            }
+        }
+    }
+
+    // Если не сработал ни TP ни SL до конца данных
+    String::from("Open")
 }
 
 pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
