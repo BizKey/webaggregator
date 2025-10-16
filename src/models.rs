@@ -92,6 +92,19 @@ pub struct Candle {
     pub volume: String,
     pub quote_volume: String,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct Strategy {
+    pub exchange: String,
+    pub symbol: String,
+    pub interval: String,
+    pub timestamp: String,
+    pub open: String,
+    pub high: String,
+    pub low: String,
+    pub close: String,
+    pub volume: String,
+    pub quote_volume: String,
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CandleWithAtr {
