@@ -354,10 +354,7 @@ pub async fn tickerstrategy(
     })?;
 
     let increment = sqlx::query_as::<_, SymbolIncrement>(
-        "SELECT price_increment
-            FROM symbol 
-            WHERE symbol = $1
-            ORDER BY symbol, timestamp::BIGINT ASC",
+        "SELECT price_increment FROM symbol WHERE symbol = $1",
     )
     .bind(&symbol_name)
     .fetch_one(pool.get_ref())
