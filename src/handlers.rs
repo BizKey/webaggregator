@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker, calc_strategy,
-    calculate_atr,
+    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, SymbolIncrement, Ticker,
+    calc_strategy, calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -353,7 +353,21 @@ pub async fn tickerstrategy(
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let processed_candles: Vec<Strategy> = calc_strategy(candles);
+    let increment = sqlx::query_as::<_, SymbolIncrement>(
+        "SELECT price_increment
+            FROM symbol 
+            WHERE symbol = $1
+            ORDER BY symbol, timestamp::BIGINT ASC",
+    )
+    .bind(&symbol_name)
+    .fetch_one(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+    let processed_candles: Vec<Strategy> = calc_strategy(candles, increment);
 
     let template = OneStrategyTemplate {
         candles: processed_candles,
