@@ -154,7 +154,6 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     let tp: f64 = 6.0;
     let sl: f64 = 2.0;
 
-    // Преобразуем все close значения заранее для эффективности
     let close_values: Vec<f64> = candles
         .iter()
         .map(|c| c.close.parse().unwrap_or(0.0))
