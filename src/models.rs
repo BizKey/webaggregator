@@ -12,6 +12,10 @@ pub struct Ticker {
     pub maker_coefficient: Option<String>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct SymbolIncrement {
+    pub price_increment: String,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Symbol {
     pub exchange: String,
     pub symbol: String,
@@ -158,8 +162,8 @@ fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     let factor = 10f64.powi(decimals as i32);
     (value * factor).round() / factor
 }
-pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
-    let precision_str = String::from("0.0001");
+pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<Strategy> {
+    let precision_str = increment.price_increment;
     let decimal_places = get_decimal_places(&precision_str); // Вернет 4
     let mut strategies = Vec::new();
     let mut is_long = true;
