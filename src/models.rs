@@ -146,8 +146,21 @@ fn calculate_true_range(current: &Candle, previous: Option<&Candle>) -> f64 {
         high - low
     }
 }
+fn get_decimal_places(precision_str: &str) -> u32 {
+    if let Some(dot_pos) = precision_str.find('.') {
+        (precision_str.len() - dot_pos - 1) as u32
+    } else {
+        0
+    }
+}
 
+fn round_to_decimal(value: f64, decimals: u32) -> f64 {
+    let factor = 10f64.powi(decimals as i32);
+    (value * factor).round() / factor
+}
 pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
+    let precision_str = String::from("0.0001");
+    let decimal_places = get_decimal_places(&precision_str); // Вернет 4
     let mut strategies = Vec::new();
     let mut is_long = true;
     let position_size: f64 = 100.0;
@@ -186,8 +199,8 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
         let result_trade = determine_trade_result(
             i,
             is_long,
-            profit_point,
-            loss_point,
+            round_to_decimal(profit_point, decimal_places),
+            round_to_decimal(loss_point, decimal_places),
             &high_values,
             &low_values,
         );
