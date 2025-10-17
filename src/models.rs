@@ -163,8 +163,7 @@ fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     (value * factor).round() / factor
 }
 pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<Strategy> {
-    let precision_str = increment.price_increment;
-    let decimal_places = get_decimal_places(&precision_str); // Вернет 4
+    let decimal_price_increment = get_decimal_places(&increment.price_increment);
     let mut strategies = Vec::new();
     let mut is_long = true;
     let position_size: f64 = 100.0;
@@ -203,8 +202,8 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
         let result_trade = determine_trade_result(
             i,
             is_long,
-            round_to_decimal(profit_point, decimal_places),
-            round_to_decimal(loss_point, decimal_places),
+            round_to_decimal(profit_point, decimal_price_increment),
+            round_to_decimal(loss_point, decimal_price_increment),
             &high_values,
             &low_values,
         );
