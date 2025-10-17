@@ -163,8 +163,7 @@ fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     (value * factor).round() / factor
 }
 pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<Strategy> {
-    let precision_str = increment.price_increment;
-    let decimal_places = get_decimal_places(&precision_str); // Вернет 4
+    let decimal_price_increment = get_decimal_places(&increment.price_increment);
     let mut strategies = Vec::new();
     let mut is_long = true;
     let position_size: f64 = 100.0;
@@ -188,7 +187,7 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
 
     for (i, c) in candles.iter().enumerate() {
         let close_value = close_values[i];
-        let (profit_point, loss_point) = if is_long {
+        let (profit_price, loss_price) = if is_long {
             (
                 close_value * (1.0 + tp / 100.0),
                 close_value * (1.0 - sl / 100.0),
@@ -203,8 +202,8 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
         let result_trade = determine_trade_result(
             i,
             is_long,
-            round_to_decimal(profit_point, decimal_places),
-            round_to_decimal(loss_point, decimal_places),
+            profit_price,
+            loss_price,
             &high_values,
             &low_values,
         );
@@ -226,8 +225,8 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
             volume: c.volume.clone(),
             quote_volume: c.quote_volume.clone(),
             entry_price: c.close.clone(),
-            profit_price: profit_point,
-            loss_price: loss_point,
+            profit_price: round_to_decimal(profit_price, decimal_price_increment),
+            loss_price: round_to_decimal(loss_price, decimal_price_increment),
             position_size: position_size,
             result_trade: result_trade.trade_final,
             tp_per: tp,
