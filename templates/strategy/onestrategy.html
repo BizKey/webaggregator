@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Candle{% endblock %}
+{% block title %}Strategy{% endblock %}
 
 {% block content %}
 <p><a href="/strategy">Strategy</a></p>
@@ -24,6 +24,8 @@
             <th>loss_price</th>
             <th>position_size</th>
             <th>result_trade</th>
+            <th>result_profit</th>
+            <th>result_loss</th>
             <th>tp</th>
             <th>sl</th>
         </tr>
@@ -47,6 +49,8 @@
             <td>{{ candle.loss_price }}</td>
             <td>{{ candle.position_size }}</td>
             <td>{{ candle.result_trade }}</td>
+            <td>{{ candle.result_profit }}</td>
+            <td>{{ candle.result_loss }}</td>
             <td>{{ candle.tp_per }}</td>
             <td>{{ candle.sl_per }}</td>
         </tr>

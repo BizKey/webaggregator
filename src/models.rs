@@ -114,6 +114,8 @@ pub struct Strategy {
     pub loss_price: f64,
     pub position_size: f64,
     pub result_trade: String,
+    pub result_profit: f64,
+    pub result_loss: f64,
     pub tp_per: f64,
     pub sl_per: f64,
 }
@@ -204,6 +206,9 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
             is_long,
             profit_price,
             loss_price,
+            tp,
+            sl,
+            position_size,
             &high_values,
             &low_values,
         );
@@ -229,6 +234,8 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
             loss_price: round_to_decimal(loss_price, decimal_price_increment),
             position_size: position_size,
             result_trade: result_trade.trade_final,
+            result_profit: result_trade.profit,
+            result_loss: result_trade.loss,
             tp_per: tp,
             sl_per: sl,
         });
@@ -242,6 +249,8 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<St
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 struct TradeResult {
     trade_final: String,
+    profit: f64,
+    loss: f64,
 }
 
 fn determine_trade_result(
@@ -249,6 +258,9 @@ fn determine_trade_result(
     is_long: bool,
     profit_point: f64,
     loss_point: f64,
+    tp: f64,
+    sl: f64,
+    position_size: f64,
     high_values: &[f64],
     low_values: &[f64],
 ) -> TradeResult {
@@ -262,11 +274,15 @@ fn determine_trade_result(
             if low <= loss_point {
                 return TradeResult {
                     trade_final: String::from("SL"),
+                    profit: 0.0,
+                    loss: position_size * (100.0 / sl),
                 };
             }
             if high >= profit_point {
                 return TradeResult {
                     trade_final: String::from("TP"),
+                    profit: position_size * (100.0 / tp),
+                    loss: 0.0,
                 };
             }
         } else {
@@ -274,11 +290,15 @@ fn determine_trade_result(
             if high >= loss_point {
                 return TradeResult {
                     trade_final: String::from("SL"),
+                    profit: 0.0,
+                    loss: position_size * (100.0 / sl),
                 };
             }
             if low <= profit_point {
                 return TradeResult {
                     trade_final: String::from("TP"),
+                    profit: position_size * (100.0 / tp),
+                    loss: 0.0,
                 };
             }
         }
@@ -287,6 +307,8 @@ fn determine_trade_result(
     // Если не сработал ни TP ни SL до конца данных
     TradeResult {
         trade_final: String::from("Open"),
+        profit: 0.0,
+        loss: 0.0,
     }
 }
 
