@@ -1,4 +1,6 @@
-use crate::models::{Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker};
+use crate::models::{
+    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker, Total,
+};
 use askama::Template;
 
 //
@@ -66,6 +68,7 @@ pub struct StrategyTemplate {
 #[template(path = "strategy/onestrategy.html")]
 pub struct OneStrategyTemplate {
     pub candles: Vec<Strategy>,
+    pub total: Total,
     pub elapsed_ms: u128,
 }
 //

@@ -1,6 +1,6 @@
 use crate::models::{
     Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, SymbolIncrement, Ticker,
-    calc_strategy, calculate_atr,
+    Total, calc_strategy, calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -366,8 +366,17 @@ pub async fn tickerstrategy(
 
     let processed_candles: Vec<Strategy> = calc_strategy(candles, increment);
 
+    let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
+    let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
+    let net_result: f64 = total_profit - total_loss;
+
     let template = OneStrategyTemplate {
         candles: processed_candles,
+        total: Total {
+            total: net_result,
+            total_loss: total_loss,
+            total_profit: total_profit,
+        },
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
