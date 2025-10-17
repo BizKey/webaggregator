@@ -16,6 +16,12 @@ pub struct SymbolIncrement {
     pub price_increment: String,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct Total {
+    pub total: f64,
+    pub total_loss: f64,
+    pub total_profit: f64,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Symbol {
     pub exchange: String,
     pub symbol: String,
@@ -275,13 +281,13 @@ fn determine_trade_result(
                 return TradeResult {
                     trade_final: String::from("SL"),
                     profit: 0.0,
-                    loss: position_size * (100.0 / sl),
+                    loss: position_size * (sl / 100.0),
                 };
             }
             if high >= profit_point {
                 return TradeResult {
                     trade_final: String::from("TP"),
-                    profit: position_size * (100.0 / tp),
+                    profit: position_size * (tp / 100.0),
                     loss: 0.0,
                 };
             }
@@ -291,13 +297,13 @@ fn determine_trade_result(
                 return TradeResult {
                     trade_final: String::from("SL"),
                     profit: 0.0,
-                    loss: position_size * (100.0 / sl),
+                    loss: position_size * (sl / 100.0),
                 };
             }
             if low <= profit_point {
                 return TradeResult {
                     trade_final: String::from("TP"),
-                    profit: position_size * (100.0 / tp),
+                    profit: position_size * (tp / 100.0),
                     loss: 0.0,
                 };
             }
