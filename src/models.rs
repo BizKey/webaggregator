@@ -154,7 +154,6 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     let tp: f64 = 6.0;
     let sl: f64 = 2.0;
 
-    // Преобразуем все close значения заранее для эффективности
     let close_values: Vec<f64> = candles
         .iter()
         .map(|c| c.close.parse().unwrap_or(0.0))
@@ -184,7 +183,6 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             )
         };
 
-        // Определяем результат сделки
         let result_trade = determine_trade_result(
             i,
             is_long,
@@ -214,7 +212,7 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             profit_point: profit_point,
             loss_point: loss_point,
             position_size: position_size,
-            result_trade,
+            result_trade: result_trade.trade_final,
             tp_per: tp,
             sl_per: sl,
         });
@@ -225,6 +223,11 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
     strategies
 }
 
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+struct TradeResult {
+    trade_final: String,
+}
+
 fn determine_trade_result(
     entry_index: usize,
     is_long: bool,
@@ -232,7 +235,7 @@ fn determine_trade_result(
     loss_point: f64,
     high_values: &[f64],
     low_values: &[f64],
-) -> String {
+) -> TradeResult {
     // Ищем в последующих свечах, что сработало первое - TP или SL
     for i in (entry_index + 1)..high_values.len() {
         let high = high_values[i];
@@ -241,24 +244,34 @@ fn determine_trade_result(
         if is_long {
             // Для лонга: TP - когда high достиг profit_point, SL - когда low достиг loss_point
             if low <= loss_point {
-                return String::from("SL");
+                return TradeResult {
+                    trade_final: String::from("SL"),
+                };
             }
             if high >= profit_point {
-                return String::from("TP");
+                return TradeResult {
+                    trade_final: String::from("TP"),
+                };
             }
         } else {
             // Для шорта: TP - когда low достиг profit_point, SL - когда high достиг loss_point
             if high >= loss_point {
-                return String::from("SL");
+                return TradeResult {
+                    trade_final: String::from("SL"),
+                };
             }
             if low <= profit_point {
-                return String::from("TP");
+                return TradeResult {
+                    trade_final: String::from("TP"),
+                };
             }
         }
     }
 
     // Если не сработал ни TP ни SL до конца данных
-    String::from("Open")
+    TradeResult {
+        trade_final: String::from("Open"),
+    }
 }
 
 pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
