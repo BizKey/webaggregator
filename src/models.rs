@@ -184,7 +184,6 @@ pub fn calc_strategy(candles: Vec<Candle>) -> Vec<Strategy> {
             )
         };
 
-        // Определяем результат сделки
         let result_trade = determine_trade_result(
             i,
             is_long,
