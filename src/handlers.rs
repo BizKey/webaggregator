@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleProfit, CandleWithAtr, Currency, Lend, Strategy, Symbol, SymbolIncrement,
-    Ticker, Total, calc_strategy, calculate_atr,
+    Borrow, Candle, CandleProfit, CandleWithAtr, CandleWithIncrement, Currency, Lend, Strategy,
+    Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -186,86 +186,89 @@ pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<Ht
 pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
-    let symbols =
-        sqlx::query_scalar::<_, String>("SELECT DISTINCT symbol FROM candle ORDER BY symbol")
-            .fetch_all(pool.get_ref())
-            .await
-            .map_err(|e| {
-                eprintln!("Database error: {}", e);
-                actix_web::error::ErrorInternalServerError("Database error")
-            })?;
+    let candle_data: Vec<CandleWithIncrement> = sqlx::query_as::<_, CandleWithIncrement>(
+        r#"
+        SELECT 
+            c.exchange, 
+            c.symbol, 
+            c.interval, 
+            c.timestamp, 
+            c.open, 
+            c.high, 
+            c.low, 
+            c.close, 
+            c.volume, 
+            c.quote_volume,
+            s.price_increment
+        FROM candle c
+        JOIN symbol s ON c.symbol = s.symbol
+        ORDER BY c.symbol, c.timestamp::BIGINT ASC
+        "#,
+    )
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
 
-    let symbol_increments_futures: Vec<_> = symbols
-        .iter()
-        .map(|symbol| {
-            sqlx::query_as::<_, SymbolIncrement>(
-                "SELECT price_increment FROM symbol WHERE symbol = $1",
-            )
-            .bind(symbol)
-            .fetch_one(pool.get_ref())
-        })
-        .collect();
+    let mut candles_by_symbol: HashMap<String, (SymbolIncrement, Vec<Candle>)> = HashMap::new();
 
-    let symbol_increments = futures::future::try_join_all(symbol_increments_futures)
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
-        })?;
+    for data in candle_data {
+        let symbol = data.symbol.clone();
+        let entry = candles_by_symbol.entry(symbol).or_insert_with(|| {
+            let increment = SymbolIncrement {
+                price_increment: data.price_increment.to_string(),
+            };
+            (increment, Vec::new())
+        });
 
-    let increment_map: HashMap<_, _> = symbols
-        .iter()
-        .zip(symbol_increments.iter())
-        .map(|(symbol, increment)| (symbol.as_str(), increment))
-        .collect();
+        let candle = Candle {
+            exchange: data.exchange,
+            symbol: data.symbol,
+            interval: data.interval,
+            timestamp: data.timestamp,
+            open: data.open,
+            high: data.high,
+            low: data.low,
+            close: data.close,
+            volume: data.volume,
+            quote_volume: data.quote_volume,
+        };
 
-    let candles_futures: Vec<_> = symbols.iter().map(|symbol| {
-        sqlx::query_as::<_, Candle>(
-            "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
-             FROM candle 
-             WHERE symbol = $1
-             ORDER BY timestamp::BIGINT ASC"
-        )
-        .bind(symbol)
-        .fetch_all(pool.get_ref())
-    }).collect();
+        entry.1.push(candle);
+    }
 
-    let all_candles_results = futures::future::try_join_all(candles_futures)
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
-        })?;
+    // 3. Обрабатываем данные
+    let mut candle_with_profit = Vec::with_capacity(candles_by_symbol.len());
 
-    let mut candle_with_profit = Vec::with_capacity(symbols.len());
+    for (symbol, (increment, candles)) in candles_by_symbol {
+        if let Some(latest_candle) = candles.last() {
+            let processed_candles = calc_strategy(candles.clone(), &increment);
 
-    for (symbol, candles) in symbols.iter().zip(all_candles_results.iter()) {
-        if let Some(increment) = increment_map.get(symbol.as_str()) {
-            if let Some(latest_candle) = candles.last() {
-                let processed_candles = calc_strategy(candles.clone(), increment);
+            let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
+            let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
+            let net_result = total_profit - total_loss;
 
-                let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
-                let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
-                let net_result = total_profit - total_loss;
-
-                candle_with_profit.push(CandleProfit {
-                    exchange: latest_candle.exchange.clone(),
-                    symbol: latest_candle.symbol.clone(),
-                    interval: latest_candle.interval.clone(),
-                    open: latest_candle.open.clone(),
-                    timestamp: latest_candle.timestamp.clone(),
-                    high: latest_candle.high.clone(),
-                    low: latest_candle.low.clone(),
-                    close: latest_candle.close.clone(),
-                    volume: latest_candle.volume.clone(),
-                    quote_volume: latest_candle.quote_volume.clone(),
-                    profit: net_result,
-                });
-            }
+            candle_with_profit.push(CandleProfit {
+                exchange: latest_candle.exchange.clone(),
+                symbol: latest_candle.symbol.clone(),
+                interval: latest_candle.interval.clone(),
+                open: latest_candle.open.clone(),
+                timestamp: latest_candle.timestamp.clone(),
+                high: latest_candle.high.clone(),
+                low: latest_candle.low.clone(),
+                close: latest_candle.close.clone(),
+                volume: latest_candle.volume.clone(),
+                quote_volume: latest_candle.quote_volume.clone(),
+                profit: net_result,
+            });
         }
     }
 
-    // Остальной код без изменений
+    // Сортируем результаты (опционально)
+    candle_with_profit.sort_by(|a, b| a.symbol.cmp(&b.symbol));
+
     let candles_with_index: Vec<(usize, CandleProfit)> = candle_with_profit
         .into_iter()
         .enumerate()

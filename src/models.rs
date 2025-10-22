@@ -116,6 +116,20 @@ pub struct CandleProfit {
     pub quote_volume: String,
     pub profit: f64,
 }
+#[derive(Debug, sqlx::FromRow)]
+pub struct CandleWithIncrement {
+    pub exchange: String,
+    pub symbol: String,
+    pub interval: String,
+    pub timestamp: String,
+    pub open: String,
+    pub high: String,
+    pub low: String,
+    pub close: String,
+    pub volume: String,
+    pub quote_volume: String,
+    pub price_increment: String,
+}
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Strategy {
     pub position: String,
