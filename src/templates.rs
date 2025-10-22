@@ -62,6 +62,7 @@ pub struct BorrowsTemplate {
 #[template(path = "strategy/strategy.html")]
 pub struct StrategyTemplate {
     pub candles: Vec<(usize, CandleProfit)>,
+    pub total_profit: f64,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
