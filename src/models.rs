@@ -89,7 +89,7 @@ pub struct Borrow {
     pub annualized_borrow_rate: String,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromRow)]
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Candle {
     pub exchange: String,
     pub symbol: String,
@@ -184,7 +184,7 @@ fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     let factor = 10f64.powi(decimals as i32);
     (value * factor).round() / factor
 }
-pub fn calc_strategy(candles: Vec<Candle>, increment: SymbolIncrement) -> Vec<Strategy> {
+pub fn calc_strategy(candles: Vec<Candle>, increment: &SymbolIncrement) -> Vec<Strategy> {
     let decimal_price_increment = get_decimal_places(&increment.price_increment);
     let mut strategies = Vec::new();
     let mut is_long = true;

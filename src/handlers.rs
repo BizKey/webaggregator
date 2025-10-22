@@ -9,6 +9,7 @@ use crate::templates::{
 };
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
+use std::collections::HashMap;
 
 use sqlx::PgPool;
 use std::time::Instant;
@@ -183,72 +184,88 @@ pub async fn lend(path: web::Path<String>, pool: web::Data<PgPool>) -> Result<Ht
 }
 
 pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // all candle
-
-    // time start
     let start = Instant::now();
 
-    let all_candles = sqlx::query_as::<_, Candle>(
-        "SELECT DISTINCT ON (symbol) 
-                exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume 
-            FROM candle 
-            ORDER BY symbol, timestamp::BIGINT DESC",
-    )
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    let symbols =
+        sqlx::query_scalar::<_, String>("SELECT DISTINCT symbol FROM candle ORDER BY symbol")
+            .fetch_all(pool.get_ref())
+            .await
+            .map_err(|e| {
+                eprintln!("Database error: {}", e);
+                actix_web::error::ErrorInternalServerError("Database error")
+            })?;
 
-    let mut candle_with_profit: Vec<CandleProfit> = Vec::new();
+    let symbol_increments_futures: Vec<_> = symbols
+        .iter()
+        .map(|symbol| {
+            sqlx::query_as::<_, SymbolIncrement>(
+                "SELECT price_increment FROM symbol WHERE symbol = $1",
+            )
+            .bind(symbol)
+            .fetch_one(pool.get_ref())
+        })
+        .collect();
 
-    for s in all_candles.iter() {
-        let candles = sqlx::query_as::<_, Candle>(
-        "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
-            FROM candle 
-            WHERE symbol = $1
-            ORDER BY symbol, timestamp::BIGINT ASC",
-    )
-    .bind(&s.symbol)
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-        let increment = sqlx::query_as::<_, SymbolIncrement>(
-            "SELECT price_increment FROM symbol WHERE symbol = $1",
-        )
-        .bind(&s.symbol)
-        .fetch_one(pool.get_ref())
+    let symbol_increments = futures::future::try_join_all(symbol_increments_futures)
         .await
         .map_err(|e| {
             eprintln!("Database error: {}", e);
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-        let processed_candles: Vec<Strategy> = calc_strategy(candles, increment);
+    let increment_map: HashMap<_, _> = symbols
+        .iter()
+        .zip(symbol_increments.iter())
+        .map(|(symbol, increment)| (symbol.as_str(), increment))
+        .collect();
 
-        let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
-        let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
-        let net_result: f64 = total_profit - total_loss;
-        candle_with_profit.push(CandleProfit {
-            exchange: s.exchange.clone(),
-            symbol: s.symbol.clone(),
-            interval: s.interval.clone(),
-            open: s.open.clone(),
-            timestamp: s.timestamp.clone(),
-            high: s.high.clone(),
-            low: s.low.clone(),
-            close: s.close.clone(),
-            volume: s.volume.clone(),
-            quote_volume: s.quote_volume.clone(),
-            profit: net_result,
-        });
+    let candles_futures: Vec<_> = symbols.iter().map(|symbol| {
+        sqlx::query_as::<_, Candle>(
+            "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+             FROM candle 
+             WHERE symbol = $1
+             ORDER BY timestamp::BIGINT ASC"
+        )
+        .bind(symbol)
+        .fetch_all(pool.get_ref())
+    }).collect();
+
+    let all_candles_results = futures::future::try_join_all(candles_futures)
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+    let mut candle_with_profit = Vec::with_capacity(symbols.len());
+
+    for (symbol, candles) in symbols.iter().zip(all_candles_results.iter()) {
+        if let Some(increment) = increment_map.get(symbol.as_str()) {
+            if let Some(latest_candle) = candles.last() {
+                let processed_candles = calc_strategy(candles.clone(), increment);
+
+                let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
+                let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
+                let net_result = total_profit - total_loss;
+
+                candle_with_profit.push(CandleProfit {
+                    exchange: latest_candle.exchange.clone(),
+                    symbol: latest_candle.symbol.clone(),
+                    interval: latest_candle.interval.clone(),
+                    open: latest_candle.open.clone(),
+                    timestamp: latest_candle.timestamp.clone(),
+                    high: latest_candle.high.clone(),
+                    low: latest_candle.low.clone(),
+                    close: latest_candle.close.clone(),
+                    volume: latest_candle.volume.clone(),
+                    quote_volume: latest_candle.quote_volume.clone(),
+                    profit: net_result,
+                });
+            }
+        }
     }
 
+    // Остальной код без изменений
     let candles_with_index: Vec<(usize, CandleProfit)> = candle_with_profit
         .into_iter()
         .enumerate()
@@ -259,6 +276,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         candles: candles_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
+
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
@@ -412,7 +430,7 @@ pub async fn tickerstrategy(
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let processed_candles: Vec<Strategy> = calc_strategy(candles, increment);
+    let processed_candles: Vec<Strategy> = calc_strategy(candles, &increment);
 
     let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
     let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
