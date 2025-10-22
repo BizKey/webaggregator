@@ -266,8 +266,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         }
     }
 
-    // Сортируем результаты (опционально)
-    candle_with_profit.sort_by(|a, b| a.symbol.cmp(&b.symbol));
+    let total_profit: f64 = candle_with_profit.iter().map(|s| s.profit).sum();
 
     let candles_with_index: Vec<(usize, CandleProfit)> = candle_with_profit
         .into_iter()
@@ -277,6 +276,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let template = StrategyTemplate {
         candles: candles_with_index,
+        total_profit: total_profit,
         elapsed_ms: start.elapsed().as_millis(),
     };
 
