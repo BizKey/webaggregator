@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleWithAtr, Currency, Lend, Strategy, Symbol, SymbolIncrement, Ticker,
-    Total, calc_strategy, calculate_atr,
+    Borrow, Candle, CandleProfit, CandleWithAtr, Currency, Lend, Strategy, Symbol, SymbolIncrement,
+    Ticker, Total, calc_strategy, calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -201,7 +201,55 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let candles_with_index: Vec<(usize, Candle)> = all_candles
+    let mut candle_with_profit: Vec<CandleProfit> = Vec::new();
+
+    for s in all_candles.iter() {
+        let candles = sqlx::query_as::<_, Candle>(
+        "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+            FROM candle 
+            WHERE symbol = $1
+            ORDER BY symbol, timestamp::BIGINT ASC",
+    )
+    .bind(&s.symbol)
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+        let increment = sqlx::query_as::<_, SymbolIncrement>(
+            "SELECT price_increment FROM symbol WHERE symbol = $1",
+        )
+        .bind(&s.symbol)
+        .fetch_one(pool.get_ref())
+        .await
+        .map_err(|e| {
+            eprintln!("Database error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
+
+        let processed_candles: Vec<Strategy> = calc_strategy(candles, increment);
+
+        let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
+        let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
+        let net_result: f64 = total_profit - total_loss;
+        candle_with_profit.push(CandleProfit {
+            exchange: s.exchange.clone(),
+            symbol: s.symbol.clone(),
+            interval: s.interval.clone(),
+            open: s.open.clone(),
+            timestamp: s.timestamp.clone(),
+            high: s.high.clone(),
+            low: s.low.clone(),
+            close: s.close.clone(),
+            volume: s.volume.clone(),
+            quote_volume: s.quote_volume.clone(),
+            profit: net_result,
+        });
+    }
+
+    let candles_with_index: Vec<(usize, CandleProfit)> = candle_with_profit
         .into_iter()
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
