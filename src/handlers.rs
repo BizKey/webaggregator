@@ -260,7 +260,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
-    let template = StrategyTemplate {
+    let template: StrategyTemplate = StrategyTemplate {
         candles: candles_with_index,
         total_profit: total_profit,
         elapsed_ms: start.elapsed().as_millis(),
