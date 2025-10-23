@@ -224,7 +224,7 @@ fn calculate_atr_for_candles(candles: &[CandleForStrategy], period: usize) -> Ve
     atr_values
 }
 
-fn round_to_decimal(value: f64, decimals: u32) -> f64 {
+pub fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     let factor = 10f64.powi(decimals as i32);
     (value * factor).round() / factor
 }

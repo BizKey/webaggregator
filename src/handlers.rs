@@ -1,6 +1,7 @@
 use crate::models::{
     Borrow, Candle, CandleForStrategy, CandleWithAtr, CandleWithIncrement, CandleWithProfit,
     Currency, Lend, Strategy, Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
+    round_to_decimal,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -423,9 +424,9 @@ pub async fn tickerstrategy(
     let template = OneStrategyTemplate {
         candles: processed_candles,
         total: Total {
-            total: net_result,
-            total_loss: total_loss,
-            total_profit: total_profit,
+            total: round_to_decimal(net_result, 2),
+            total_loss: round_to_decimal(total_loss, 2),
+            total_profit: round_to_decimal(total_profit, 2),
         },
         elapsed_ms: start.elapsed().as_millis(),
     };
