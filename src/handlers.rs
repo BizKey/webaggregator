@@ -239,7 +239,6 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         entry.1.push(candle);
     }
 
-    // 3. Обрабатываем данные
     let mut candle_with_profit = Vec::with_capacity(candles_by_symbol.len());
 
     for (symbol, (increment, candles)) in candles_by_symbol {
