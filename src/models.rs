@@ -237,11 +237,10 @@ pub fn calc_strategy(
     let mut is_long = true;
     let position_size: f64 = 100.0;
 
-    // Параметры ATR для TP/SL (в множителях ATR)
-    let tp_atr_multiplier: f64 = 2.0; // TP = 2 * ATR
-    let sl_atr_multiplier: f64 = 1.0; // SL = 1 * ATR
+    // Фиксированное соотношение риск:прибыль = 1:3
+    let risk_reward_ratio = 3.0;
+    let base_sl_atr = 1.0; // Базовый риск = 1 ATR
 
-    // Конвертируем свечи в числовые значения
     let close_values: Vec<f64> = candles
         .iter()
         .map(|c| c.close.parse().unwrap_or(0.0))
@@ -257,31 +256,31 @@ pub fn calc_strategy(
         .map(|c| c.low.parse().unwrap_or(0.0))
         .collect();
 
-    // Рассчитываем ATR для всех свечей
-    let atr_values = calculate_atr_for_candles(&candles, 20); // период ATR = 20
+    let atr_values = calculate_atr_for_candles(&candles, 20);
 
     for (i, c) in candles.iter().enumerate() {
         let close_value = close_values[i];
-
-        // Получаем текущее значение ATR
         let current_atr = if i < atr_values.len() {
             atr_values[i].unwrap_or(0.0)
         } else {
             0.0
         };
 
-        // Рассчитываем TP и SL на основе ATR
         let (profit_price, loss_price, tp_per, sl_per) = if is_long {
-            // Для лонга: TP = цена входа + (ATR * множитель), SL = цена входа - (ATR * множитель)
-            let tp_price = close_value + (current_atr * tp_atr_multiplier);
-            let sl_price = close_value - (current_atr * sl_atr_multiplier);
+            // Для лонга
+            let sl_price = close_value - (current_atr * base_sl_atr);
+            let risk_amount = close_value - sl_price;
+            let tp_price = close_value + (risk_amount * risk_reward_ratio);
+
             let tp_percent = ((tp_price - close_value) / close_value) * 100.0;
             let sl_percent = ((close_value - sl_price) / close_value) * 100.0;
             (tp_price, sl_price, tp_percent, sl_percent)
         } else {
-            // Для шорта: TP = цена входа - (ATR * множитель), SL = цена входа + (ATR * множитель)
-            let tp_price = close_value - (current_atr * tp_atr_multiplier);
-            let sl_price = close_value + (current_atr * sl_atr_multiplier);
+            // Для шорта
+            let sl_price = close_value + (current_atr * base_sl_atr);
+            let risk_amount = sl_price - close_value;
+            let tp_price = close_value - (risk_amount * risk_reward_ratio);
+
             let tp_percent = ((close_value - tp_price) / close_value) * 100.0;
             let sl_percent = ((sl_price - close_value) / close_value) * 100.0;
             (tp_price, sl_price, tp_percent, sl_percent)
@@ -316,7 +315,7 @@ pub fn calc_strategy(
             result_trade: result_trade.trade_final,
             result_profit: result_trade.profit,
             result_loss: result_trade.loss,
-            tp_per: round_to_decimal(tp_per, 2), // округляем проценты до 2 знаков
+            tp_per: round_to_decimal(tp_per, 2),
             sl_per: round_to_decimal(sl_per, 2),
         });
 
