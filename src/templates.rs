@@ -1,5 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleProfit, CandleWithAtr, Currency, Lend, Strategy, Symbol, Ticker, Total,
+    Borrow, Candle, CandleWithAtr, CandleWithProfit, Currency, Lend, Strategy, Symbol, Ticker,
+    Total,
 };
 use askama::Template;
 
@@ -61,7 +62,7 @@ pub struct BorrowsTemplate {
 #[derive(Template)]
 #[template(path = "strategy/strategy.html")]
 pub struct StrategyTemplate {
-    pub candles: Vec<(usize, CandleProfit)>,
+    pub candles: Vec<(usize, CandleWithProfit)>,
     pub total_profit: f64,
     pub elapsed_ms: u128,
 }

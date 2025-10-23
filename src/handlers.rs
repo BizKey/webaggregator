@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleProfit, CandleWithAtr, CandleWithIncrement, Currency, Lend, Strategy,
-    Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
+    Borrow, Candle, CandleForStrategy, CandleWithAtr, CandleWithIncrement, CandleWithProfit,
+    Currency, Lend, Strategy, Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -189,16 +189,11 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let candle_data: Vec<CandleWithIncrement> = sqlx::query_as::<_, CandleWithIncrement>(
         r#"
         SELECT 
-            c.exchange, 
-            c.symbol, 
-            c.interval, 
-            c.timestamp, 
+            c.symbol,  
             c.open, 
             c.high, 
             c.low, 
             c.close, 
-            c.volume, 
-            c.quote_volume,
             s.price_increment
         FROM candle c
         JOIN symbol s ON c.symbol = s.symbol
@@ -212,69 +207,50 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let mut candles_by_symbol: HashMap<String, (SymbolIncrement, Vec<Candle>)> = HashMap::new();
+    let mut candles_by_symbol: HashMap<String, (SymbolIncrement, Vec<CandleForStrategy>)> =
+        HashMap::new();
 
     for data in candle_data {
-        let symbol = data.symbol.clone();
-        let entry = candles_by_symbol.entry(symbol).or_insert_with(|| {
-            let increment = SymbolIncrement {
-                price_increment: data.price_increment.to_string(),
-            };
-            (increment, Vec::new())
-        });
+        let entry = candles_by_symbol
+            .entry(data.symbol.clone())
+            .or_insert_with(|| {
+                (
+                    SymbolIncrement {
+                        price_increment: data.price_increment.to_string(),
+                    },
+                    Vec::new(),
+                )
+            });
 
-        let candle = Candle {
-            exchange: data.exchange,
-            symbol: data.symbol,
-            interval: data.interval,
-            timestamp: data.timestamp,
+        entry.1.push(CandleForStrategy {
             open: data.open,
             high: data.high,
             low: data.low,
             close: data.close,
-            volume: data.volume,
-            quote_volume: data.quote_volume,
-        };
-
-        entry.1.push(candle);
+        });
     }
 
-    // 3. Обрабатываем данные
-    let mut candle_with_profit = Vec::with_capacity(candles_by_symbol.len());
+    let mut candle_with_profit: Vec<CandleWithProfit> = Vec::with_capacity(candles_by_symbol.len());
 
     for (symbol, (increment, candles)) in candles_by_symbol {
-        if let Some(latest_candle) = candles.last() {
-            let processed_candles = calc_strategy(candles.clone(), &increment);
-
-            let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
-            let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
-            let net_result = total_profit - total_loss;
-
-            candle_with_profit.push(CandleProfit {
-                exchange: latest_candle.exchange.clone(),
-                symbol: latest_candle.symbol.clone(),
-                interval: latest_candle.interval.clone(),
-                open: latest_candle.open.clone(),
-                timestamp: latest_candle.timestamp.clone(),
-                high: latest_candle.high.clone(),
-                low: latest_candle.low.clone(),
-                close: latest_candle.close.clone(),
-                volume: latest_candle.volume.clone(),
-                quote_volume: latest_candle.quote_volume.clone(),
-                profit: net_result,
-            });
-        }
+        candle_with_profit.push(CandleWithProfit {
+            symbol: symbol,
+            profit: calc_strategy(candles.clone(), &increment)
+                .iter()
+                .map(|s| s.result_profit - s.result_loss)
+                .sum(),
+        });
     }
 
     let total_profit: f64 = candle_with_profit.iter().map(|s| s.profit).sum();
 
-    let candles_with_index: Vec<(usize, CandleProfit)> = candle_with_profit
+    let candles_with_index: Vec<(usize, CandleWithProfit)> = candle_with_profit
         .into_iter()
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
-    let template = StrategyTemplate {
+    let template: StrategyTemplate = StrategyTemplate {
         candles: candles_with_index,
         total_profit: total_profit,
         elapsed_ms: start.elapsed().as_millis(),
@@ -408,8 +384,8 @@ pub async fn tickerstrategy(
     let start = Instant::now();
     let symbol_name = path.into_inner();
 
-    let candles = sqlx::query_as::<_, Candle>(
-        "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+    let candles: Vec<CandleForStrategy> = sqlx::query_as::<_, CandleForStrategy>(
+        "SELECT open, high, low, close
             FROM candle 
             WHERE symbol = $1
             ORDER BY symbol, timestamp::BIGINT ASC",
