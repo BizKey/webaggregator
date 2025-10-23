@@ -182,6 +182,48 @@ fn get_decimal_places(precision_str: &str) -> u32 {
     }
 }
 
+fn calculate_atr_for_candles(candles: &[CandleForStrategy], period: usize) -> Vec<Option<f64>> {
+    if candles.len() < period {
+        return vec![None; candles.len()];
+    }
+
+    let mut atr_values: Vec<Option<f64>> = vec![None; candles.len()];
+    let mut true_ranges: Vec<f64> = Vec::new();
+
+    // Рассчитываем True Range для всех свечей
+    for i in 0..candles.len() {
+        let high: f64 = candles[i].high.parse().unwrap_or(0.0);
+        let low: f64 = candles[i].low.parse().unwrap_or(0.0);
+
+        let tr = if i == 0 {
+            high - low // для первой свечи TR = High - Low
+        } else {
+            let prev_close: f64 = candles[i - 1].close.parse().unwrap_or(0.0);
+            let tr1 = high - low;
+            let tr2 = (high - prev_close).abs();
+            let tr3 = (low - prev_close).abs();
+            tr1.max(tr2).max(tr3)
+        };
+        true_ranges.push(tr);
+    }
+
+    // Рассчитываем ATR
+    for i in (period - 1)..candles.len() {
+        if i == period - 1 {
+            // Первое значение ATR - простая средняя первых period TR
+            let sum: f64 = true_ranges[0..=i].iter().sum();
+            atr_values[i] = Some(sum / period as f64);
+        } else {
+            // Последующие значения ATR - скользящая средняя
+            let prev_atr = atr_values[i - 1].unwrap();
+            let current_tr = true_ranges[i];
+            atr_values[i] = Some((prev_atr * (period - 1) as f64 + current_tr) / period as f64);
+        }
+    }
+
+    atr_values
+}
+
 fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     let factor = 10f64.powi(decimals as i32);
     (value * factor).round() / factor
@@ -194,9 +236,12 @@ pub fn calc_strategy(
     let mut strategies = Vec::new();
     let mut is_long = true;
     let position_size: f64 = 100.0;
-    let tp: f64 = 6.0;
-    let sl: f64 = 2.0;
 
+    // Параметры ATR для TP/SL (в множителях ATR)
+    let tp_atr_multiplier: f64 = 2.0; // TP = 2 * ATR
+    let sl_atr_multiplier: f64 = 1.0; // SL = 1 * ATR
+
+    // Конвертируем свечи в числовые значения
     let close_values: Vec<f64> = candles
         .iter()
         .map(|c| c.close.parse().unwrap_or(0.0))
@@ -212,18 +257,34 @@ pub fn calc_strategy(
         .map(|c| c.low.parse().unwrap_or(0.0))
         .collect();
 
+    // Рассчитываем ATR для всех свечей
+    let atr_values = calculate_atr_for_candles(&candles, 20); // период ATR = 20
+
     for (i, c) in candles.iter().enumerate() {
         let close_value = close_values[i];
-        let (profit_price, loss_price) = if is_long {
-            (
-                close_value * (1.0 + tp / 100.0),
-                close_value * (1.0 - sl / 100.0),
-            )
+
+        // Получаем текущее значение ATR
+        let current_atr = if i < atr_values.len() {
+            atr_values[i].unwrap_or(0.0)
         } else {
-            (
-                close_value * (1.0 - tp / 100.0),
-                close_value * (1.0 + sl / 100.0),
-            )
+            0.0
+        };
+
+        // Рассчитываем TP и SL на основе ATR
+        let (profit_price, loss_price, tp_per, sl_per) = if is_long {
+            // Для лонга: TP = цена входа + (ATR * множитель), SL = цена входа - (ATR * множитель)
+            let tp_price = close_value + (current_atr * tp_atr_multiplier);
+            let sl_price = close_value - (current_atr * sl_atr_multiplier);
+            let tp_percent = ((tp_price - close_value) / close_value) * 100.0;
+            let sl_percent = ((close_value - sl_price) / close_value) * 100.0;
+            (tp_price, sl_price, tp_percent, sl_percent)
+        } else {
+            // Для шорта: TP = цена входа - (ATR * множитель), SL = цена входа + (ATR * множитель)
+            let tp_price = close_value - (current_atr * tp_atr_multiplier);
+            let sl_price = close_value + (current_atr * sl_atr_multiplier);
+            let tp_percent = ((close_value - tp_price) / close_value) * 100.0;
+            let sl_percent = ((sl_price - close_value) / close_value) * 100.0;
+            (tp_price, sl_price, tp_percent, sl_percent)
         };
 
         let result_trade = determine_trade_result(
@@ -231,8 +292,8 @@ pub fn calc_strategy(
             is_long,
             profit_price,
             loss_price,
-            tp,
-            sl,
+            tp_per,
+            sl_per,
             position_size,
             &high_values,
             &low_values,
@@ -255,8 +316,8 @@ pub fn calc_strategy(
             result_trade: result_trade.trade_final,
             result_profit: result_trade.profit,
             result_loss: result_trade.loss,
-            tp_per: tp,
-            sl_per: sl,
+            tp_per: round_to_decimal(tp_per, 2), // округляем проценты до 2 знаков
+            sl_per: round_to_decimal(sl_per, 2),
         });
 
         is_long = !is_long;
@@ -277,53 +338,49 @@ fn determine_trade_result(
     is_long: bool,
     profit_point: f64,
     loss_point: f64,
-    tp: f64,
-    sl: f64,
+    tp_per: f64, // теперь в процентах
+    sl_per: f64, // теперь в процентах
     position_size: f64,
     high_values: &[f64],
     low_values: &[f64],
 ) -> TradeResult {
-    // Ищем в последующих свечах, что сработало первое - TP или SL
     for i in (entry_index + 1)..high_values.len() {
         let high = high_values[i];
         let low = low_values[i];
 
         if is_long {
-            // Для лонга: TP - когда high достиг profit_point, SL - когда low достиг loss_point
             if low <= loss_point {
                 return TradeResult {
                     trade_final: String::from("SL"),
                     profit: 0.0,
-                    loss: position_size * (sl / 100.0),
+                    loss: position_size * (sl_per / 100.0), // используем sl_per вместо фиксированного sl
                 };
             }
             if high >= profit_point {
                 return TradeResult {
                     trade_final: String::from("TP"),
-                    profit: position_size * (tp / 100.0),
+                    profit: position_size * (tp_per / 100.0), // используем tp_per вместо фиксированного tp
                     loss: 0.0,
                 };
             }
         } else {
-            // Для шорта: TP - когда low достиг profit_point, SL - когда high достиг loss_point
             if high >= loss_point {
                 return TradeResult {
                     trade_final: String::from("SL"),
                     profit: 0.0,
-                    loss: position_size * (sl / 100.0),
+                    loss: position_size * (sl_per / 100.0),
                 };
             }
             if low <= profit_point {
                 return TradeResult {
                     trade_final: String::from("TP"),
-                    profit: position_size * (tp / 100.0),
+                    profit: position_size * (tp_per / 100.0),
                     loss: 0.0,
                 };
             }
         }
     }
 
-    // Если не сработал ни TP ни SL до конца данных
     TradeResult {
         trade_final: String::from("Open"),
         profit: 0.0,
