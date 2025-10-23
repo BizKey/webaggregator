@@ -313,8 +313,8 @@ pub fn calc_strategy(
             loss_price: round_to_decimal(loss_price, decimal_price_increment),
             position_size: position_size,
             result_trade: result_trade.trade_final,
-            result_profit: result_trade.profit,
-            result_loss: result_trade.loss,
+            result_profit: round_to_decimal(result_trade.profit, 2),
+            result_loss: round_to_decimal(result_trade.loss, 2),
             tp_per: round_to_decimal(tp_per, 2),
             sl_per: round_to_decimal(sl_per, 2),
         });
