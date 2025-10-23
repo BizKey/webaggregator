@@ -239,7 +239,7 @@ pub fn calc_strategy(
 
     // Фиксированное соотношение риск:прибыль = 1:3
     let risk_reward_ratio = 3.0;
-    let base_sl_atr = 1.0; // Базовый риск = 1 ATR
+    let base_sl_atr = 2.0; // Базовый риск = 1 ATR
 
     let close_values: Vec<f64> = candles
         .iter()
