@@ -9,7 +9,6 @@
     <thead>
         <tr>
             <th>№</th>
-            <th>exchange</th>
             <th>symbol</th>
             <th>profit</th>
         </tr>
@@ -18,7 +17,6 @@
         {% for (index, candle) in candles %}
         <tr>
             <td>{{ index }}</td>
-            <td>{{ candle.exchange }}</td>
             <td><a href="/strategy/{{ candle.symbol }}">{{ candle.symbol }}</a></td>
             <td>{{ candle.profit }}</td>
         </tr>

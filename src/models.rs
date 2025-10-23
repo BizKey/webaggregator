@@ -90,6 +90,13 @@ pub struct Borrow {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct CandleForStrategy {
+    pub open: String,
+    pub high: String,
+    pub low: String,
+    pub close: String,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Candle {
     pub exchange: String,
     pub symbol: String,
@@ -105,37 +112,25 @@ pub struct Candle {
 // CandleWithProfit структура для хранения прибыльности по стратегии
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct CandleWithProfit {
-    pub exchange: String,
     pub symbol: String,
     pub profit: f64,
 }
 #[derive(Debug, sqlx::FromRow)]
 pub struct CandleWithIncrement {
-    pub exchange: String,
     pub symbol: String,
-    pub interval: String,
-    pub timestamp: String,
     pub open: String,
     pub high: String,
     pub low: String,
     pub close: String,
-    pub volume: String,
-    pub quote_volume: String,
     pub price_increment: String,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Strategy {
     pub position: String,
-    pub exchange: String,
-    pub symbol: String,
-    pub interval: String,
-    pub timestamp: String,
     pub open: String,
     pub high: String,
     pub low: String,
     pub close: String,
-    pub volume: String,
-    pub quote_volume: String,
     pub entry_price: String,
     pub profit_price: f64,
     pub loss_price: f64,
@@ -191,7 +186,10 @@ fn round_to_decimal(value: f64, decimals: u32) -> f64 {
     let factor = 10f64.powi(decimals as i32);
     (value * factor).round() / factor
 }
-pub fn calc_strategy(candles: Vec<Candle>, increment: &SymbolIncrement) -> Vec<Strategy> {
+pub fn calc_strategy(
+    candles: Vec<CandleForStrategy>,
+    increment: &SymbolIncrement,
+) -> Vec<Strategy> {
     let decimal_price_increment = get_decimal_places(&increment.price_increment);
     let mut strategies = Vec::new();
     let mut is_long = true;
@@ -246,16 +244,10 @@ pub fn calc_strategy(candles: Vec<Candle>, increment: &SymbolIncrement) -> Vec<S
             } else {
                 String::from("Short")
             },
-            exchange: c.exchange.clone(),
-            symbol: c.symbol.clone(),
-            interval: c.interval.clone(),
-            timestamp: c.timestamp.clone(),
             open: c.open.clone(),
             high: c.high.clone(),
             low: c.low.clone(),
             close: c.close.clone(),
-            volume: c.volume.clone(),
-            quote_volume: c.quote_volume.clone(),
             entry_price: c.close.clone(),
             profit_price: round_to_decimal(profit_price, decimal_price_increment),
             loss_price: round_to_decimal(loss_price, decimal_price_increment),

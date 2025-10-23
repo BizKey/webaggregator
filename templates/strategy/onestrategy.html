@@ -9,16 +9,10 @@
     <thead>
         <tr>
             <th>position</th>
-            <th>exchange</th>
-            <th>symbol</th>
-            <th>interval</th>
-            <th>timestamp</th>
             <th>open</th>
             <th>high</th>
             <th>low</th>
             <th>close</th>
-            <th>volume</th>
-            <th>quote_volume</th>
             <th>entry_price</th>
             <th>profit_price</th>
             <th>loss_price</th>
@@ -34,16 +28,10 @@
         {% for candle in candles %}
         <tr>
             <td>{{ candle.position }}</td>
-            <td>{{ candle.exchange }}</td>
-            <td>{{ candle.symbol }}</td>
-            <td>{{ candle.interval }}</td>
-            <td>{{ candle.timestamp }}</td>
             <td>{{ candle.open }}</td>
             <td>{{ candle.high }}</td>
             <td>{{ candle.low }}</td>
             <td>{{ candle.close }}</td>
-            <td>{{ candle.volume }}</td>
-            <td>{{ candle.quote_volume }}</td>
             <td>{{ candle.entry_price }}</td>
             <td>{{ candle.profit_price }}</td>
             <td>{{ candle.loss_price }}</td>

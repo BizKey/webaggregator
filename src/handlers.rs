@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleWithAtr, CandleWithIncrement, CandleWithProfit, Currency, Lend, Strategy,
-    Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
+    Borrow, Candle, CandleForStrategy, CandleWithAtr, CandleWithIncrement, CandleWithProfit,
+    Currency, Lend, Strategy, Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
 };
 use crate::templates::{
     BorrowTemplate, BorrowsTemplate, CandleTemplate, CandlesTemplate, CurrenciesTemplate,
@@ -189,16 +189,11 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let candle_data: Vec<CandleWithIncrement> = sqlx::query_as::<_, CandleWithIncrement>(
         r#"
         SELECT 
-            c.exchange, 
-            c.symbol, 
-            c.interval, 
-            c.timestamp, 
+            c.symbol,  
             c.open, 
             c.high, 
             c.low, 
             c.close, 
-            c.volume, 
-            c.quote_volume,
             s.price_increment
         FROM candle c
         JOIN symbol s ON c.symbol = s.symbol
@@ -212,7 +207,8 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let mut candles_by_symbol: HashMap<String, (SymbolIncrement, Vec<Candle>)> = HashMap::new();
+    let mut candles_by_symbol: HashMap<String, (SymbolIncrement, Vec<CandleForStrategy>)> =
+        HashMap::new();
 
     for data in candle_data {
         let entry = candles_by_symbol
@@ -226,17 +222,11 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
                 )
             });
 
-        entry.1.push(Candle {
-            exchange: data.exchange,
-            symbol: data.symbol,
-            interval: data.interval,
-            timestamp: data.timestamp,
+        entry.1.push(CandleForStrategy {
             open: data.open,
             high: data.high,
             low: data.low,
             close: data.close,
-            volume: data.volume,
-            quote_volume: data.quote_volume,
         });
     }
 
@@ -244,7 +234,6 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     for (symbol, (increment, candles)) in candles_by_symbol {
         candle_with_profit.push(CandleWithProfit {
-            exchange: candles.last().unwrap().exchange.clone(),
             symbol: symbol,
             profit: calc_strategy(candles.clone(), &increment)
                 .iter()
@@ -395,8 +384,8 @@ pub async fn tickerstrategy(
     let start = Instant::now();
     let symbol_name = path.into_inner();
 
-    let candles = sqlx::query_as::<_, Candle>(
-        "SELECT exchange, symbol, interval, timestamp, open, high, low, close, volume, quote_volume
+    let candles: Vec<CandleForStrategy> = sqlx::query_as::<_, CandleForStrategy>(
+        "SELECT open, high, low, close
             FROM candle 
             WHERE symbol = $1
             ORDER BY symbol, timestamp::BIGINT ASC",
