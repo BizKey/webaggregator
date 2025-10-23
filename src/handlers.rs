@@ -236,10 +236,13 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     for (symbol, (increment, candles)) in candles_by_symbol {
         candle_with_profit.push(CandleWithProfit {
             symbol: symbol,
-            profit: calc_strategy(candles.clone(), &increment)
-                .iter()
-                .map(|s| s.result_profit - s.result_loss)
-                .sum(),
+            profit: round_to_decimal(
+                calc_strategy(candles.clone(), &increment)
+                    .iter()
+                    .map(|s| s.result_profit - s.result_loss)
+                    .sum(),
+                2,
+            ),
         });
     }
 
