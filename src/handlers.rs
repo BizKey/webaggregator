@@ -215,13 +215,14 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let mut candles_by_symbol: HashMap<String, (SymbolIncrement, Vec<Candle>)> = HashMap::new();
 
     for data in candle_data {
-        let symbol = data.symbol.clone();
-        let entry = candles_by_symbol.entry(symbol).or_insert_with(|| {
-            let increment = SymbolIncrement {
-                price_increment: data.price_increment.to_string(),
-            };
-            (increment, Vec::new())
-        });
+        let entry = candles_by_symbol
+            .entry(data.symbol.clone())
+            .or_insert_with(|| {
+                let increment = SymbolIncrement {
+                    price_increment: data.price_increment.to_string(),
+                };
+                (increment, Vec::new())
+            });
 
         let candle = Candle {
             exchange: data.exchange,
