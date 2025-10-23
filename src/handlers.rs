@@ -243,12 +243,13 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     for (symbol, (increment, candles)) in candles_by_symbol {
         if let Some(latest_candle) = candles.last() {
-            let processed_candles = calc_strategy(candles.clone(), &increment);
-
             candle_with_profit.push(CandleWithProfit {
                 exchange: latest_candle.exchange.clone(),
-                symbol: latest_candle.symbol.clone(),
-                profit: processed_candles.iter().map(|s| s.result_profit - s.result_loss).sum(),
+                symbol: symbol,
+                profit: calc_strategy(candles.clone(), &increment)
+                    .iter()
+                    .map(|s| s.result_profit - s.result_loss)
+                    .sum(),
             });
         }
     }
