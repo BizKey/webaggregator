@@ -242,16 +242,14 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let mut candle_with_profit = Vec::with_capacity(candles_by_symbol.len());
 
     for (symbol, (increment, candles)) in candles_by_symbol {
-        if let Some(latest_candle) = candles.last() {
-            candle_with_profit.push(CandleWithProfit {
-                exchange: latest_candle.exchange.clone(),
-                symbol: symbol,
-                profit: calc_strategy(candles.clone(), &increment)
-                    .iter()
-                    .map(|s| s.result_profit - s.result_loss)
-                    .sum(),
-            });
-        }
+        candle_with_profit.push(CandleWithProfit {
+            exchange: candles.last().unwrap().exchange.clone(),
+            symbol: symbol,
+            profit: calc_strategy(candles.clone(), &increment)
+                .iter()
+                .map(|s| s.result_profit - s.result_loss)
+                .sum(),
+        });
     }
 
     let total_profit: f64 = candle_with_profit.iter().map(|s| s.profit).sum();
