@@ -1,5 +1,5 @@
 use crate::models::{
-    Borrow, Candle, CandleProfit, CandleWithAtr, CandleWithIncrement, Currency, Lend, Strategy,
+    Borrow, Candle, CandleWithAtr, CandleWithIncrement, CandleWithProfit, Currency, Lend, Strategy,
     Symbol, SymbolIncrement, Ticker, Total, calc_strategy, calculate_atr,
 };
 use crate::templates::{
@@ -249,17 +249,9 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
             let net_result = total_profit - total_loss;
 
-            candle_with_profit.push(CandleProfit {
+            candle_with_profit.push(CandleWithProfit {
                 exchange: latest_candle.exchange.clone(),
                 symbol: latest_candle.symbol.clone(),
-                interval: latest_candle.interval.clone(),
-                open: latest_candle.open.clone(),
-                timestamp: latest_candle.timestamp.clone(),
-                high: latest_candle.high.clone(),
-                low: latest_candle.low.clone(),
-                close: latest_candle.close.clone(),
-                volume: latest_candle.volume.clone(),
-                quote_volume: latest_candle.quote_volume.clone(),
                 profit: net_result,
             });
         }
@@ -267,7 +259,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let total_profit: f64 = candle_with_profit.iter().map(|s| s.profit).sum();
 
-    let candles_with_index: Vec<(usize, CandleProfit)> = candle_with_profit
+    let candles_with_index: Vec<(usize, CandleWithProfit)> = candle_with_profit
         .into_iter()
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))

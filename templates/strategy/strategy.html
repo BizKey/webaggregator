@@ -11,14 +11,6 @@
             <th>№</th>
             <th>exchange</th>
             <th>symbol</th>
-            <th>interval</th>
-            <th>timestamp</th>
-            <th>open</th>
-            <th>high</th>
-            <th>low</th>
-            <th>close</th>
-            <th>volume</th>
-            <th>quote_volume</th>
             <th>profit</th>
         </tr>
     </thead>
@@ -28,14 +20,6 @@
             <td>{{ index }}</td>
             <td>{{ candle.exchange }}</td>
             <td><a href="/strategy/{{ candle.symbol }}">{{ candle.symbol }}</a></td>
-            <td>{{ candle.interval }}</td>
-            <td>{{ candle.timestamp }}</td>
-            <td>{{ candle.open }}</td>
-            <td>{{ candle.high }}</td>
-            <td>{{ candle.low }}</td>
-            <td>{{ candle.close }}</td>
-            <td>{{ candle.volume }}</td>
-            <td>{{ candle.quote_volume }}</td>
             <td>{{ candle.profit }}</td>
         </tr>
         {% endfor %}
