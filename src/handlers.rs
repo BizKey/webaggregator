@@ -239,7 +239,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         entry.1.push(candle);
     }
 
-    let mut candle_with_profit = Vec::with_capacity(candles_by_symbol.len());
+    let mut candle_with_profit: Vec<CandleWithProfit> = Vec::with_capacity(candles_by_symbol.len());
 
     for (symbol, (increment, candles)) in candles_by_symbol {
         candle_with_profit.push(CandleWithProfit {
