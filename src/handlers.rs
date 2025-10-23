@@ -218,10 +218,12 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         let entry = candles_by_symbol
             .entry(data.symbol.clone())
             .or_insert_with(|| {
-                let increment = SymbolIncrement {
-                    price_increment: data.price_increment.to_string(),
-                };
-                (increment, Vec::new())
+                (
+                    SymbolIncrement {
+                        price_increment: data.price_increment.to_string(),
+                    },
+                    Vec::new(),
+                )
             });
 
         let candle = Candle {
