@@ -226,7 +226,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
                 )
             });
 
-        let candle = Candle {
+        entry.1.push(Candle {
             exchange: data.exchange,
             symbol: data.symbol,
             interval: data.interval,
@@ -237,9 +237,7 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             close: data.close,
             volume: data.volume,
             quote_volume: data.quote_volume,
-        };
-
-        entry.1.push(candle);
+        });
     }
 
     let mut candle_with_profit: Vec<CandleWithProfit> = Vec::with_capacity(candles_by_symbol.len());
