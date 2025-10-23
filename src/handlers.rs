@@ -243,6 +243,11 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     }
 
     let total_profit: f64 = candle_with_profit.iter().map(|s| s.profit).sum();
+    candle_with_profit.sort_by(|a, b| {
+        b.profit
+            .partial_cmp(&a.profit)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
 
     let candles_with_index: Vec<(usize, CandleWithProfit)> = candle_with_profit
         .into_iter()
