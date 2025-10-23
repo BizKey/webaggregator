@@ -245,14 +245,10 @@ pub async fn strategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         if let Some(latest_candle) = candles.last() {
             let processed_candles = calc_strategy(candles.clone(), &increment);
 
-            let total_profit: f64 = processed_candles.iter().map(|s| s.result_profit).sum();
-            let total_loss: f64 = processed_candles.iter().map(|s| s.result_loss).sum();
-            let net_result = total_profit - total_loss;
-
             candle_with_profit.push(CandleWithProfit {
                 exchange: latest_candle.exchange.clone(),
                 symbol: latest_candle.symbol.clone(),
-                profit: net_result,
+                profit: processed_candles.iter().map(|s| s.result_profit - s.result_loss).sum(),
             });
         }
     }
