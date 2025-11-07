@@ -51,6 +51,7 @@ async fn main() -> std::io::Result<()> {
                                 "/strategy/{ticker}",
                                 web::get().to(handlers::tickerstrategy),
                             )
+                            .route("/smastrategy", web::get().to(handlers::smastrategy))
                             //
                             // System links
                             .route("/static/style.css", web::get().to(handlers::serve_css))
