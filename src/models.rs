@@ -109,6 +109,10 @@ pub struct Candle {
     pub volume: String,
     pub quote_volume: String,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct CandleForSma {
+    pub symbol: String,
+}
 // CandleWithProfit структура для хранения прибыльности по стратегии
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct CandleWithProfit {
