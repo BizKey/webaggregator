@@ -279,17 +279,14 @@ pub async fn smastrategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let all_symbols = sqlx::query_as::<_, CandleForSma>(
-        "SELECT DISTINCT ON (symbol) 
-                symbol FROM candle 
-            ORDER BY symbol, timestamp::BIGINT DESC",
-    )
-    .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    let all_symbols =
+        sqlx::query_as::<_, CandleForSma>("SELECT symbol FROM candle GROUP BY symbol")
+            .fetch_all(pool.get_ref())
+            .await
+            .map_err(|e| {
+                eprintln!("Database error: {}", e);
+                actix_web::error::ErrorInternalServerError("Database error")
+            })?;
 
     let symbols_with_index: Vec<(usize, CandleForSma)> = all_symbols
         .into_iter()
