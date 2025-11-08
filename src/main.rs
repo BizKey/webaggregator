@@ -51,9 +51,9 @@ async fn main() -> std::io::Result<()> {
                                 "/strategy/{ticker}",
                                 web::get().to(handlers::tickerstrategy),
                             )
-                            .route("/smastrategy", web::get().to(handlers::smastrategy))
+                            .route("/sma", web::get().to(handlers::smastrategy))
                             .route(
-                                "/smastrategy/{symbol}",
+                                "/sma/{symbol}",
                                 web::get().to(handlers::smastrategy_by_symbol),
                             )
                             //
