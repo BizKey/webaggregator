@@ -5,6 +5,9 @@ use std::env;
 mod handlers;
 mod models;
 mod templates;
+use crate::handlers::lend::{lend, lends};
+use crate::handlers::system::{favicon, serve_css};
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
@@ -34,8 +37,8 @@ async fn main() -> std::io::Result<()> {
                             .route("/symbols", web::get().to(handlers::symbols))
                             //
                             // Working with lend
-                            .route("/lend", web::get().to(handlers::lends))
-                            .route("/lend/{currency}", web::get().to(handlers::lend))
+                            .route("/lend", web::get().to(lends))
+                            .route("/lend/{currency}", web::get().to(lend))
                             //
                             // Working with borrow
                             .route("/borrow", web::get().to(handlers::borrows))
@@ -58,8 +61,8 @@ async fn main() -> std::io::Result<()> {
                             )
                             //
                             // System links
-                            .route("/static/style.css", web::get().to(handlers::serve_css))
-                            .route("/favicon.png", web::get().to(handlers::favicon))
+                            .route("/static/style.css", web::get().to(serve_css))
+                            .route("/favicon.png", web::get().to(favicon))
                     })
                     .bind("0.0.0.0:8080")?
                     .run()
