@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Sma Symbol{% endblock %}
+
+{% block content %}
+<p><a href="/sma">Sma</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>close</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, symbol) in symbols %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ symbol.close }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
