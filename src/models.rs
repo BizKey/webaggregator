@@ -114,7 +114,7 @@ pub struct CandleForSma {
     pub symbol: String,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
-pub struct CandleForSmaSymbol {
+pub struct CandleClose {
     pub close: String,
 }
 // CandleWithProfit структура для хранения прибыльности по стратегии
@@ -454,4 +454,13 @@ pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
     }
 
     result
+}
+
+#[derive(Debug)]
+pub struct SMAResult {
+    pub period: usize,
+    pub total_profit: f64,
+    pub profit_percentage: f64,
+    pub trades_count: usize,
+    pub winning_trades: usize,
 }

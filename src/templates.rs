@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleForSma, CandleForSmaSymbol, CandleWithAtr, CandleWithProfit, Currency,
-    Lend, Strategy, Symbol, Ticker, Total,
+    Borrow, Candle, CandleClose, CandleForSma, CandleWithAtr, CandleWithProfit, Currency, Lend,
+    Strategy, Symbol, Ticker, Total,
 };
 use askama::Template;
 
@@ -84,8 +84,8 @@ pub struct CandlesSmaTemplate {
 }
 #[derive(Template)]
 #[template(path = "sma/candle.html")]
-pub struct CandlesSmaSymbolTemplate {
-    pub symbols: Vec<(usize, CandleForSmaSymbol)>,
+pub struct CandlesCloseTemplate {
+    pub symbols: Vec<(usize, CandleClose)>,
     pub elapsed_ms: u128,
 }
 
