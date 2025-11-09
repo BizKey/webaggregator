@@ -455,3 +455,12 @@ pub fn calculate_atr(candles: &[Candle], period: usize) -> Vec<CandleWithAtr> {
 
     result
 }
+
+#[derive(Debug)]
+pub struct SMAResult {
+    pub period: usize,
+    pub total_profit: f64,
+    pub profit_percentage: f64,
+    pub trades_count: usize,
+    pub winning_trades: usize,
+}
