@@ -1,5 +1,5 @@
-use crate::models::{CandleForSma, CandleForSmaSymbol};
-use crate::templates::{CandlesSmaSymbolTemplate, CandlesSmaTemplate};
+use crate::models::{CandleClose, CandleForSma};
+use crate::templates::{CandlesCloseTemplate, CandlesSmaTemplate};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 
@@ -15,7 +15,7 @@ pub async fn smastrategy_by_symbol(
     // time start
     let start = Instant::now();
 
-    let all_symbols = sqlx::query_as::<_, CandleForSmaSymbol>(
+    let all_symbols = sqlx::query_as::<_, CandleClose>(
         "SELECT close 
             FROM (
                 SELECT close, timestamp::BIGINT 
@@ -34,13 +34,13 @@ pub async fn smastrategy_by_symbol(
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let symbols_with_index: Vec<(usize, CandleForSmaSymbol)> = all_symbols
+    let symbols_with_index: Vec<(usize, CandleClose)> = all_symbols
         .into_iter()
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
-    let template = CandlesSmaSymbolTemplate {
+    let template = CandlesCloseTemplate {
         symbols: symbols_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };

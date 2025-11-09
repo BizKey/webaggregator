@@ -114,7 +114,7 @@ pub struct CandleForSma {
     pub symbol: String,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
-pub struct CandleForSmaSymbol {
+pub struct CandleClose {
     pub close: String,
 }
 // CandleWithProfit структура для хранения прибыльности по стратегии
