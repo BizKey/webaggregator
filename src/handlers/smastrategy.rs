@@ -84,8 +84,7 @@ fn find_best_sma_strategy(prices: &[f64]) -> Option<SMAResult> {
     let mut best_result = None;
     let mut best_profit = std::f64::NEG_INFINITY;
 
-    // Тестируем периоды SMA от 2 до 24
-    for period in 2..=24 {
+    for period in 2..=200 {
         let result = simulate_sma_strategy(prices, period);
 
         if result.total_profit > best_profit {
