@@ -139,15 +139,7 @@ pub async fn smastrategy_by_symbol(
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let taker_fee: f64 = symbol_fee.taker_fee_coefficient.parse().map_err(|e| {
-        eprintln!(
-            "Failed to parse taker_fee_coefficient '{}': {}",
-            symbol_fee.taker_fee_coefficient, e
-        );
-        actix_web::error::ErrorInternalServerError("Invalid fee coefficient format")
-    })?;
-
-    let commission_rate = (symbol_fee.fee_category as f64) * taker_fee;
+    let commission_rate = 0.001 * symbol_fee.fee_category as f64;
 
     let template = CandleSmaTemplate {
         symbol_name: symbol_name,
