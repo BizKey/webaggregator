@@ -19,8 +19,8 @@
         {% for sma in sma_result %}
         <tr>
             <td>{{ sma.period }}</td>
-            <td>{{ sma.total_profit }}</td>
-            <td>{{ sma.profit_percentage }}</td>
+            <td>${{ sma.total_profit }}</td>
+            <td>{{ sma.profit_percentage }}%</td>
             <td>{{ sma.trades_count }}</td>
             <td>{{ sma.winning_trades }}</td>
         </tr>
