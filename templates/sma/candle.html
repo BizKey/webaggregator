@@ -1,21 +1,27 @@
 {% extends "base.html" %}
 
-{% block title %}Sma Symbol{% endblock %}
+{% block title %}Sma {{ symbol_name }}{% endblock %}
 
 {% block content %}
 <p><a href="/sma">Sma</a></p>
 <table border="1">
     <thead>
         <tr>
-            <th>№</th>
-            <th>close</th>
+            <th>Period</th>
+            <th>Total profit</th>
+            <th>Profit percentage</th>
+            <th>Trades count</th>
+            <th>Winning trades</th>
         </tr>
     </thead>
     <tbody>
-        {% for (index, symbol) in symbols %}
+        {% for sma in sma_result %}
         <tr>
-            <td>{{ index }}</td>
-            <td>{{ symbol.close }}</td>
+            <td>{{ sma.period }}</td>
+            <td>{{ sma.total_profit }}</td>
+            <td>{{ sma.profit_percentage }}</td>
+            <td>{{ sma.trades_count }}</td>
+            <td>{{ sma.winning_trades }}</td>
         </tr>
         {% endfor %}
     </tbody>
