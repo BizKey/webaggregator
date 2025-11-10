@@ -86,6 +86,7 @@ pub struct CandlesSmaTemplate {
 #[template(path = "sma/candle.html")]
 pub struct CandleSmaTemplate {
     pub symbol_name: String,
+    pub commission_rate: f64,
     pub sma_result: Vec<SMAResult>,
     pub elapsed_ms: u128,
 }

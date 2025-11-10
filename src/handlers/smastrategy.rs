@@ -1,4 +1,4 @@
-use crate::models::{CandleClose, CandleForSma, SMAResult};
+use crate::models::{CandleClose, CandleForSma, SMAResult, SymbolFee};
 use crate::templates::{CandleSmaTemplate, CandlesSmaTemplate};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
@@ -6,7 +6,7 @@ use askama::Template;
 use sqlx::PgPool;
 use std::time::Instant;
 
-fn simulate_sma_strategy(prices: &[f64], sma_period: usize) -> SMAResult {
+fn simulate_sma_strategy(prices: &[f64], sma_period: usize, commission_rate: f64) -> SMAResult {
     let sma_values: Vec<Option<f64>> = calculate_sma(prices, sma_period);
     let mut total_profit: f64 = 0.0;
     let mut trades_count = 0;
@@ -27,7 +27,10 @@ fn simulate_sma_strategy(prices: &[f64], sma_period: usize) -> SMAResult {
             }
         } else if current_price < current_sma_val {
             if let Some(buy_price) = position {
-                let profit = 100.0 * (current_price / buy_price - 1.0);
+                let gross_return: f64 = current_price / buy_price;
+                let net_return: f64 = gross_return * (1.0 - commission_rate).powi(2);
+
+                let profit: f64 = 100.0 * (net_return - 1.0);
                 total_profit += profit;
                 trades_count += 1;
 
@@ -75,11 +78,11 @@ fn calculate_sma(prices: &[f64], period: usize) -> Vec<Option<f64>> {
     sma
 }
 
-fn sma_strategy(prices: &[f64]) -> Vec<SMAResult> {
+fn sma_strategy(prices: &[f64], commission_rate: f64) -> Vec<SMAResult> {
     let mut result: Vec<SMAResult> = vec![];
 
     for period in 2..=200 {
-        result.push(simulate_sma_strategy(prices, period));
+        result.push(simulate_sma_strategy(prices, period, commission_rate));
     }
 
     result
@@ -123,9 +126,33 @@ pub async fn smastrategy_by_symbol(
         actix_web::error::ErrorInternalServerError("Error parsing price data")
     })?;
 
+    let symbol_fee: SymbolFee = sqlx::query_as::<_, SymbolFee>(
+        "SELECT fee_category, taker_fee_coefficient
+        FROM symbol
+        WHERE symbol = $1",
+    )
+    .bind(&symbol_name)
+    .fetch_one(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
+
+    let taker_fee: f64 = symbol_fee.taker_fee_coefficient.parse().map_err(|e| {
+        eprintln!(
+            "Failed to parse taker_fee_coefficient '{}': {}",
+            symbol_fee.taker_fee_coefficient, e
+        );
+        actix_web::error::ErrorInternalServerError("Invalid fee coefficient format")
+    })?;
+
+    let commission_rate = (symbol_fee.fee_category as f64) * taker_fee;
+
     let template = CandleSmaTemplate {
         symbol_name: symbol_name,
-        sma_result: sma_strategy(&prices),
+        commission_rate: commission_rate,
+        sma_result: sma_strategy(&prices, commission_rate),
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
