@@ -13,22 +13,19 @@ fn simulate_sma_strategy(prices: &[f64], sma_period: usize) -> SMAResult {
     let mut winning_trades = 0;
     let mut position: Option<f64> = None;
 
-    for i in 1..prices.len() {
-        if i >= sma_values.len() || sma_values[i].is_none() || sma_values[i - 1].is_none() {
+    for i in 0..prices.len() {
+        if sma_values[i].is_none() {
             continue;
         }
 
         let current_price = prices[i];
-        let prev_price = prices[i - 1];
         let current_sma_val = sma_values[i].unwrap();
-        let prev_sma_val = sma_values[i - 1].unwrap();
 
-        if prev_price <= prev_sma_val && current_price > current_sma_val {
+        if current_price > current_sma_val {
             if position.is_none() {
                 position = Some(current_price);
             }
-        }
-        else if prev_price >= prev_sma_val && current_price < current_sma_val {
+        } else if current_price < current_sma_val {
             if let Some(buy_price) = position {
                 let profit = 100.0 * (current_price / buy_price - 1.0);
                 total_profit += profit;
@@ -40,17 +37,6 @@ fn simulate_sma_strategy(prices: &[f64], sma_period: usize) -> SMAResult {
 
                 position = None;
             }
-        }
-    }
-
-    if let Some(buy_price) = position {
-        let last_price = prices[prices.len() - 1];
-        let profit = 100.0 * (last_price / buy_price - 1.0);
-        total_profit += profit;
-        trades_count += 1;
-
-        if profit > 0.0 {
-            winning_trades += 1;
         }
     }
 
