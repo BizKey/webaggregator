@@ -10,7 +10,7 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let symbols = sqlx::query_as::<_, Symbol>(
+    let symbols: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
         "SELECT 
                 exchange, symbol, name, base_currency, quote_currency, fee_currency, 
                 market, base_min_size, quote_min_size, base_max_size, quote_max_size, 

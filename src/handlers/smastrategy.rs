@@ -1,36 +1,36 @@
-use crate::models::{CandleClose, CandleForSma, SMAResult};
-use crate::templates::{CandlesCloseTemplate, CandlesSmaTemplate};
+use crate::models::{CandleClose, CandleForSma, SMAResult, SymbolFee};
+use crate::templates::{CandleSmaTemplate, CandlesSmaTemplate};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-fn simulate_sma_strategy(prices: &[f64], sma_period: usize) -> SMAResult {
-    let sma_values = calculate_sma(prices, sma_period);
-    let mut total_profit = 0.0;
+fn simulate_sma_strategy(prices: &[f64], sma_period: usize, commission_rate: f64) -> SMAResult {
+    let sma_values: Vec<Option<f64>> = calculate_sma(prices, sma_period);
+    let mut total_profit: f64 = 0.0;
     let mut trades_count = 0;
     let mut winning_trades = 0;
     let mut position: Option<f64> = None;
 
-    for i in 1..prices.len() {
-        if i >= sma_values.len() || sma_values[i].is_none() || sma_values[i - 1].is_none() {
+    for i in 0..prices.len() {
+        if sma_values[i].is_none() {
             continue;
         }
 
         let current_price = prices[i];
-        let prev_price = prices[i - 1];
         let current_sma_val = sma_values[i].unwrap();
-        let prev_sma_val = sma_values[i - 1].unwrap();
 
-        if prev_price <= prev_sma_val && current_price > current_sma_val {
+        if current_price > current_sma_val {
             if position.is_none() {
                 position = Some(current_price);
             }
-        }
-        else if prev_price >= prev_sma_val && current_price < current_sma_val {
+        } else if current_price < current_sma_val {
             if let Some(buy_price) = position {
-                let profit = 100.0 * (current_price / buy_price - 1.0);
+                let gross_return: f64 = current_price / buy_price;
+                let net_return: f64 = gross_return * (1.0 - commission_rate).powi(2);
+
+                let profit: f64 = 100.0 * (net_return - 1.0);
                 total_profit += profit;
                 trades_count += 1;
 
@@ -40,17 +40,6 @@ fn simulate_sma_strategy(prices: &[f64], sma_period: usize) -> SMAResult {
 
                 position = None;
             }
-        }
-    }
-
-    if let Some(buy_price) = position {
-        let last_price = prices[prices.len() - 1];
-        let profit = 100.0 * (last_price / buy_price - 1.0);
-        total_profit += profit;
-        trades_count += 1;
-
-        if profit > 0.0 {
-            winning_trades += 1;
         }
     }
 
@@ -74,7 +63,7 @@ fn calculate_sma(prices: &[f64], period: usize) -> Vec<Option<f64>> {
         return vec![None; prices.len()];
     }
 
-    let mut sma = vec![None; period - 1];
+    let mut sma: Vec<Option<f64>> = vec![None; period - 1];
     let mut sum: f64 = prices[..period].iter().sum();
 
     for i in period..prices.len() {
@@ -82,7 +71,6 @@ fn calculate_sma(prices: &[f64], period: usize) -> Vec<Option<f64>> {
         sum += prices[i] - prices[i - period];
     }
 
-    // Добавляем последнее значение
     if prices.len() >= period {
         sma.push(Some(sum / period as f64));
     }
@@ -90,26 +78,14 @@ fn calculate_sma(prices: &[f64], period: usize) -> Vec<Option<f64>> {
     sma
 }
 
-fn find_best_sma_strategy(prices: &[f64]) -> Option<SMAResult> {
-    if prices.len() < 24 {
-        eprintln!("Недостаточно данных для анализа SMA");
-        return None;
+fn sma_strategy(prices: &[f64], commission_rate: f64) -> Vec<SMAResult> {
+    let mut result: Vec<SMAResult> = vec![];
+
+    for period in 2..=200 {
+        result.push(simulate_sma_strategy(prices, period, commission_rate));
     }
 
-    let mut best_result = None;
-    let mut best_profit = std::f64::NEG_INFINITY;
-
-    // Тестируем периоды SMA от 2 до 24
-    for period in 2..=24 {
-        let result = simulate_sma_strategy(prices, period);
-
-        if result.total_profit > best_profit {
-            best_profit = result.total_profit;
-            best_result = Some(result);
-        }
-    }
-
-    best_result
+    result
 }
 
 pub async fn smastrategy_by_symbol(
@@ -150,57 +126,33 @@ pub async fn smastrategy_by_symbol(
         actix_web::error::ErrorInternalServerError("Error parsing price data")
     })?;
 
-    if prices.len() < 24 {
-        return Ok(HttpResponse::BadRequest().body(format!(
-            "Недостаточно данных для символа {}. Получено {} свечей, требуется минимум 24.",
-            symbol_name,
-            prices.len()
-        )));
-    }
+    let symbol_fee: SymbolFee = sqlx::query_as::<_, SymbolFee>(
+        "SELECT fee_category, taker_fee_coefficient
+        FROM symbol
+        WHERE symbol = $1",
+    )
+    .bind(&symbol_name)
+    .fetch_one(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
 
-    let best_sma = find_best_sma_strategy(&prices);
+    let commission_rate = 0.001 * symbol_fee.fee_category as f64;
 
-    let response = match best_sma {
-        Some(result) => {
-            let win_rate = if result.trades_count > 0 {
-                (result.winning_trades as f64 / result.trades_count as f64) * 100.0
-            } else {
-                0.0
-            };
-
-            format!(
-                "SMA Strategy Analysis for {}:\n\
-                 Best SMA Period: {}\n\
-                 Total Profit: ${:.2}\n\
-                 Average Profit per Trade: {:.1}%\n\
-                 Total Trades: {}\n\
-                 Winning Trades: {} ({:.1}% win rate)\n\
-                 Analysis Time: {}ms\n\
-                 Data Points: {}",
-                symbol_name,
-                result.period,
-                result.total_profit,
-                result.profit_percentage,
-                result.trades_count,
-                result.winning_trades,
-                win_rate,
-                start.elapsed().as_millis(),
-                prices.len()
-            )
-        }
-        None => {
-            format!(
-                "Не удалось найти прибыльную SMA стратегию для {}\n\
-                 Analysis Time: {}ms",
-                symbol_name,
-                start.elapsed().as_millis()
-            )
-        }
+    let template = CandleSmaTemplate {
+        symbol_name: symbol_name,
+        commission_rate: commission_rate,
+        sma_result: sma_strategy(&prices, commission_rate),
+        elapsed_ms: start.elapsed().as_millis(),
     };
-
-    Ok(HttpResponse::Ok()
-        .content_type("text/plain; charset=utf-8")
-        .body(response))
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
 }
 
 pub async fn smastrategy(pool: web::Data<PgPool>) -> Result<HttpResponse> {

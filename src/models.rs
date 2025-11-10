@@ -16,6 +16,11 @@ pub struct SymbolIncrement {
     pub price_increment: String,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct SymbolFee {
+    pub fee_category: i16,
+    pub taker_fee_coefficient: String,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Total {
     pub total: f64,
     pub total_loss: f64,
