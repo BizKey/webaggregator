@@ -82,7 +82,6 @@ fn calculate_sma(prices: &[f64], period: usize) -> Vec<Option<f64>> {
         sum += prices[i] - prices[i - period];
     }
 
-    // Добавляем последнее значение
     if prices.len() >= period {
         sma.push(Some(sum / period as f64));
     }
