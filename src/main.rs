@@ -10,6 +10,7 @@ use crate::handlers::candle::{candle, candles};
 use crate::handlers::currency::currencies;
 use crate::handlers::index::index;
 use crate::handlers::lend::{lend, lends};
+use crate::handlers::pg::pg;
 use crate::handlers::smastrategy::{smastrategy, smastrategy_by_symbol};
 use crate::handlers::strategy::{strategy, tickerstrategy};
 use crate::handlers::symbol::symbols;
@@ -36,6 +37,9 @@ async fn main() -> std::io::Result<()> {
                             //
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))
+                            //
+                            // Work with pg
+                            .route("/pg", web::get().to(pg))
                             //
                             // Working with currencies
                             .route("/currencies", web::get().to(currencies))

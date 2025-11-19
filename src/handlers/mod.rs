@@ -3,6 +3,7 @@ pub mod candle;
 pub mod currency;
 pub mod index;
 pub mod lend;
+pub mod pg;
 pub mod smastrategy;
 pub mod strategy;
 pub mod symbol;
