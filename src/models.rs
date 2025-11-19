@@ -509,7 +509,7 @@ pub struct PgStatStatements {
 pub struct PgStatTableSize {
     pub schemaname: String,
     pub relname: String,
-    pub total_size: Option<f64>,
-    pub table_size: Option<f64>,
-    pub indexes_size: Option<f64>,
+    pub total_size: String,
+    pub table_size: String,
+    pub indexes_size: String,
 }
