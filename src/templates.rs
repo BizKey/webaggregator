@@ -1,6 +1,6 @@
 use crate::models::{
-    Borrow, Candle, CandleForSma, CandleWithAtr, CandleWithProfit, Currency, Lend, SMAResult,
-    Strategy, Symbol, Ticker, Total,
+    Borrow, Candle, CandleForSma, CandleWithAtr, CandleWithProfit, Currency, Lend, PgConnection,PgStatStatements,
+    PgTableIndex, PgTableInfo, SMAResult, Strategy, Symbol, Ticker, Total,
 };
 use askama::Template;
 
@@ -106,6 +106,20 @@ pub struct CandlesTemplate {
 #[template(path = "candle/candle.html")]
 pub struct CandleTemplate {
     pub candles: Vec<CandleWithAtr>,
+    pub elapsed_ms: u128,
+}
+
+//
+// pg stats
+//
+//
+#[derive(Template)]
+#[template(path = "pg/pg.html")]
+pub struct PgTemplate {
+    pub pg_stats_connections: Vec<PgConnection>,
+    pub pg_stats_table_info: Vec<PgTableInfo>,
+    pub pg_stats_table_index: Vec<PgTableIndex>,
+    pub pg_stat_statements: Vec<PgStatStatements>,
     pub elapsed_ms: u128,
 }
 //
