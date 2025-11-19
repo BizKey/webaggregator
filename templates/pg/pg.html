@@ -4,11 +4,13 @@
 
 {% block content %}
 <p><a href="/">Home</a></p>
+<p>pg_stats_connections</p>
 {% for connection in pg_stats_connections %}
     <p>total_connections: {{ connection.total_connections }}</p>
     <p>active_connections: {{ connection.active_connections }}</p>
 {% endfor %}
 
+<p>pg_stats_table_info</p>
 {% for table_info in pg_stats_table_info %}
     <p>schemaname: {{ table_info.schemaname }}</p>
     <p>relname: {{ table_info.relname }}</p>
@@ -23,6 +25,7 @@
     <p>n_dead_tup: {% if let Some(n_dead_tup) = table_info.n_dead_tup %}{{ n_dead_tup }}{% endif %}</p>
 {% endfor %}
 
+<p>pg_stats_table_index</p>
 {% for table_index in pg_stats_table_index %}
     <p>schemaname: {{ table_index.schemaname }}</p>
     <p>relname: {{ table_index.relname }}</p>
@@ -31,6 +34,7 @@
     <p>idx_tup_fetch: {% if let Some(idx_tup_fetch) = table_index.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</p>    
 {% endfor %}
 
+<p>pg_stat_statements</p>
 {% for stat_statements in pg_stat_statements %}
     <p>query: {{ stat_statements.query }}</p>
     <p>calls: {% if let Some(calls) = stat_statements.calls %}{{ calls }}{% endif %}</p>    
@@ -39,6 +43,14 @@
     <p>rows: {% if let Some(rows) = stat_statements.rows %}{{ rows }}{% endif %}</p>    
 {% endfor %}
 
+<p>pg_stat_table_size</p>
+{% for stat_table_size in pg_stat_table_size %}
+    <p>schemaname: {{ stat_table_size.schemaname }}</p>
+    <p>relname: {{ stat_table_size.relname }}</p>
+    <p>total_size: {% if let Some(total_size) = stat_table_size.total_size %}{{ total_size }}{% endif %}</p>    
+    <p>table_size: {% if let Some(table_size) = stat_table_size.table_size %}{{ table_size }}{% endif %}</p>    
+    <p>indexes_size: {% if let Some(indexes_size) = stat_table_size.indexes_size %}{{ indexes_size }}{% endif %}</p>    
+{% endfor %}
 
 <div class="pin_time">{{ elapsed_ms }} ms</div>
 {% endblock %}

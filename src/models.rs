@@ -501,7 +501,15 @@ pub struct PgTableIndex {
 pub struct PgStatStatements {
     pub query: String,
     pub calls: Option<i64>,
-    pub total_exec_time: Option<i64>,
-    pub mean_exec_time: Option<i64>,
+    pub total_exec_time: Option<f64>,
+    pub mean_exec_time: Option<f64>,
     pub rows: Option<i64>,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct PgStatTableSize {
+    pub schemaname: String,
+    pub relname: String,
+    pub total_size: Option<f64>,
+    pub table_size: Option<f64>,
+    pub indexes_size: Option<f64>,
 }
