@@ -11,14 +11,6 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let _ = sqlx::query_as::<_, PgConnection>("CREATE EXTENSION IF NOT EXISTS pg_stat_statements;")
-        .fetch_all(pool.get_ref())
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
-        })?;
-
     let pg_stats_connections = sqlx::query_as::<_, PgConnection>(
         "SELECT count(*) AS total_connections, count(*) FILTER (WHERE state = 'active') AS active_connections FROM pg_stat_activity;",
     )
