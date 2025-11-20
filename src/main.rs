@@ -5,14 +5,9 @@ use std::env;
 mod handlers;
 mod models;
 mod templates;
-use crate::handlers::borrow::{borrow, borrows};
-use crate::handlers::candle::{candle, candles};
 use crate::handlers::currency::currencies;
 use crate::handlers::index::index;
-use crate::handlers::lend::{lend, lends};
 use crate::handlers::pg::pg;
-use crate::handlers::smastrategy::{smastrategy, smastrategy_by_symbol};
-use crate::handlers::strategy::{strategy, tickerstrategy};
 use crate::handlers::symbol::symbols;
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
@@ -35,35 +30,17 @@ async fn main() -> std::io::Result<()> {
                             .wrap(middleware::Compress::default())
                             .route("/", web::get().to(index))
                             //
-                            // Working with tickers
-                            .route("/tickers", web::get().to(tickers))
-                            //
                             // Work with pg
                             .route("/pg", web::get().to(pg))
+                            //
+                            // Working with tickers
+                            .route("/tickers", web::get().to(tickers))
                             //
                             // Working with currencies
                             .route("/currencies", web::get().to(currencies))
                             //
                             // Working with symbols
                             .route("/symbols", web::get().to(symbols))
-                            //
-                            // Working with lend
-                            .route("/lend", web::get().to(lends))
-                            .route("/lend/{currency}", web::get().to(lend))
-                            //
-                            // Working with borrow
-                            .route("/borrow", web::get().to(borrows))
-                            .route("/borrow/{currency}", web::get().to(borrow))
-                            //
-                            // Working with candles
-                            .route("/candle", web::get().to(candles))
-                            .route("/candle/{ticker}", web::get().to(candle))
-                            //
-                            //
-                            .route("/strategy", web::get().to(strategy))
-                            .route("/strategy/{ticker}", web::get().to(tickerstrategy))
-                            .route("/sma", web::get().to(smastrategy))
-                            .route("/sma/{symbol}", web::get().to(smastrategy_by_symbol))
                             //
                             // System links
                             .route("/static/style.css", web::get().to(serve_css))
