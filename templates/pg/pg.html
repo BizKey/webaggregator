@@ -5,53 +5,131 @@
 {% block content %}
 <p><a href="/">Home</a></p>
 <p>pg_stats_connections</p>
-{% for connection in pg_stats_connections %}
-<p>total_connections: {{ connection.total_connections }}</p>
-<p>active_connections: {{ connection.active_connections }}</p>
-{% endfor %}
+<table>
+    <thead>
+        <tr>
+            <th>total_connections</th>
+            <th>active_connections</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% for connection in pg_stats_connections %}
+            <td>{{ connection.total_connections }}</td>
+            <td>{{ connection.active_connections }}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
 
 <p>pg_stats_table_info</p>
-{% for table_info in pg_stats_table_info %}
-<p>schemaname: {{ table_info.schemaname }}</p>
-<p>relname: {{ table_info.relname }}</p>
-<p>seq_scan: {% if let Some(seq_scan) = table_info.seq_scan %}{{ seq_scan }}{% endif %}</p>
-<p>seq_tup_read: {% if let Some(seq_tup_read) = table_info.seq_tup_read %}{{ seq_tup_read }}{% endif %}</p>
-<p>idx_scan: {% if let Some(idx_scan) = table_info.idx_scan %}{{ idx_scan }}{% endif %}</p>
-<p>idx_tup_fetch: {% if let Some(idx_tup_fetch) = table_info.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</p>
-<p>n_tup_ins: {% if let Some(n_tup_ins) = table_info.n_tup_ins %}{{ n_tup_ins }}{% endif %}</p>
-<p>n_tup_upd: {% if let Some(n_tup_upd) = table_info.n_tup_upd %}{{ n_tup_upd }}{% endif %}</p>
-<p>n_tup_del: {% if let Some(n_tup_del) = table_info.n_tup_del %}{{ n_tup_del }}{% endif %}</p>
-<p>n_live_tup: {% if let Some(n_live_tup) = table_info.n_live_tup %}{{ n_live_tup }}{% endif %}</p>
-<p>n_dead_tup: {% if let Some(n_dead_tup) = table_info.n_dead_tup %}{{ n_dead_tup }}{% endif %}</p>
-{% endfor %}
+<table>
+    <thead>
+        <tr>
+            <th>schemaname</th>
+            <th>relname</th>
+            <th>seq_scan</th>
+            <th>seq_tup_read</th>
+            <th>idx_scan</th>
+            <th>idx_tup_fetch</th>
+            <th>n_tup_ins</th>
+            <th>n_tup_upd</th>
+            <th>n_tup_del</th>
+            <th>n_live_tup</th>
+            <th>n_dead_tup</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% for table_info in pg_stats_table_info %}
+            <td>{{ table_info.schemaname }}</td>
+            <td>{{ table_info.relname }}</td>
+            <td>{% if let Some(seq_scan) = table_info.seq_scan %}{{ seq_scan }}{% endif %}</td>
+            <td>{% if let Some(seq_tup_read) = table_info.seq_tup_read %}{{ seq_tup_read }}{% endif %}</td>
+            <td>{% if let Some(idx_scan) = table_info.idx_scan %}{{ idx_scan }}{% endif %}</td>
+            <td>{% if let Some(idx_tup_fetch) = table_info.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</td>
+            <td>{% if let Some(n_tup_ins) = table_info.n_tup_ins %}{{ n_tup_ins }}{% endif %}</td>
+            <td>{% if let Some(n_tup_upd) = table_info.n_tup_upd %}{{ n_tup_upd }}{% endif %}</td>
+            <td>{% if let Some(n_tup_del) = table_info.n_tup_del %}{{ n_tup_del }}{% endif %}</td>
+            <td>{% if let Some(n_live_tup) = table_info.n_live_tup %}{{ n_live_tup }}{% endif %}</td>
+            <td>{% if let Some(n_dead_tup) = table_info.n_dead_tup %}{{ n_dead_tup }}{% endif %}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
 
 <p>pg_stats_table_index</p>
-{% for table_index in pg_stats_table_index %}
-<p>schemaname: {{ table_index.schemaname }}</p>
-<p>relname: {{ table_index.relname }}</p>
-<p>idx_scan: {% if let Some(idx_scan) = table_index.idx_scan %}{{ idx_scan }}{% endif %}</p>
-<p>idx_tup_read: {% if let Some(idx_tup_read) = table_index.idx_tup_read %}{{ idx_tup_read }}{% endif %}</p>
-<p>idx_tup_fetch: {% if let Some(idx_tup_fetch) = table_index.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</p>
-{% endfor %}
+<table>
+    <thead>
+        <tr>
+            <th>schemaname</th>
+            <th>relname</th>
+            <th>idx_scan</th>
+            <th>idx_tup_read</th>
+            <th>idx_tup_fetch</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% for table_index in pg_stats_table_index %}
+            <td>{{ table_index.schemaname }}</td>
+            <td>{{ table_index.relname }}</td>
+            <td>{% if let Some(idx_scan) = table_index.idx_scan %}{{ idx_scan }}{% endif %}</td>
+            <td>{% if let Some(idx_tup_read) = table_index.idx_tup_read %}{{ idx_tup_read }}{% endif %}</td>
+            <td>{% if let Some(idx_tup_fetch) = table_index.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</td>
+            <td>{% if let Some(idx_tup_fetch) = table_index.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
 
 <p>pg_stat_statements</p>
-{% for stat_statements in pg_stat_statements %}
-<p>query: {{ stat_statements.query }}</p>
-<p>calls: {% if let Some(calls) = stat_statements.calls %}{{ calls }}{% endif %}</p>
-<p>total_exec_time: {% if let Some(total_exec_time) = stat_statements.total_exec_time %}{{ total_exec_time }}{% endif %}
-</p>
-<p>mean_exec_time: {% if let Some(mean_exec_time) = stat_statements.mean_exec_time %}{{ mean_exec_time }}{% endif %}</p>
-<p>rows: {% if let Some(rows) = stat_statements.rows %}{{ rows }}{% endif %}</p>
-{% endfor %}
+<table>
+    <thead>
+        <tr>
+            <th>query</th>
+            <th>calls</th>
+            <th>total_exec_time</th>
+            <th>mean_exec_time</th>
+            <th>rows</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% for stat_statements in pg_stat_statements %}
+            <td>{{ stat_statements.query }}</td>
+            <td>{% if let Some(calls) = stat_statements.calls %}{{ calls }}{% endif %}</td>
+            <td>{% if let Some(total_exec_time) = stat_statements.total_exec_time %}{{ total_exec_time }}{% endif %}
+            </td>
+            <td>{% if let Some(mean_exec_time) = stat_statements.mean_exec_time %}{{ mean_exec_time }}{% endif %}</td>
+            <td>{% if let Some(rows) = stat_statements.rows %}{{ rows }}{% endif %}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
 
 <p>pg_stat_table_size</p>
-{% for stat_table_size in pg_stat_table_size %}
-<p>schemaname: {{ stat_table_size.schemaname }}</p>
-<p>relname: {{ stat_table_size.relname }}</p>
-<p>total_size: {{ stat_table_size.total_size }}</p>
-<p>table_size: {{ stat_table_size.table_size }}</p>
-<p>indexes_size: {{ stat_table_size.indexes_size }}</p>
-{% endfor %}
-
+<table>
+    <thead>
+        <tr>
+            <th>schemaname</th>
+            <th>relname</th>
+            <th>total_size</th>
+            <th>table_size</th>
+            <th>indexes_size</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            {% for stat_table_size in pg_stat_table_size %}
+            <td>{{ stat_table_size.schemaname }}</td>
+            <td>{{ stat_table_size.relname }}</td>
+            <td>{{ stat_table_size.total_size }}</td>
+            <td>{{ stat_table_size.table_size }}</td>
+            <td>{{ stat_table_size.indexes_size }}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
 <div class="pin_time">{{ elapsed_ms }} ms</div>
 {% endblock %}
