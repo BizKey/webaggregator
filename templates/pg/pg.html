@@ -77,12 +77,7 @@
             <td>{% if let Some(idx_scan) = table_index.idx_scan %}{{ idx_scan }}{% endif %}</td>
             <td>{% if let Some(idx_tup_read) = table_index.idx_tup_read %}{{ idx_tup_read }}{% endif %}</td>
             <td>{% if let Some(idx_tup_fetch) = table_index.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</td>
-            <td>{% if let Some(idx_tup_fetch) = table_info.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</td>
-            <td>{% if let Some(n_tup_ins) = table_info.n_tup_ins %}{{ n_tup_ins }}{% endif %}</td>
-            <td>{% if let Some(n_tup_upd) = table_info.n_tup_upd %}{{ n_tup_upd }}{% endif %}</td>
-            <td>{% if let Some(n_tup_del) = table_info.n_tup_del %}{{ n_tup_del }}{% endif %}</td>
-            <td>{% if let Some(n_live_tup) = table_info.n_live_tup %}{{ n_live_tup }}{% endif %}</td>
-            <td>{% if let Some(n_dead_tup) = table_info.n_dead_tup %}{{ n_dead_tup }}{% endif %}</td>
+            <td>{% if let Some(idx_tup_fetch) = table_index.idx_tup_fetch %}{{ idx_tup_fetch }}{% endif %}</td>
             {% endfor %}
         </tr>
     </tbody>
