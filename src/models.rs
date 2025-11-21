@@ -100,3 +100,8 @@ pub struct PgStatTableSize {
     pub table_size: String,
     pub indexes_size: String,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct Event {
+    pub exchange: String,
+    pub msg: String,
+}

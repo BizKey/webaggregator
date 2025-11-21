@@ -6,6 +6,7 @@ mod handlers;
 mod models;
 mod templates;
 use crate::handlers::currency::currencies;
+use crate::handlers::events::events;
 use crate::handlers::index::index;
 use crate::handlers::pg::pg;
 use crate::handlers::symbol::symbols;
@@ -32,6 +33,8 @@ async fn main() -> std::io::Result<()> {
                             //
                             // Work with pg
                             .route("/pg", web::get().to(pg))
+                            // events
+                            .route("/events", web::get().to(events))
                             //
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))
