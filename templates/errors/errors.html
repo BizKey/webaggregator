@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Events{% endblock %}
+{% block title %}Errors{% endblock %}
 
 {% block content %}
 <p><a href="/">Home</a></p>
-<p>events</p>
+<p>errors</p>
 <table>
     <thead>
         <tr>
@@ -13,10 +13,10 @@
         </tr>
     </thead>
     <tbody>
-        {% for event in events %}
+        {% for error in errors %}
         <tr>
-            <td>{{ event.exchange }}</td>
-            <td>{{ event.msg }}</td>
+            <td>{{ error.exchange }}</td>
+            <td>{{ error.msg }}</td>
         </tr>
         {% endfor %}
     </tbody>

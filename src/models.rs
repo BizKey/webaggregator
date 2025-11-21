@@ -105,3 +105,8 @@ pub struct Event {
     pub exchange: String,
     pub msg: String,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct Error {
+    pub exchange: String,
+    pub msg: String,
+}
