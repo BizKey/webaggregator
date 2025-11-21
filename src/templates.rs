@@ -1,6 +1,6 @@
 use crate::models::{
-    Currency, Event, PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo,
-    Symbol, Ticker,
+    Currency, Error, Event, PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex,
+    PgTableInfo, Symbol, Ticker,
 };
 use askama::Template;
 
@@ -40,6 +40,12 @@ pub struct PgTemplate {
 #[template(path = "events/events.html")]
 pub struct EventsTemplate {
     pub events: Vec<Event>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "errors/errors.html")]
+pub struct ErrorsTemplate {
+    pub errors: Vec<Error>,
     pub elapsed_ms: u128,
 }
 // Index template
