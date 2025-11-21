@@ -85,22 +85,22 @@
 <p>pg_stat_statements</p>
 <table>
     <thead>
-        <tr>
-            <th>query</th>
+        <tr>            
             <th>calls</th>
             <th>total_exec_time</th>
             <th>mean_exec_time</th>
             <th>rows</th>
+            <th>query</th>
         </tr>
     </thead>
     <tbody>
         {% for stat_statements in pg_stat_statements %}
         <tr>
-            <td>{{ stat_statements.query }}</td>
             <td>{% if let Some(calls) = stat_statements.calls %}{{ calls }}{% endif %}</td>
             <td>{% if let Some(total_exec_time) = stat_statements.total_exec_time %}{{ total_exec_time }}{% endif %}</td>
             <td>{% if let Some(mean_exec_time) = stat_statements.mean_exec_time %}{{ mean_exec_time }}{% endif %}</td>
             <td>{% if let Some(rows) = stat_statements.rows %}{{ rows }}{% endif %}</td>
+            <td>{{ stat_statements.query }}</td>
         </tr>
         {% endfor %}        
     </tbody>
