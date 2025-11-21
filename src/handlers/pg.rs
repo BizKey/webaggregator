@@ -42,7 +42,7 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     })?;
 
     let pg_stat_statements = sqlx::query_as::<_, PgStatStatements>(
-        "SELECT query, calls, total_exec_time, mean_exec_time, rows FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;",
+        "SELECT query, calls, total_exec_time, mean_exec_time, rows FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 100;",
     )
     .fetch_all(pool.get_ref())
     .await
