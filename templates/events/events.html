@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}PG{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>events</p>
+<table>
+    <thead>
+        <tr>
+            <th>exchange</th>
+            <th>msg</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in events %}
+        <tr>
+            <td>{{ event.exchange }}</td>
+            <td>{{ event.msg }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
