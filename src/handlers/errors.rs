@@ -11,13 +11,15 @@ pub async fn errors(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let errors = sqlx::query_as::<_, Error>("SELECT exchange, msg, created_at FROM errors;")
-        .fetch_all(pool.get_ref())
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
-        })?;
+    let errors = sqlx::query_as::<_, Error>(
+        "SELECT exchange, msg, created_at FROM errors ORDER BY created_at DESC;",
+    )
+    .fetch_all(pool.get_ref())
+    .await
+    .map_err(|e| {
+        eprintln!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
+    })?;
 
     let template = ErrorsTemplate {
         errors: errors,
