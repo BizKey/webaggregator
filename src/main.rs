@@ -5,6 +5,7 @@ use std::env;
 mod handlers;
 mod models;
 mod templates;
+use crate::handlers::balance::balances;
 use crate::handlers::currency::currencies;
 use crate::handlers::errors::errors;
 use crate::handlers::events::events;
@@ -38,6 +39,8 @@ async fn main() -> std::io::Result<()> {
                             .route("/events", web::get().to(events))
                             // errors
                             .route("/errors", web::get().to(errors))
+                            // balance
+                            .route("/balance", web::get().to(balances))
                             //
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))

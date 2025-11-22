@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Balance{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>errors</p>
+<table>
+    <thead>
+        <tr>
+            <th>exchange</th>
+            <th>account_id</th>
+            <th>available</th>
+            <th>available_change</th>
+            <th>currency</th>
+            <th>hold</th>
+            <th>hold_change</th>
+            <th>relation_event</th>
+            <th>relation_event_id</th>
+            <th>time</th>
+            <th>total</th>
+            <th>symbol</th>
+            <th>order_id</th>
+            <th>trade_id</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for balance in balances %}
+        <tr>
+            <td>{{ balance.exchange }}</td>
+            <td>{{ balance.account_id }}</td>
+            <td>{{ balance.available }}</td>
+            <td>{{ balance.available_change }}</td>
+            <td>{{ balance.currency }}</td>
+            <td>{{ balance.hold }}</td>
+            <td>{{ balance.hold_change }}</td>
+            <td>{{ balance.relation_event }}</td>
+            <td>{{ balance.relation_event_id }}</td>
+            <td>{{ balance.time }}</td>
+            <td>{{ balance.total }}</td>
+            <td>
+                {% if let Some(symbol) = balance.symbol %}
+                {{ symbol }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(order_id) = balance.order_id %}
+                {{ order_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(trade_id) = balance.trade_id %}
+                {{ trade_id }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
