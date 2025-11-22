@@ -8,6 +8,7 @@
 <table>
     <thead>
         <tr>
+            <th>created</th>
             <th>exchange</th>
             <th>msg</th>
         </tr>
@@ -15,6 +16,7 @@
     <tbody>
         {% for error in errors %}
         <tr>
+            <td>{{ error.created_at }}</td>
             <td>{{ error.exchange }}</td>
             <td>{{ error.msg }}</td>
         </tr>

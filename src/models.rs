@@ -104,11 +104,13 @@ pub struct PgStatTableSize {
 pub struct Event {
     pub exchange: String,
     pub msg: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Error {
     pub exchange: String,
     pub msg: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
@@ -127,4 +129,5 @@ pub struct Balance {
     pub symbol: Option<String>,
     pub order_id: Option<String>,
     pub trade_id: Option<String>,
+    pub created_at: chrono::DateTime<chrono::Utc>,
 }
