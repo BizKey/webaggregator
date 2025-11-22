@@ -1,3 +1,4 @@
+pub mod balance;
 pub mod currency;
 pub mod errors;
 pub mod events;
