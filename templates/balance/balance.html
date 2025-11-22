@@ -8,6 +8,7 @@
 <table>
     <thead>
         <tr>
+            <th>created</th>
             <th>exchange</th>
             <th>account_id</th>
             <th>available</th>
@@ -27,6 +28,7 @@
     <tbody>
         {% for balance in balances %}
         <tr>
+            <td>{{ balance.created_at }}</td>
             <td>{{ balance.exchange }}</td>
             <td>{{ balance.account_id }}</td>
             <td>{{ balance.available }}</td>
