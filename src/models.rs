@@ -11,6 +11,39 @@ pub struct Ticker {
     pub taker_coefficient: Option<String>,
     pub maker_coefficient: Option<String>,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct ActiveOrder {
+    pub exchange: String,
+    pub order_id: String,
+    pub symbol: String,
+    pub side: String,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct EventOrder {
+    pub exchange: String,
+    pub status: String,
+    pub type_: String,
+    pub symbol: String,
+    pub side: String,
+    pub order_type: String,
+    pub fee_type: String,
+    pub liquidity: String,
+    pub price: String,
+    pub order_id: String,
+    pub client_oid: String,
+    pub trade_id: String,
+    pub origin_size: String,
+    pub size: String,
+    pub filled_size: String,
+    pub match_size: String,
+    pub match_price: String,
+    pub canceled_size: String,
+    pub old_size: String,
+    pub remain_size: String,
+    pub remain_funds: String,
+    pub order_time: String,
+    pub ts: String,
+}
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Symbol {
