@@ -148,8 +148,8 @@ pub struct Error {
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct PositionRatio {
     pub exchange: String,
-    pub debt_ratio: String,
-    pub total_asset: String,
+    pub debt_ratio: f64,
+    pub total_asset: f64,
     pub margin_coefficient_total_asset: String,
     pub total_debt: String,
     pub updated_at: chrono::DateTime<chrono::Utc>,
