@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Event Orders{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>Event orders</p>
+<table>
+    <thead>
+        <tr>
+            <th>exchange</th>
+            <th>debt_symbol</th>
+            <th>debt_value</th>
+            <th>updated_at</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for position in position_debt %}
+        <tr>
+            <td>{{ position.exchange }}</td>
+            <td>{{ position.debt_symbol }}</td>
+            <td>{{ position.debt_value }}</td>
+            <td>{{ position.updated_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

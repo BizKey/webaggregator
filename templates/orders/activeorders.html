@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Active Orders{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>Active orders</p>
+<table>
+    <thead>
+        <tr>
+            <th>exchange</th>
+            <th>order_id</th>
+            <th>symbol</th>
+            <th>side</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in active_orders %}
+        <tr>
+            <td>{{ order.exchange }}</td>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.symbol }}</td>
+            <td>{{ order.side }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

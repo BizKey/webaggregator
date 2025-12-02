@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Event Orders{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>Event orders</p>
+<table>
+    <thead>
+        <tr>
+            <th>exchange</th>
+            <th>status</th>
+            <th>type_</th>
+            <th>symbol</th>
+            <th>side</th>
+            <th>order_type</th>
+            <th>fee_type</th>
+            <th>liquidity</th>
+            <th>price</th>
+            <th>order_id</th>
+            <th>client_oid</th>
+            <th>trade_id</th>
+            <th>origin_size</th>
+            <th>size</th>
+            <th>filled_size</th>
+            <th>match_size</th>
+            <th>match_price</th>
+            <th>canceled_size</th>
+            <th>old_size</th>
+            <th>remain_size</th>
+            <th>remain_funds</th>
+            <th>order_time</th>
+            <th>ts</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in event_orders %}
+        <tr>
+            <td>{{ order.exchange }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.type_ }}</td>
+            <td>{{ order.symbol }}</td>
+            <td>{{ order.side }}</td>
+            <td>{{ order.order_type }}</td>
+            <td>
+                {% if let Some(fee_type) = order.fee_type %}
+                {{ fee_type }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(liquidity) = order.liquidity %}
+                {{ liquidity }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(price) = order.price %}
+                {{ price }}
+                {% endif %}
+            </td>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.client_oid }}</td>
+            <td>{% if let Some(trade_id) = order.trade_id %}
+                {{ trade_id }}
+                {% endif %}
+            </td>
+            <td>{{ order.origin_size }}</td>
+            <td>
+                {% if let Some(size) = order.size %}
+                {{ size }}
+                {% endif %}</td>
+            <td>
+                {% if let Some(filled_size) = order.filled_size %}
+                {{ filled_size }}
+                {% endif %}
+            </td>
+            <td>{% if let Some(match_size) = order.match_size %}
+                {{ match_size }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(match_price) = order.match_price %}
+                {{ match_price }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(canceled_size) = order.canceled_size %}
+                {{ canceled_size }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(old_size) = order.old_size %}
+                {{ old_size }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(remain_size) = order.remain_size %}
+                {{ remain_size }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(remain_funds) = order.remain_funds %}
+                {{ remain_funds }}
+                {% endif %}
+            </td>
+            <td>{{ order.order_time }}</td>
+            <td>{{ order.ts }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
