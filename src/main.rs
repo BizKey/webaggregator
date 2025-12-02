@@ -43,9 +43,9 @@ async fn main() -> std::io::Result<()> {
                             // balance
                             .route("/balance", web::get().to(balances))
                             // active orders
-                            .route("/activeorders", web::get().to(activeorders))
+                            .route("/activeorder", web::get().to(activeorders))
                             // event orders
-                            .route("/eventorders", web::get().to(eventorders))
+                            .route("/eventorder", web::get().to(eventorders))
                             //
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))
