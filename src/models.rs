@@ -145,6 +145,31 @@ pub struct Error {
     pub msg: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct PositionRatio {
+    pub exchange: String,
+    pub debt_ratio: String,
+    pub total_asset: String,
+    pub margin_coefficient_total_asset: String,
+    pub total_debt: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct PositionDebt {
+    pub exchange: String,
+    pub debt_symbol: String,
+    pub debt_value: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct PositionAsset {
+    pub exchange: String,
+    pub asset_symbol: String,
+    pub asset_total: String,
+    pub asset_available: String,
+    pub asset_hold: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Balance {

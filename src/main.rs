@@ -12,6 +12,7 @@ use crate::handlers::events::events;
 use crate::handlers::index::index;
 use crate::handlers::orders::{activeorders, eventorders};
 use crate::handlers::pg::pg;
+use crate::handlers::position::{positionasset, positiondebt, positionratio};
 use crate::handlers::symbol::symbols;
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
@@ -46,6 +47,12 @@ async fn main() -> std::io::Result<()> {
                             .route("/activeorder", web::get().to(activeorders))
                             // event orders
                             .route("/eventorder", web::get().to(eventorders))
+                            // position debt
+                            .route("/positiondebt", web::get().to(positiondebt))
+                            // position asset
+                            .route("/positionasset", web::get().to(positionasset))
+                            // position ratio
+                            .route("/positionratio", web::get().to(positionratio))
                             //
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))

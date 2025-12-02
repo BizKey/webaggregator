@@ -5,6 +5,7 @@ pub mod events;
 pub mod index;
 pub mod orders;
 pub mod pg;
+pub mod position;
 pub mod symbol;
 pub mod system;
 pub mod ticker;
