@@ -32,7 +32,7 @@ pub struct EventOrder {
     pub order_id: String,
     pub client_oid: String,
     pub trade_id: Option<String>,
-    pub origin_size: String,
+    pub origin_size: Option<String>,
     pub size: Option<String>,
     pub filled_size: Option<String>,
     pub match_size: Option<String>,
