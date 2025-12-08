@@ -20,7 +20,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
                 callauction_price_floor, callauction_price_ceiling, 
                 callauction_first_stage_start_time, callauction_second_stage_start_time, 
                 callauction_third_stage_start_time, trading_start_time 
-            FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = USDT",
+            FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = 'USDT'",
     )
     .fetch_all(pool.get_ref())
     .await
