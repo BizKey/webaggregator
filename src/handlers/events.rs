@@ -12,7 +12,7 @@ pub async fn events(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let events = sqlx::query_as::<_, Event>(
-        "SELECT exchange, msg, created_at FROM events ORDER BY created_at DESC;",
+        "SELECT exchange, msg, updated_at FROM events ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
     .await
