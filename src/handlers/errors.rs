@@ -12,7 +12,7 @@ pub async fn errors(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let errors = sqlx::query_as::<_, Error>(
-        "SELECT exchange, msg, created_at FROM errors ORDER BY created_at DESC;",
+        "SELECT exchange, msg, updated_at FROM errors ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
     .await
