@@ -173,7 +173,7 @@ pub struct Balance {
     pub available: String,
     pub available_change: String,
     pub currency: String,
-    pub hold: String,
+    pub hold_value: String,
     pub hold_change: String,
     pub relation_event: String,
     pub relation_event_id: String,
