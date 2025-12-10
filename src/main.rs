@@ -34,7 +34,6 @@ async fn main() -> std::io::Result<()> {
                             .app_data(web::Data::new(pool.clone()))
                             .wrap(middleware::Compress::default())
                             .route("/", web::get().to(index))
-                            //
                             // Work with pg
                             .route("/pg", web::get().to(pg))
                             // events
@@ -55,16 +54,12 @@ async fn main() -> std::io::Result<()> {
                             .route("/positionratio", web::get().to(positionratio))
                             // tradeable
                             .route("/tradeable", web::get().to(tradeable))
-                            //
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))
-                            //
                             // Working with currencies
                             .route("/currencies", web::get().to(currencies))
-                            //
                             // Working with symbols
                             .route("/symbols", web::get().to(symbols))
-                            //
                             // System links
                             .route("/static/style.css", web::get().to(serve_css))
                             .route("/favicon.png", web::get().to(favicon))
