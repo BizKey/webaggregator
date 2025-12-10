@@ -8,23 +8,23 @@
 <table>
     <thead>
         <tr>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>debt_ratio</th>
             <th>total_asset</th>
             <th>margin_coefficient_total_asset</th>
             <th>total_debt</th>
-            <th>updated_at</th>
         </tr>
     </thead>
     <tbody>
         {% for position in position_ratio %}
         <tr>
+            <td>{{ position.updated_at }}</td>
             <td>{{ position.exchange }}</td>
             <td>{{ position.debt_ratio }}</td>
             <td>{{ position.total_asset }}</td>
             <td>{{ position.margin_coefficient_total_asset }}</td>
             <td>{{ position.total_debt }}</td>
-            <td>{{ position.updated_at }}</td>
         </tr>
         {% endfor %}
     </tbody>

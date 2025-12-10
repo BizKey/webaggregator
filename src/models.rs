@@ -10,6 +10,7 @@ pub struct Ticker {
     pub maker_fee_rate: Option<String>,
     pub taker_coefficient: Option<String>,
     pub maker_coefficient: Option<String>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct ActiveOrder {
@@ -17,6 +18,7 @@ pub struct ActiveOrder {
     pub order_id: String,
     pub symbol: String,
     pub side: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct EventOrder {
@@ -43,6 +45,7 @@ pub struct EventOrder {
     pub remain_funds: Option<String>,
     pub order_time: i64,
     pub ts: i64,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
@@ -69,6 +72,7 @@ pub struct Symbol {
     pub maker_fee_coefficient: String,
     pub taker_fee_coefficient: String,
     pub st: bool,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Currency {
@@ -78,6 +82,7 @@ pub struct Currency {
     pub full_name: String,
     pub is_margin_enabled: bool,
     pub is_debit_enabled: bool,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
@@ -127,13 +132,13 @@ pub struct PgStatTableSize {
 pub struct Event {
     pub exchange: String,
     pub msg: String,
-    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Error {
     pub exchange: String,
     pub msg: String,
-    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct PositionRatio {
@@ -177,5 +182,5 @@ pub struct Balance {
     pub symbol: Option<String>,
     pub order_id: Option<String>,
     pub trade_id: Option<String>,
-    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }

@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>symbol</th>
             <th>symbol_name</th>
@@ -36,6 +37,7 @@
         {% for (index, symbol) in symbols %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ symbol.updated_at }}</td>
             <td>{{ symbol.exchange }}</td>
             <td>{{ symbol.symbol }}</td>
             <td>{{ symbol.symbol_name }}</td>

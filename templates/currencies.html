@@ -8,6 +8,7 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>currency</th>
             <th>currency_name</th>
@@ -20,6 +21,7 @@
         {% for (index, currency) in currencies %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ currency.updated_at }}</td>
             <td>{{ currency.exchange }}</td>
             <td>{{ currency.currency }}</td>
             <td>{{ currency.currency_name }}</td>
