@@ -177,7 +177,7 @@ pub struct Balance {
     pub hold_change: String,
     pub relation_event: String,
     pub relation_event_id: String,
-    pub time: String,
+    pub event_time: String,
     pub total: String,
     pub symbol: Option<String>,
     pub order_id: Option<String>,
