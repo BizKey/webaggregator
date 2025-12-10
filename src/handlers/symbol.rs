@@ -53,7 +53,7 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         fee_currency, market, base_min_size, quote_min_size, base_max_size, 
         quote_max_size, base_increment, quote_increment, price_increment, price_limit_rate, 
         min_funds, is_margin_enabled, enable_trading, fee_category, maker_fee_coefficient, 
-        taker_fee_coefficient, st
+        taker_fee_coefficient, st, updated_at
             FROM symbol",
     )
     .fetch_all(pool.get_ref())
