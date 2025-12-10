@@ -13,9 +13,8 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let tickers = sqlx::query_as::<_, Ticker>(
-        "SELECT
-                exchange, symbol, symbol_name, taker_fee_rate, maker_fee_rate, 
-                taker_coefficient, maker_coefficient 
+        "SELECT exchange, symbol, symbol_name, taker_fee_rate, 
+                maker_fee_rate, taker_coefficient, maker_coefficient 
             FROM ticker",
     )
     .fetch_all(pool.get_ref())
