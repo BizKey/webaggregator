@@ -1,26 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Event Orders{% endblock %}
+{% block title %}Position Debt{% endblock %}
 
 {% block content %}
 <p><a href="/">Home</a></p>
-<p>Event orders</p>
+<p>Position Debt</p>
 <table>
     <thead>
         <tr>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>debt_symbol</th>
             <th>debt_value</th>
-            <th>updated_at</th>
         </tr>
     </thead>
     <tbody>
         {% for position in position_debt %}
         <tr>
+            <td>{{ position.updated_at }}</td>
             <td>{{ position.exchange }}</td>
             <td>{{ position.debt_symbol }}</td>
             <td>{{ position.debt_value }}</td>
-            <td>{{ position.updated_at }}</td>
         </tr>
         {% endfor %}
     </tbody>

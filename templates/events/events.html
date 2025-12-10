@@ -8,7 +8,7 @@
 <table>
     <thead>
         <tr>
-            <th>created</th>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>msg</th>
         </tr>
@@ -16,8 +16,8 @@
     <tbody>
         {% for event in events %}
         <tr>
-            <td>{{ event.exchange }}</td>
-            <td>{{ event.created_at }}</td>
+            <td>{{ event.updated_at }}</td>
+            <td>{{ event.exchange }}</td>            
             <td>{{ event.msg }}</td>
         </tr>
         {% endfor %}

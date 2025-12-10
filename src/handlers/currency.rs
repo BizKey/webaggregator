@@ -13,9 +13,8 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let all_currencies = sqlx::query_as::<_, Currency>(
-        "SELECT 
-                exchange, currency, name, full_name, precision, confirms, 
-                contract_address, is_margin_enabled, is_debit_enabled 
+        "SELECT exchange, currency, currency_name, full_name, 
+                is_margin_enabled, is_debit_enabled 
             FROM currency",
     )
     .fetch_all(pool.get_ref())

@@ -9,22 +9,22 @@
     <thead>
         <tr>
             <th>exchange</th>
+            <th>updated_at</th>
             <th>asset_symbol</th>
             <th>asset_total</th>
             <th>asset_available</th>
             <th>asset_hold</th>
-            <th>updated_at</th>
         </tr>
     </thead>
     <tbody>
         {% for position in position_asset %}
         <tr>
+            <td>{{ position.updated_at }}</td>
             <td>{{ position.exchange }}</td>
             <td>{{ position.asset_symbol }}</td>
             <td>{{ position.asset_total }}</td>
             <td>{{ position.asset_available }}</td>
             <td>{{ position.asset_hold }}</td>
-            <td>{{ position.updated_at }}</td>
         </tr>
         {% endfor %}
     </tbody>

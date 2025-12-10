@@ -8,6 +8,7 @@
 <table>
     <thead>
         <tr>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>status</th>
             <th>type_</th>
@@ -36,6 +37,7 @@
     <tbody>
         {% for order in event_orders %}
         <tr>
+            <td>{{ order.updated_at }}</td>
             <td>{{ order.exchange }}</td>
             <td>{{ order.status }}</td>
             <td>{{ order.type_ }}</td>

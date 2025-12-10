@@ -8,9 +8,10 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>symbol</th>
-            <th>name</th>
+            <th>symbol_name</th>
             <th>base_currency</th>
             <th>quote_currency</th>
             <th>fee_currency</th>
@@ -30,22 +31,16 @@
             <th>maker_fee_coefficient</th>
             <th>taker_fee_coefficient</th>
             <th>st</th>
-            <th>callauction_is_enabled</th>
-            <th>callauction_price_floor</th>
-            <th>callauction_price_ceiling</th>
-            <th>callauction_first_stage_start_time</th>
-            <th>callauction_second_stage_start_time</th>
-            <th>callauction_third_stage_start_time</th>
-            <th>trading_start_time</th>
         </tr>
     </thead>
     <tbody>
         {% for (index, symbol) in symbols %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ symbol.updated_at }}</td>
             <td>{{ symbol.exchange }}</td>
             <td>{{ symbol.symbol }}</td>
-            <td>{{ symbol.name }}</td>
+            <td>{{ symbol.symbol_name }}</td>
             <td>{{ symbol.base_currency }}</td>
             <td>{{ symbol.quote_currency }}</td>
             <td>{{ symbol.fee_currency }}</td>
@@ -69,37 +64,6 @@
             <td>{{ symbol.maker_fee_coefficient }}</td>
             <td>{{ symbol.taker_fee_coefficient }}</td>
             <td>{{ symbol.st }}</td>
-            <td>{{ symbol.callauction_is_enabled }}</td>
-            <td>
-                {% if let Some(callauction_price_floor) = symbol.callauction_price_floor %}
-                {{ callauction_price_floor }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(callauction_price_ceiling) = symbol.callauction_price_ceiling %}
-                {{ callauction_price_ceiling }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(callauction_first_stage_start_time) = symbol.callauction_first_stage_start_time %}
-                {{ callauction_first_stage_start_time }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(callauction_second_stage_start_time) = symbol.callauction_second_stage_start_time %}
-                {{ callauction_second_stage_start_time }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(callauction_third_stage_start_time) = symbol.callauction_third_stage_start_time %}
-                {{ callauction_third_stage_start_time }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(trading_start_time) = symbol.trading_start_time %}
-                {{ trading_start_time }}
-                {% endif %}
-            </td>
         </tr>
         {% endfor %}
     </tbody>

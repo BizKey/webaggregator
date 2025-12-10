@@ -8,13 +8,11 @@
     <thead>
         <tr>
             <th>№</th>
+            <th>updated_at</th>
             <th>exchange</th>
             <th>currency</th>
-            <th>name</th>
+            <th>currency_name</th>
             <th>full_name</th>
-            <th>precision</th>
-            <th>confirms</th>
-            <th>contract_address</th>
             <th>is_margin_enabled</th>
             <th>is_debit_enabled</th>
         </tr>
@@ -23,21 +21,11 @@
         {% for (index, currency) in currencies %}
         <tr>
             <td>{{ index }}</td>
+            <td>{{ currency.updated_at }}</td>
             <td>{{ currency.exchange }}</td>
             <td>{{ currency.currency }}</td>
-            <td>{{ currency.name }}</td>
+            <td>{{ currency.currency_name }}</td>
             <td>{{ currency.full_name }}</td>
-            <td>{{ currency.precision }}</td>
-            <td>
-                {% if let Some(confirms) = currency.confirms %}
-                {{ confirms }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(contract_address) = currency.contract_address %}
-                {{ contract_address }}
-                {% endif %}
-            </td>
             <td>{{ currency.is_margin_enabled }}</td>
             <td>{{ currency.is_margin_enabled }}</td>
         </tr>
