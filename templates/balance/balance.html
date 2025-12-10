@@ -18,7 +18,7 @@
             <th>hold_change</th>
             <th>relation_event</th>
             <th>relation_event_id</th>
-            <th>time</th>
+            <th>event_time</th>
             <th>total</th>
             <th>symbol</th>
             <th>order_id</th>
@@ -38,7 +38,7 @@
             <td>{{ balance.hold_change }}</td>
             <td>{{ balance.relation_event }}</td>
             <td>{{ balance.relation_event_id }}</td>
-            <td>{{ balance.time }}</td>
+            <td>{{ balance.event_time }}</td>
             <td>{{ balance.total }}</td>
             <td>
                 {% if let Some(symbol) = balance.symbol %}
