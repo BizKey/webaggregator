@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}MsgSend{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>MsgSend</p>
+<table>
+    <thead>
+        <tr>
+            <th>updated_at</th>
+            <th>exchange</th>
+            <th>id_msg</th>
+            <th>op</th>
+            <th>args_symbol</th>
+            <th>args_side</th>
+            <th>args_size</th>
+            <th>args_price</th>
+            <th>args_time_in_force</th>
+            <th>args_type</th>
+            <th>args_auto_borrow</th>
+            <th>args_auto_repay</th>
+            <th>args_client_oid</th>
+            <th>args_order_id</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in msgsend %}
+        <tr>
+            <td>{{ event.updated_at }}</td>
+            <td>{{ event.exchange }}</td>
+            <td>
+                {% if let Some(id_msg) = event.id_msg %}
+                {{ id_msg }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(op) = event.op %}
+                {{ op }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_symbol) = event.args_symbol %}
+                {{ args_symbol }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_side) = event.args_side %}
+                {{ args_side }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_size) = event.args_size %}
+                {{ args_size }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_price) = event.args_price %}
+                {{ args_price }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_time_in_force) = event.args_time_in_force %}
+                {{ args_time_in_force }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_type) = event.args_type %}
+                {{ args_type }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_auto_borrow) = event.args_auto_borrow %}
+                {{ args_auto_borrow }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_auto_repay) = event.args_auto_repay %}
+                {{ args_auto_repay }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_client_oid) = event.args_client_oid %}
+                {{ args_client_oid }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(args_order_id) = event.args_order_id %}
+                {{ args_order_id }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
