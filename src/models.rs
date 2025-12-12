@@ -184,3 +184,21 @@ pub struct Balance {
     pub trade_id: Option<String>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct MsgEvent {
+    pub exchange: String,
+    pub idmsg: Option<String>,
+    pub op: Option<String>,
+    pub msg: Option<String>,
+    pub code: Option<String>,
+    pub borrow_size: Option<String>,
+    pub hold_change: Option<String>,
+    pub order_id: Option<String>,
+    pub loan_apply_id: Option<String>,
+    pub limit_rate: Option<String>,
+    pub reset_rate: Option<String>,
+    pub remaining_rate: Option<String>,
+    pub in_time: String,
+    pub out_time: String,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}

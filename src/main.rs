@@ -8,7 +8,7 @@ mod templates;
 use crate::handlers::balance::balances;
 use crate::handlers::currency::currencies;
 use crate::handlers::errors::errors;
-use crate::handlers::events::events;
+use crate::handlers::events::{events, msgevent};
 use crate::handlers::index::index;
 use crate::handlers::orders::{activeorders, eventorders};
 use crate::handlers::pg::pg;
@@ -48,6 +48,8 @@ async fn main() -> std::io::Result<()> {
                             .route("/eventorder", web::get().to(eventorders))
                             // position debt
                             .route("/positiondebt", web::get().to(positiondebt))
+                            // msgevent
+                            .route("/msgevent", web::get().to(msgevent))
                             // position asset
                             .route("/positionasset", web::get().to(positionasset))
                             // position ratio
