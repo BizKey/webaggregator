@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}MsgEvent{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<p>MsgEvent</p>
+<table>
+    <thead>
+        <tr>
+            <th>updated_at</th>
+            <th>exchange</th>
+            <th>idmsg</th>
+            <th>op</th>
+            <th>msg</th>
+            <th>code</th>
+            <th>borrow_size</th>
+            <th>hold_change</th>
+            <th>order_id</th>
+            <th>loan_apply_id</th>
+            <th>limit_rate</th>
+            <th>reset_rate</th>
+            <th>remaining_rate</th>
+            <th>in_time</th>
+            <th>out_time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in msgevents %}
+        <tr>
+            <td>{{ event.updated_at }}</td>
+            <td>{{ event.exchange }}</td>
+            <td>
+                {% if let Some(idmsg) = event.idmsg %}
+                {{ idmsg }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(op) = event.op %}
+                {{ op }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(msg) = event.msg %}
+                {{ msg }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(code) = event.code %}
+                {{ code }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(borrow_size) = event.borrow_size %}
+                {{ borrow_size }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(hold_change) = event.hold_change %}
+                {{ hold_change }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(order_id) = event.order_id %}
+                {{ order_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(loan_apply_id) = event.loan_apply_id %}
+                {{ loan_apply_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(limit_rate) = event.limit_rate %}
+                {{ limit_rate }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(reset_rate) = event.reset_rate %}
+                {{ reset_rate }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(remaining_rate) = event.remaining_rate %}
+                {{ remaining_rate }}
+                {% endif %}
+            </td>
+            <td>{{ event.in_time }}</td>
+            <td>{{ event.out_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}
