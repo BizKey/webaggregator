@@ -15,7 +15,7 @@
             <th>msg</th>
             <th>code</th>
             <th>borrow_size</th>
-            <th>hold_change</th>
+            <th>client_oid</th>
             <th>order_id</th>
             <th>loan_apply_id</th>
             <th>limit_rate</th>
@@ -56,8 +56,8 @@
                 {% endif %}
             </td>
             <td>
-                {% if let Some(hold_change) = event.hold_change %}
-                {{ hold_change }}
+                {% if let Some(client_oid) = event.client_oid %}
+                {{ client_oid }}
                 {% endif %}
             </td>
             <td>

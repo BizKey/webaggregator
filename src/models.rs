@@ -192,7 +192,7 @@ pub struct MsgEvent {
     pub msg: Option<String>,
     pub code: Option<String>,
     pub borrow_size: Option<String>,
-    pub hold_change: Option<String>,
+    pub client_oid: Option<String>,
     pub order_id: Option<String>,
     pub loan_apply_id: Option<String>,
     pub limit_rate: Option<String>,
