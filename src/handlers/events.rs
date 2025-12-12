@@ -39,7 +39,7 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let msgevents = sqlx::query_as::<_, MsgEvent>(
-        "SELECT exchange, idmsg, op, msg, code, borrow_size, client_oid, order_id, loan_apply_id, limit_rate, reset_rate, remaining_rate, in_time, out_time FROM msgevent ORDER BY updated_at DESC;",
+        "SELECT exchange, idmsg, op, msg, code, borrow_size, client_oid, order_id, loan_apply_id, limit_rate, reset_rate, remaining_rate, in_time, out_time, updated_at FROM msgevent ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
     .await
