@@ -185,6 +185,23 @@ pub struct Balance {
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
+pub struct MsgSend {
+    pub exchange: String,
+    pub id_msg: Option<String>,
+    pub op: Option<String>,
+    pub args_symbol: Option<String>,
+    pub args_side: Option<String>,
+    pub args_size: Option<String>,
+    pub args_price: Option<String>,
+    pub args_time_in_force: Option<String>,
+    pub args_type: Option<String>,
+    pub args_auto_borrow: Option<String>,
+    pub args_auto_repay: Option<String>,
+    pub args_client_oid: Option<String>,
+    pub args_order_id: Option<String>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct MsgEvent {
     pub exchange: String,
     pub idmsg: Option<String>,

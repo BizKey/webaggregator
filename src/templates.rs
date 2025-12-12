@@ -1,5 +1,5 @@
 use crate::models::{
-    ActiveOrder, Balance, Currency, Error, Event, EventOrder, MsgEvent, PgConnection,
+    ActiveOrder, Balance, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
     PositionRatio, Symbol, Ticker,
 };
@@ -53,6 +53,12 @@ pub struct ErrorsTemplate {
 #[template(path = "events/msgevents.html")]
 pub struct MsgEventTemplate {
     pub msgevents: Vec<MsgEvent>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "events/msgsend.html")]
+pub struct MsgSendTemplate {
+    pub msgsend: Vec<MsgSend>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
