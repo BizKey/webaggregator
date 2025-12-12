@@ -198,7 +198,7 @@ pub struct MsgEvent {
     pub limit_rate: Option<String>,
     pub reset_rate: Option<String>,
     pub remaining_rate: Option<String>,
-    pub in_time: i64,
-    pub out_time: i64,
+    pub in_time: f64,
+    pub out_time: f64,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
