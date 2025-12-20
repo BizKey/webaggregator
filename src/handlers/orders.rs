@@ -12,7 +12,7 @@ pub async fn activeorders(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let active_orders = sqlx::query_as::<_, ActiveOrder>(
-        "SELECT exchange, order_id, symbol, side, updated_at FROM orderactive;",
+        "SELECT exchange, order_id, symbol, side, updated_at FROM orderactive ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
     .await
