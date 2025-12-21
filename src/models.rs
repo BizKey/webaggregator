@@ -18,6 +18,8 @@ pub struct ActiveOrder {
     pub order_id: String,
     pub symbol: String,
     pub side: String,
+    pub price: String,
+    pub size: String,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]

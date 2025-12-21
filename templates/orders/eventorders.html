@@ -15,14 +15,13 @@
             <th>symbol</th>
             <th>side</th>
             <th>order_type</th>
+            <th>price</th>
+            <th>size</th>
             <th>fee_type</th>
             <th>liquidity</th>
-            <th>price</th>
             <th>order_id</th>
             <th>client_oid</th>
-            <th>trade_id</th>
             <th>origin_size</th>
-            <th>size</th>
             <th>filled_size</th>
             <th>match_size</th>
             <th>match_price</th>
@@ -30,6 +29,7 @@
             <th>old_size</th>
             <th>remain_size</th>
             <th>remain_funds</th>
+            <th>trade_id</th>
             <th>order_time</th>
             <th>ts</th>
         </tr>
@@ -45,6 +45,16 @@
             <td>{{ order.side }}</td>
             <td>{{ order.order_type }}</td>
             <td>
+                {% if let Some(price) = order.price %}
+                {{ price }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(size) = order.size %}
+                {{ size }}
+                {% endif %}
+            </td>
+            <td>
                 {% if let Some(fee_type) = order.fee_type %}
                 {{ fee_type }}
                 {% endif %}
@@ -54,25 +64,12 @@
                 {{ liquidity }}
                 {% endif %}
             </td>
-            <td>
-                {% if let Some(price) = order.price %}
-                {{ price }}
-                {% endif %}
-            </td>
             <td>{{ order.order_id }}</td>
             <td>{{ order.client_oid }}</td>
-            <td>{% if let Some(trade_id) = order.trade_id %}
-                {{ trade_id }}
-                {% endif %}
-            </td>
             <td>{% if let Some(origin_size) = order.origin_size %}
                 {{ origin_size }}
                 {% endif %}
             </td>
-            <td>
-                {% if let Some(size) = order.size %}
-                {{ size }}
-                {% endif %}</td>
             <td>
                 {% if let Some(filled_size) = order.filled_size %}
                 {{ filled_size }}
@@ -105,6 +102,10 @@
             <td>
                 {% if let Some(remain_funds) = order.remain_funds %}
                 {{ remain_funds }}
+                {% endif %}
+            </td>
+            <td>{% if let Some(trade_id) = order.trade_id %}
+                {{ trade_id }}
                 {% endif %}
             </td>
             <td>{{ order.order_time }}</td>
