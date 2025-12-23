@@ -85,7 +85,7 @@ pub async fn symbol_trade(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let symbols_trade: Vec<TradeSymbol> =
-        sqlx::query_as::<_, TradeSymbol>("SELECT symbol, exchange, enable FROM symbol_trade;")
+        sqlx::query_as::<_, TradeSymbol>("SELECT symbol, exchange, size, enable FROM symbol_trade;")
             .fetch_all(pool.get_ref())
             .await
             .map_err(|e| {
