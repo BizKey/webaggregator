@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Trade Symbols{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>exchange</th>
+            <th>symbol</th>
+            <th>enable</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, symbol) in symbols %}
+        <tr>
+            <td>{{ index }}</td>            
+            <td>{{ symbol.exchange }}</td>
+            <td>{{ symbol.symbol }}</td>
+            <td>{{ symbol.enable }}</td>            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

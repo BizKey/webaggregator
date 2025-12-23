@@ -1,5 +1,5 @@
-use crate::models::Symbol;
-use crate::templates::SymbolsTemplate;
+use crate::models::{Symbol, TradeSymbol};
+use crate::templates::{SymbolsTemplate, TradeSymbolTemplate};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 
@@ -71,6 +71,36 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let template = SymbolsTemplate {
         symbols: symbols_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+    match template.render() {
+        Ok(html) => Ok(HttpResponse::Ok()
+            .content_type("text/html; charset=utf-8")
+            .body(html)),
+        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+}
+pub async fn symbol_trade(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+    // time start
+    let start = Instant::now();
+
+    let symbols_trade: Vec<TradeSymbol> =
+        sqlx::query_as::<_, TradeSymbol>("SELECT symbol, exchange, enable FROM symbol_trade;")
+            .fetch_all(pool.get_ref())
+            .await
+            .map_err(|e| {
+                eprintln!("Database error: {}", e);
+                actix_web::error::ErrorInternalServerError("Database error")
+            })?;
+
+    let symbols_trade_with_index: Vec<(usize, TradeSymbol)> = symbols_trade
+        .into_iter()
+        .enumerate()
+        .map(|(i, symbol)| (i + 1, symbol))
+        .collect();
+
+    let template = TradeSymbolTemplate {
+        symbols: symbols_trade_with_index,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
