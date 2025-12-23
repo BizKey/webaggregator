@@ -1,7 +1,7 @@
 use crate::models::{
     ActiveOrder, Balance, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
-    PositionRatio, Symbol, Ticker,
+    PositionRatio, Symbol, Ticker, TradeSymbol,
 };
 use askama::Template;
 
@@ -17,6 +17,13 @@ pub struct TickersTemplate {
 #[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<(usize, Symbol)>,
+    pub elapsed_ms: u128,
+}
+// Trade Symbol template
+#[derive(Template)]
+#[template(path = "trade_symbols.html")]
+pub struct TradeSymbolTemplate {
+    pub symbols: Vec<(usize, TradeSymbol)>,
     pub elapsed_ms: u128,
 }
 // Currency template

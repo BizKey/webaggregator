@@ -51,6 +51,13 @@ pub struct EventOrder {
 }
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct TradeSymbol {
+    pub exchange: String,
+    pub symbol: String,
+    pub size: String,
+    pub enable: bool,
+}
+#[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Symbol {
     pub exchange: String,
     pub symbol: String,

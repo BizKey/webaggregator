@@ -13,7 +13,7 @@ use crate::handlers::index::index;
 use crate::handlers::orders::{activeorders, eventorders};
 use crate::handlers::pg::pg;
 use crate::handlers::position::{positionasset, positiondebt, positionratio};
-use crate::handlers::symbol::{symbols, tradeable};
+use crate::handlers::symbol::{symbol_trade, symbols, tradeable};
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
 #[actix_web::main]
@@ -58,6 +58,8 @@ async fn main() -> std::io::Result<()> {
                             .route("/positionratio", web::get().to(positionratio))
                             // tradeable
                             .route("/tradeable", web::get().to(tradeable))
+                            // symbol_trade
+                            .route("/symbol_trade", web::get().to(symbol_trade))
                             // Working with tickers
                             .route("/tickers", web::get().to(tickers))
                             // Working with currencies
