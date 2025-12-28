@@ -10,8 +10,6 @@
         <tr>
             <th>updated_at</th>
             <th>exchange</th>
-            <th>id_msg</th>
-            <th>op</th>
             <th>args_symbol</th>
             <th>args_side</th>
             <th>args_size</th>
@@ -29,16 +27,6 @@
         <tr>
             <td>{{ event.updated_at }}</td>
             <td>{{ event.exchange }}</td>
-            <td>
-                {% if let Some(id_msg) = event.id_msg %}
-                {{ id_msg }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(op) = event.op %}
-                {{ op }}
-                {% endif %}
-            </td>
             <td>
                 {% if let Some(args_symbol) = event.args_symbol %}
                 {{ args_symbol }}

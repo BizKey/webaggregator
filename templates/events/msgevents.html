@@ -10,8 +10,6 @@
         <tr>
             <th>updated_at</th>
             <th>exchange</th>
-            <th>idmsg</th>
-            <th>op</th>
             <th>msg</th>
             <th>code</th>
             <th>borrow_size</th>
@@ -30,16 +28,6 @@
         <tr>
             <td>{{ event.updated_at }}</td>
             <td>{{ event.exchange }}</td>
-            <td>
-                {% if let Some(idmsg) = event.idmsg %}
-                {{ idmsg }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(op) = event.op %}
-                {{ op }}
-                {% endif %}
-            </td>
             <td>
                 {% if let Some(msg) = event.msg %}
                 {{ msg }}
