@@ -196,8 +196,6 @@ pub struct Balance {
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct MsgSend {
     pub exchange: String,
-    pub id_msg: Option<String>,
-    pub op: Option<String>,
     pub args_symbol: Option<String>,
     pub args_side: Option<String>,
     pub args_size: Option<String>,
@@ -213,8 +211,6 @@ pub struct MsgSend {
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct MsgEvent {
     pub exchange: String,
-    pub idmsg: Option<String>,
-    pub op: Option<String>,
     pub msg: Option<String>,
     pub code: Option<String>,
     pub borrow_size: Option<String>,
