@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Bots{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<table border="1">
+    <thead>
+        <tr>
+            <th>№</th>
+            <th>updated_at</th>
+            <th>exchange</th>
+            <th>balance</th>
+            <th>entry_id</th>
+            <th>exit_tp_id</th>
+            <th>exit_sl_id</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for (index, bot) in bots %}
+        <tr>
+            <td>{{ index }}</td>
+            <td>{{ bot.updated_at }}</td>       
+            <td>
+                {% if let Some(exchange) = bot.exchange %}
+                {{ exchange }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(balance) = bot.balance %}
+                {{ balance }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(entry_id) = bot.entry_id %}
+                {{ entry_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(exit_tp_id) = bot.exit_tp_id %}
+                {{ exit_tp_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(exit_sl_id) = bot.exit_sl_id %}
+                {{ exit_sl_id }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

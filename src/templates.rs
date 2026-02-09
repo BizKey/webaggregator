@@ -1,7 +1,7 @@
 use crate::models::{
-    ActiveOrder, Balance, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
-    PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
-    PositionRatio, Symbol, Ticker, TradeSymbol,
+    ActiveOrder, Balance, Bots, Currency, Error, Event, EventOrder, MsgEvent, MsgSend,
+    PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset,
+    PositionDebt, PositionRatio, Symbol, Ticker, TradeSymbol,
 };
 use askama::Template;
 
@@ -66,6 +66,12 @@ pub struct MsgEventTemplate {
 #[template(path = "events/msgsend.html")]
 pub struct MsgSendTemplate {
     pub msgsend: Vec<MsgSend>,
+    pub elapsed_ms: u128,
+}
+#[derive(Template)]
+#[template(path = "bots/bots.html")]
+pub struct BotsTemplate {
+    pub bots: Vec<(usize, Bots)>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
