@@ -20,7 +20,7 @@
         {% for (index, bot) in bots %}
         <tr>
             <td>{{ index }}</td>
-            <td>{{ bot.updated_at }}</td>       
+            <td>{{ bot.updated_at }}</td>
             <td>
                 {% if let Some(exchange) = bot.exchange %}
                 {{ exchange }}

@@ -65,7 +65,10 @@
                 {% endif %}
             </td>
             <td>{{ order.order_id }}</td>
-            <td>{{ order.client_oid }}</td>
+            <td>{% if let Some(client_oid) = order.client_oid %}
+                {{ client_oid }}
+                {% endif %}
+            </td>
             <td>{% if let Some(origin_size) = order.origin_size %}
                 {{ origin_size }}
                 {% endif %}
