@@ -34,7 +34,7 @@ pub struct EventOrder {
     pub liquidity: Option<String>,
     pub price: Option<String>,
     pub order_id: String,
-    pub client_oid: String,
+    pub client_oid: Option<String>,
     pub trade_id: Option<String>,
     pub origin_size: Option<String>,
     pub size: Option<String>,
