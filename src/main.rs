@@ -6,6 +6,7 @@ mod handlers;
 mod models;
 mod templates;
 use crate::handlers::balance::balances;
+use crate::handlers::bots::bots;
 use crate::handlers::currency::currencies;
 use crate::handlers::errors::errors;
 use crate::handlers::events::{events, msgevent, msgsend};
@@ -66,6 +67,8 @@ async fn main() -> std::io::Result<()> {
                             .route("/currencies", web::get().to(currencies))
                             // Working with symbols
                             .route("/symbols", web::get().to(symbols))
+                            // bots
+                            .route("/bots", web::get().to(bots))
                             // System links
                             .route("/static/style.css", web::get().to(serve_css))
                             .route("/favicon.png", web::get().to(favicon))
