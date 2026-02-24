@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-actix-web = "4.11"
+actix-web = "4.13"
 sqlx = { version = "0.8", features = ["postgres", "runtime-tokio", "chrono"] }
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1.47", features = ["full"] }
+tokio = { version = "1.49", features = ["full"] }
 askama = { version = "0.14", features = ["serde_json"]}
 dotenv = "0.15"
 chrono = { version = "0.4", features = ["serde"]  }
 log = "0.4"
 env_logger = "0.11"
-futures = "0.3.31"
+futures = "0.3.32"
