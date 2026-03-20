@@ -17,7 +17,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
                 base_increment, quote_increment, price_increment, price_limit_rate, 
                 min_funds, is_margin_enabled, enable_trading, fee_category, 
                 maker_fee_coefficient, taker_fee_coefficient, st, updated_at
-            FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = 'USDT' ORDER BY updated_at DESC;",
+            FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = 'USDT' AND base_currency <> 'USDC' ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
     .await
