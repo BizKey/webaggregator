@@ -13,16 +13,6 @@ pub struct Ticker {
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
-pub struct ActiveOrder {
-    pub exchange: String,
-    pub order_id: String,
-    pub symbol: String,
-    pub side: String,
-    pub price: String,
-    pub origin_size: String,
-    pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-#[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct EventOrder {
     pub exchange: String,
     pub status: String,
@@ -48,14 +38,6 @@ pub struct EventOrder {
     pub order_time: i64,
     pub ts: i64,
     pub updated_at: chrono::DateTime<chrono::Utc>,
-}
-
-#[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct TradeSymbol {
-    pub exchange: String,
-    pub symbol: String,
-    pub size: String,
-    pub enable: bool,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Symbol {

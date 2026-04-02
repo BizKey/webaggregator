@@ -12,7 +12,11 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     let start = Instant::now();
 
     let bots_list = sqlx::query_as::<_, Bots>(
-        "SELECT exchange, entry_id, exit_tp_id, exit_sl_id, balance, updated_at FROM bots ORDER BY updated_at DESC;",
+        "
+        SELECT exchange, entry_id, exit_tp_id, exit_sl_id, balance, updated_at
+        FROM bots
+        ORDER BY updated_at DESC;
+        ",
     )
     .fetch_all(pool.get_ref())
     .await
@@ -27,8 +31,21 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .map(|(i, bot)| (i + 1, bot))
         .collect();
 
+    let final_balance: f64 = bots_with_index
+        .iter()
+        .filter_map(|(_, bot)| {
+            bot.balance
+                .as_ref() // Получаем Option<&String>
+                .and_then(|s| s.parse::<f64>().ok()) // Парсим строку в f64
+        })
+        .sum();
+    let bots_count = bots_with_index.len();
+    let init_balance_value = (20 * bots_count) as f64;
+
     let template = BotsTemplate {
         bots: bots_with_index,
+        init_balance: init_balance_value,
+        final_balance: final_balance,
         elapsed_ms: start.elapsed().as_millis(),
     };
     match template.render() {
