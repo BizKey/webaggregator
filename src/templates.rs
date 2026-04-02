@@ -1,7 +1,7 @@
 use crate::models::{
-    ActiveOrder, Balance, Bots, Currency, Error, Event, EventOrder, MsgEvent, MsgSend,
-    PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset,
-    PositionDebt, PositionRatio, Symbol, Ticker, TradeSymbol,
+    Balance, Bots, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
+    PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
+    PositionRatio, Symbol, Ticker,
 };
 use askama::Template;
 
@@ -17,13 +17,6 @@ pub struct TickersTemplate {
 #[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<(usize, Symbol)>,
-    pub elapsed_ms: u128,
-}
-// Trade Symbol template
-#[derive(Template)]
-#[template(path = "trade_symbols.html")]
-pub struct TradeSymbolTemplate {
-    pub symbols: Vec<(usize, TradeSymbol)>,
     pub elapsed_ms: u128,
 }
 // Currency template
@@ -72,6 +65,8 @@ pub struct MsgSendTemplate {
 #[template(path = "bots/bots.html")]
 pub struct BotsTemplate {
     pub bots: Vec<(usize, Bots)>,
+    pub init_balance: f64,
+    pub final_balance: f64,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
@@ -90,12 +85,6 @@ pub struct PositionDebtTemplate {
 #[template(path = "position/positionasset.html")]
 pub struct PositionAssetTemplate {
     pub position_asset: Vec<PositionAsset>,
-    pub elapsed_ms: u128,
-}
-#[derive(Template)]
-#[template(path = "orders/activeorders.html")]
-pub struct ActiveOrderTemplate {
-    pub active_orders: Vec<ActiveOrder>,
     pub elapsed_ms: u128,
 }
 #[derive(Template)]
