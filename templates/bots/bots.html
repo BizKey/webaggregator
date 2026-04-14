@@ -16,6 +16,7 @@
             <th>entry_id</th>
             <th>exit_tp_id</th>
             <th>exit_sl_id</th>
+            <th>symbol</th>
         </tr>
     </thead>
     <tbody>
@@ -46,6 +47,11 @@
             <td>
                 {% if let Some(exit_sl_id) = bot.exit_sl_id %}
                 {{ exit_sl_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(symbol) = bot.symbol %}
+                {{ symbol }}
                 {% endif %}
             </td>
         </tr>

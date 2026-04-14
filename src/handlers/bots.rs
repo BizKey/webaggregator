@@ -13,7 +13,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let bots_list = sqlx::query_as::<_, Bots>(
         "
-        SELECT exchange, entry_id, exit_tp_id, exit_sl_id, balance, updated_at
+        SELECT exchange, entry_id, exit_tp_id, exit_sl_id, symbol, balance, updated_at
         FROM bots
         ORDER BY updated_at DESC;
         ",

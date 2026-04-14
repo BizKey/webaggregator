@@ -197,6 +197,7 @@ pub struct Bots {
     pub entry_id: Option<String>,
     pub exit_tp_id: Option<String>,
     pub exit_sl_id: Option<String>,
+    pub symbol: Option<String>,
     pub balance: Option<String>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
