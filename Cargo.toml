@@ -7,7 +7,7 @@ edition = "2024"
 actix-web = "4.13"
 sqlx = { version = "0.8", features = ["postgres", "runtime-tokio", "chrono"] }
 serde = { version = "1.0", features = ["derive"] }
-tokio = { version = "1.51", features = ["full"] }
+tokio = { version = "1.52", features = ["full"] }
 askama = { version = "0.14", features = ["serde_json"]}
 dotenv = "0.15"
 chrono = { version = "0.4", features = ["serde"]  }
