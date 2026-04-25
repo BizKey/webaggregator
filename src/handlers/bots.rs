@@ -13,7 +13,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let bots_list = sqlx::query_as::<_, Bots>(
         "
-        SELECT exchange, entry_id, exit_tp_id, exit_sl_id, symbol, balance, updated_at
+        SELECT exchange, entry_client_oid, exit_tp_order_id, exit_tp_client_oid, exit_sl_order_id, exit_sl_client_oid, symbol, balance, updated_at
         FROM bots
         ORDER BY updated_at DESC;
         ",
@@ -33,11 +33,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
     let final_balance: f64 = bots_with_index
         .iter()
-        .filter_map(|(_, bot)| {
-            bot.balance
-                .as_ref() // Получаем Option<&String>
-                .and_then(|s| s.parse::<f64>().ok()) // Парсим строку в f64
-        })
+        .filter_map(|(_, bot)| bot.balance.as_ref().and_then(|s| s.parse::<f64>().ok()))
         .sum();
     let bots_count = bots_with_index.len();
     let init_balance_value = (20 * bots_count) as f64;

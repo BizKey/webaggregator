@@ -194,9 +194,11 @@ pub struct MsgSend {
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Bots {
     pub exchange: Option<String>,
-    pub entry_id: Option<String>,
-    pub exit_tp_id: Option<String>,
-    pub exit_sl_id: Option<String>,
+    pub entry_client_oid: Option<String>,
+    pub exit_tp_order_id: Option<String>,
+    pub exit_tp_client_oid: Option<String>,
+    pub exit_sl_order_id: Option<String>,
+    pub exit_sl_client_oid: Option<String>,
     pub symbol: Option<String>,
     pub balance: Option<String>,
     pub updated_at: chrono::DateTime<chrono::Utc>,

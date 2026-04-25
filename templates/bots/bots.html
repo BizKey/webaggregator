@@ -13,7 +13,9 @@
             <th>updated_at</th>
             <th>exchange</th>
             <th>balance</th>
-            <th>entry_id</th>
+            <th>entry_client_oid</th>
+            <th>exit_tp_id</th>
+            <th>exit_tp_id</th>
             <th>exit_tp_id</th>
             <th>exit_sl_id</th>
             <th>symbol</th>
@@ -35,18 +37,28 @@
                 {% endif %}
             </td>
             <td>
-                {% if let Some(entry_id) = bot.entry_id %}
-                {{ entry_id }}
+                {% if let Some(entry_client_oid) = bot.entry_client_oid %}
+                {{ entry_client_oid }}
                 {% endif %}
             </td>
             <td>
-                {% if let Some(exit_tp_id) = bot.exit_tp_id %}
-                {{ exit_tp_id }}
+                {% if let Some(exit_tp_order_id) = bot.exit_tp_order_id %}
+                {{ exit_tp_order_id }}
                 {% endif %}
             </td>
             <td>
-                {% if let Some(exit_sl_id) = bot.exit_sl_id %}
-                {{ exit_sl_id }}
+                {% if let Some(exit_tp_client_oid) = bot.exit_tp_client_oid %}
+                {{ exit_tp_client_oid }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(exit_sl_order_id) = bot.exit_sl_order_id %}
+                {{ exit_sl_order_id }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(exit_sl_client_oid) = bot.exit_sl_client_oid %}
+                {{ exit_sl_client_oid }}
                 {% endif %}
             </td>
             <td>
