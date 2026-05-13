@@ -12,15 +12,12 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let all_currencies = sqlx::query_as::<_, Currency>(
+    match sqlx::query_as::<_, Currency>(
         "SELECT exchange, currency, currency_name, full_name, is_margin_enabled, is_debit_enabled, updated_at FROM currency ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    .await {
+        Ok(all_currencies) => {
 
     let currencies_with_index: Vec<(usize, Currency)> = all_currencies
         .into_iter()
@@ -37,5 +34,11 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .content_type("text/html; charset=utf-8")
             .body(html)),
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+        },
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }

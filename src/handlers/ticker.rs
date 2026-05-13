@@ -12,32 +12,37 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let tickers = sqlx::query_as::<_, Ticker>(
-        "SELECT exchange, symbol, symbol_name, taker_fee_rate, 
-                maker_fee_rate, taker_coefficient, maker_coefficient, updated_at
-            FROM ticker ORDER BY updated_at DESC;",
+    match sqlx::query_as::<_, Ticker>(
+        "
+        SELECT exchange, symbol, symbol_name, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, updated_at
+        FROM ticker
+        ORDER BY updated_at DESC;
+        ",
     )
     .fetch_all(pool.get_ref())
     .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    {
+        Ok(tickers) => {
+            let tickers_with_index: Vec<(usize, Ticker)> = tickers
+                .into_iter()
+                .enumerate()
+                .map(|(i, ticker)| (i + 1, ticker))
+                .collect();
 
-    let tickers_with_index: Vec<(usize, Ticker)> = tickers
-        .into_iter()
-        .enumerate()
-        .map(|(i, ticker)| (i + 1, ticker))
-        .collect();
-
-    let template = TickersTemplate {
-        tickers: tickers_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            let template = TickersTemplate {
+                tickers: tickers_with_index,
+                elapsed_ms: start.elapsed().as_millis(),
+            };
+            match template.render() {
+                Ok(html) => Ok(HttpResponse::Ok()
+                    .content_type("text/html; charset=utf-8")
+                    .body(html)),
+                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            }
+        }
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }

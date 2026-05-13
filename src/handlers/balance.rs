@@ -11,15 +11,11 @@ pub async fn balances(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let balances = sqlx::query_as::<_, Balance>("SELECT exchange, account_id, available, available_change, currency, hold_value, hold_change, relation_event, relation_event_id, event_time, total, symbol, order_id, trade_id, updated_at FROM balance ORDER BY updated_at DESC LIMIT 1000;")
+    match sqlx::query_as::<_, Balance>("SELECT exchange, account_id, available, available_change, currency, hold_value, hold_change, relation_event, relation_event_id, event_time, total, symbol, order_id, trade_id, updated_at FROM balance ORDER BY updated_at DESC LIMIT 1000;")
         .fetch_all(pool.get_ref())
-        .await
-        .map_err(|e| {
-            eprintln!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
-        })?;
-
-    let template = BalanceTemplate {
+        .await {
+            Ok(balances) => {
+                let template = BalanceTemplate {
         balances: balances,
         elapsed_ms: start.elapsed().as_millis(),
     };
@@ -29,4 +25,10 @@ pub async fn balances(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .body(html)),
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
     }
+            },
+            Err(e) => {
+                eprintln!("Database error: {}", e);
+            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+            }
+        }
 }

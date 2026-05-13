@@ -11,7 +11,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let bots_list = sqlx::query_as::<_, Bots>(
+    match sqlx::query_as::<_, Bots>(
         "
         SELECT exchange, entry_client_oid, exit_tp_order_id, exit_tp_client_oid, exit_sl_order_id, exit_sl_client_oid, symbol, balance, updated_at
         FROM bots
@@ -19,13 +19,9 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         ",
     )
     .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let bots_with_index: Vec<(usize, Bots)> = bots_list
+    .await {
+        Ok(bots_list) => {
+            let bots_with_index: Vec<(usize, Bots)> = bots_list
         .into_iter()
         .enumerate()
         .map(|(i, bot)| (i + 1, bot))
@@ -49,5 +45,12 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .content_type("text/html; charset=utf-8")
             .body(html)),
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+
+        },
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }

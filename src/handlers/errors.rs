@@ -11,24 +11,27 @@ pub async fn errors(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let errors = sqlx::query_as::<_, Error>(
+    match sqlx::query_as::<_, Error>(
         "SELECT exchange, msg, updated_at FROM errors ORDER BY updated_at DESC LIMIT 1000;",
     )
     .fetch_all(pool.get_ref())
     .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let template = ErrorsTemplate {
-        errors: errors,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    {
+        Ok(errors) => {
+            let template = ErrorsTemplate {
+                errors: errors,
+                elapsed_ms: start.elapsed().as_millis(),
+            };
+            match template.render() {
+                Ok(html) => Ok(HttpResponse::Ok()
+                    .content_type("text/html; charset=utf-8")
+                    .body(html)),
+                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            }
+        }
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }
