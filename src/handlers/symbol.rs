@@ -10,7 +10,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let tradeable_symbol: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
+    match sqlx::query_as::<_, Symbol>(
         "SELECT 
                 exchange, symbol, symbol_name, base_currency, quote_currency, fee_currency, 
                 market, base_min_size, quote_min_size, base_max_size, quote_max_size, 
@@ -20,12 +20,8 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = 'USDT' AND base_currency <> 'USDC' AND base_currency <> 'KCS' ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
+    .await {
+        Ok(tradeable_symbol) => {
     let tradeable_symbol_with_index: Vec<(usize, Symbol)> = tradeable_symbol
         .into_iter()
         .enumerate()
@@ -42,13 +38,19 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .body(html)),
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
     }
+        },
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
+    }
 }
 
 pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let symbols: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
+    match sqlx::query_as::<_, Symbol>(
         "SELECT exchange, symbol, symbol_name, base_currency, quote_currency, 
         fee_currency, market, base_min_size, quote_min_size, base_max_size, 
         quote_max_size, base_increment, quote_increment, price_increment, price_limit_rate, 
@@ -58,25 +60,28 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     )
     .fetch_all(pool.get_ref())
     .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    {
+        Ok(symbols) => {
+            let symbols_with_index: Vec<(usize, Symbol)> = symbols
+                .into_iter()
+                .enumerate()
+                .map(|(i, symbol)| (i + 1, symbol))
+                .collect();
 
-    let symbols_with_index: Vec<(usize, Symbol)> = symbols
-        .into_iter()
-        .enumerate()
-        .map(|(i, symbol)| (i + 1, symbol))
-        .collect();
-
-    let template = SymbolsTemplate {
-        symbols: symbols_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            let template = SymbolsTemplate {
+                symbols: symbols_with_index,
+                elapsed_ms: start.elapsed().as_millis(),
+            };
+            match template.render() {
+                Ok(html) => Ok(HttpResponse::Ok()
+                    .content_type("text/html; charset=utf-8")
+                    .body(html)),
+                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            }
+        }
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }
