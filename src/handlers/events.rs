@@ -11,25 +11,28 @@ pub async fn events(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let events = sqlx::query_as::<_, Event>(
+    match sqlx::query_as::<_, Event>(
         "SELECT exchange, msg, updated_at FROM events ORDER BY updated_at DESC LIMIT 1000;",
     )
     .fetch_all(pool.get_ref())
     .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let template = EventsTemplate {
-        events: events,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    {
+        Ok(events) => {
+            let template = EventsTemplate {
+                events: events,
+                elapsed_ms: start.elapsed().as_millis(),
+            };
+            match template.render() {
+                Ok(html) => Ok(HttpResponse::Ok()
+                    .content_type("text/html; charset=utf-8")
+                    .body(html)),
+                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            }
+        }
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }
 pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
@@ -38,15 +41,12 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let msgevents = sqlx::query_as::<_, MsgEvent>(
+    match sqlx::query_as::<_, MsgEvent>(
         "SELECT exchange, msg, code, borrow_size, client_oid, order_id, loan_apply_id, limit_rate, reset_rate, remaining_rate, in_time, out_time, updated_at FROM msgevent ORDER BY updated_at DESC LIMIT 1000;",
     )
     .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    .await {
+        Ok(msgevents) => {
 
     let template = MsgEventTemplate {
         msgevents: msgevents,
@@ -58,6 +58,12 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .body(html)),
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
     }
+        },
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
+    }
 }
 pub async fn msgsend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // msgsend
@@ -65,24 +71,27 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start = Instant::now();
 
-    let msgsend = sqlx::query_as::<_, MsgSend>(
+    match sqlx::query_as::<_, MsgSend>(
         "SELECT exchange, args_symbol, args_side, args_size, args_funds, args_price, args_time_in_force, args_type, args_auto_borrow, args_auto_repay, args_client_oid, args_order_id, updated_at FROM msgsend ORDER BY updated_at DESC LIMIT 1000;",
     )
     .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    .await {
+        Ok(msgsend) => {
+            let template = MsgSendTemplate {
+                msgsend: msgsend,
+                elapsed_ms: start.elapsed().as_millis(),
+            };
+            match template.render() {
+                Ok(html) => Ok(HttpResponse::Ok()
+                    .content_type("text/html; charset=utf-8")
+                    .body(html)),
+                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            }
+        },
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
 
-    let template = MsgSendTemplate {
-        msgsend: msgsend,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+        }
     }
 }

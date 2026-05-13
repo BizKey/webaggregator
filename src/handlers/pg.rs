@@ -31,17 +31,13 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let pg_stats_table_index = sqlx::query_as::<_, PgTableIndex>(
+    match sqlx::query_as::<_, PgTableIndex>(
         "SELECT schemaname, relname, idx_scan, idx_tup_read, idx_tup_fetch FROM pg_stat_user_indexes;",
     )
     .fetch_all(pool.get_ref())
-    .await
-    .map_err(|e| {
-        eprintln!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
-
-    let pg_stat_statements = sqlx::query_as::<_, PgStatStatements>(
+    .await {
+        Ok(pg_stats_table_index) => {
+            let pg_stat_statements = sqlx::query_as::<_, PgStatStatements>(
         "SELECT query, calls, total_exec_time, mean_exec_time, rows FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 100;",
     )
     .fetch_all(pool.get_ref())
@@ -74,5 +70,11 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .content_type("text/html; charset=utf-8")
             .body(html)),
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+    }
+        }
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
     }
 }
