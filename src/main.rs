@@ -22,14 +22,14 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     dotenv().ok();
 
-    let database_url = match env::var("DATABASE_URL") {
+    let database_url: String = match env::var("DATABASE_URL") {
         Err(e) => {
             eprintln!("DATABASE_URL not set: {}", e);
             return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, e));
         }
         Ok(database_url) => database_url,
     };
-    let pool = match PgPoolOptions::new()
+    let pool: sqlx::Pool<sqlx::Postgres> = match PgPoolOptions::new()
         .max_connections(5)
         .connect(&database_url)
         .await
