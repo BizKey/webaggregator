@@ -22,66 +22,65 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
     dotenv().ok();
 
-    match env::var("DATABASE_URL") {
-        Ok(database_url) => {
-            match PgPoolOptions::new()
-                .max_connections(5)
-                .connect(&database_url)
-                .await
-            {
-                Ok(pool) => {
-                    HttpServer::new(move || {
-                        App::new()
-                            .app_data(web::Data::new(pool.clone()))
-                            .wrap(middleware::Compress::default())
-                            .route("/", web::get().to(index))
-                            // Work with pg
-                            .route("/pg", web::get().to(pg))
-                            // events
-                            .route("/events", web::get().to(events))
-                            // errors
-                            .route("/errors", web::get().to(errors))
-                            // balance
-                            .route("/balance", web::get().to(balances))
-                            // event orders
-                            .route("/eventorder", web::get().to(eventorders))
-                            // position debt
-                            .route("/positiondebt", web::get().to(positiondebt))
-                            // msgevent
-                            .route("/msgevent", web::get().to(msgevent))
-                            // msgsend
-                            .route("/msgsend", web::get().to(msgsend))
-                            // position asset
-                            .route("/positionasset", web::get().to(positionasset))
-                            // position ratio
-                            .route("/positionratio", web::get().to(positionratio))
-                            // tradeable
-                            .route("/tradeable", web::get().to(tradeable))
-                            // Working with tickers
-                            .route("/tickers", web::get().to(tickers))
-                            // Working with currencies
-                            .route("/currencies", web::get().to(currencies))
-                            // Working with symbols
-                            .route("/symbols", web::get().to(symbols))
-                            // bots
-                            .route("/bots", web::get().to(bots))
-                            // System links
-                            .route("/static/style.css", web::get().to(serve_css))
-                            .route("/favicon.png", web::get().to(favicon))
-                    })
-                    .bind("0.0.0.0:8080")?
-                    .run()
-                    .await
-                }
-                Err(e) => {
-                    eprintln!("Failed to create database pool: {}", e);
-                    return Err(std::io::Error::new(std::io::ErrorKind::Other, e));
-                }
-            }
-        }
+    let database_url = match env::var("DATABASE_URL") {
         Err(e) => {
             eprintln!("DATABASE_URL not set: {}", e);
             return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, e));
         }
-    }
+        Ok(database_url) => database_url,
+    };
+    let pool = match PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await
+    {
+        Err(e) => {
+            eprintln!("Failed to create database pool: {}", e);
+            return Err(std::io::Error::new(std::io::ErrorKind::Other, e));
+        }
+        Ok(pool) => pool,
+    };
+
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(pool.clone()))
+            .wrap(middleware::Compress::default())
+            .route("/", web::get().to(index))
+            // Work with pg
+            .route("/pg", web::get().to(pg))
+            // events
+            .route("/events", web::get().to(events))
+            // errors
+            .route("/errors", web::get().to(errors))
+            // balance
+            .route("/balance", web::get().to(balances))
+            // event orders
+            .route("/eventorder", web::get().to(eventorders))
+            // position debt
+            .route("/positiondebt", web::get().to(positiondebt))
+            // msgevent
+            .route("/msgevent", web::get().to(msgevent))
+            // msgsend
+            .route("/msgsend", web::get().to(msgsend))
+            // position asset
+            .route("/positionasset", web::get().to(positionasset))
+            // position ratio
+            .route("/positionratio", web::get().to(positionratio))
+            // tradeable
+            .route("/tradeable", web::get().to(tradeable))
+            // Working with tickers
+            .route("/tickers", web::get().to(tickers))
+            // Working with currencies
+            .route("/currencies", web::get().to(currencies))
+            // Working with symbols
+            .route("/symbols", web::get().to(symbols))
+            // bots
+            .route("/bots", web::get().to(bots))
+            // System links
+            .route("/static/style.css", web::get().to(serve_css))
+            .route("/favicon.png", web::get().to(favicon))
+    })
+    .bind("0.0.0.0:8080")?
+    .run()
+    .await
 }
