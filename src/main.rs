@@ -1,5 +1,5 @@
 use actix_web::{App, HttpServer, middleware, web};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 mod handlers;
