@@ -1,10 +1,13 @@
 use actix_web::{App, HttpServer, middleware, web};
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
-use std::env;
 mod handlers;
 mod models;
+
+use sqlx::Postgres;
+use std::time::Duration;
 mod templates;
+use crate::api::tools::get_env;
 use crate::handlers::balance::balances;
 use crate::handlers::bots::bots;
 use crate::handlers::currency::currencies;
@@ -17,31 +20,35 @@ use crate::handlers::position::{positionasset, positiondebt, positionratio};
 use crate::handlers::symbol::{symbols, tradeable};
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
+mod api {
+    pub mod tools;
+}
+
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<(), String> {
     env_logger::init();
     dotenv().ok();
 
-    let database_url: String = match env::var("DATABASE_URL") {
-        Err(e) => {
-            eprintln!("DATABASE_URL not set: {}", e);
-            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, e));
-        }
-        Ok(database_url) => database_url,
-    };
-    let pool: sqlx::Pool<sqlx::Postgres> = match PgPoolOptions::new()
-        .max_connections(5)
+    let database_url: String = get_env("DATABASE_URL")?;
+
+    let pool: sqlx::Pool<Postgres> = match PgPoolOptions::new()
+        .max_connections(10)
+        .min_connections(5)
+        .acquire_timeout(Duration::from_secs(10))
+        .idle_timeout(Duration::from_secs(600))
+        .max_lifetime(Duration::from_secs(1800))
         .connect(&database_url)
         .await
     {
-        Err(e) => {
-            eprintln!("Failed to create database pool: {}", e);
-            return Err(std::io::Error::new(std::io::ErrorKind::Other, e));
-        }
         Ok(pool) => pool,
+        Err(e) => {
+            let msg: String = format!("Failed to create pg pool:{}", e);
+            log::error!("{}", msg);
+            return Err(msg);
+        }
     };
 
-    HttpServer::new(move || {
+    let server = match HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .wrap(middleware::Compress::default())
@@ -80,7 +87,22 @@ async fn main() -> std::io::Result<()> {
             .route("/static/style.css", web::get().to(serve_css))
             .route("/favicon.png", web::get().to(favicon))
     })
-    .bind("0.0.0.0:8080")?
-    .run()
-    .await
+    .bind("0.0.0.0:8080")
+    {
+        Ok(server) => server,
+        Err(e) => {
+            let msg: String = format!("Failed start server:{}", e);
+            log::error!("{}", msg);
+            return Err(msg);
+        }
+    };
+
+    match server.run().await {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            let msg: String = format!("Failed start server:{}", e);
+            log::error!("{}", msg);
+            return Err(msg);
+        }
+    }
 }
