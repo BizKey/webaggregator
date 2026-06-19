@@ -74,29 +74,29 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start: Instant = Instant::now();
 
-    match sqlx::query_as::<_, PositionRatio>(
+    let position_ratio = match sqlx::query_as::<_, PositionRatio>(
         "SELECT exchange, debt_ratio, total_asset, margin_coefficient_total_asset, total_debt, updated_at FROM positionratio ORDER BY updated_at DESC LIMIT 1000;",
     )
     .fetch_all(pool.get_ref())
     .await {
-        Ok(position_ratio ) => {
+        Ok(position_ratio ) => position_ratio,
+        Err(e) => {
+            eprintln!("Database error: {}", e);
+            return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+        }
+    };
 
-            let template = PositinRatioTemplate {
+    let template: PositinRatioTemplate = PositinRatioTemplate {
         position_ratio: position_ratio,
         elapsed_ms: start.elapsed().as_millis(),
     };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
 
-        },
-        Err(e) => {
-            eprintln!("Database error: {}", e);
-        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+    let html: String = match template.render() {
+        Ok(html) => html,
+        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
+    };
 
-        }
-    }
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }

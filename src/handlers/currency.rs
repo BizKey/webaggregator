@@ -35,7 +35,7 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    let html = match template.render() {
+    let html: String = match template.render() {
         Ok(html) => html,
         Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
     };
