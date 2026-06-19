@@ -1,4 +1,4 @@
-use crate::templates::IndexTemplate;
+use crate::api::templates::IndexTemplate;
 use actix_web::HttpResponse;
 use askama::Template;
 

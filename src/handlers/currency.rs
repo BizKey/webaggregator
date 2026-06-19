@@ -1,5 +1,5 @@
-use crate::models::Currency;
-use crate::templates::CurrenciesTemplate;
+use crate::api::models::Currency;
+use crate::api::templates::CurrenciesTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

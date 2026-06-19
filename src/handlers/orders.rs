@@ -1,5 +1,5 @@
-use crate::models::EventOrder;
-use crate::templates::EventOrderTemplate;
+use crate::api::models::EventOrder;
+use crate::api::templates::EventOrderTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

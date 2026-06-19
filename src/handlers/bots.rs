@@ -1,5 +1,5 @@
-use crate::models::Bots;
-use crate::templates::BotsTemplate;
+use crate::api::models::Bots;
+use crate::api::templates::BotsTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

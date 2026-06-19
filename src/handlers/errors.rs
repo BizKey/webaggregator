@@ -1,5 +1,5 @@
-use crate::models::Error;
-use crate::templates::ErrorsTemplate;
+use crate::api::models::Error;
+use crate::api::templates::ErrorsTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

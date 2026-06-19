@@ -1,5 +1,5 @@
-use crate::models::Balance;
-use crate::templates::BalanceTemplate;
+use crate::api::models::Balance;
+use crate::api::templates::BalanceTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

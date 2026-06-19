@@ -1,5 +1,5 @@
-use crate::models::{Event, MsgEvent, MsgSend};
-use crate::templates::{EventsTemplate, MsgEventTemplate, MsgSendTemplate};
+use crate::api::models::{Event, MsgEvent, MsgSend};
+use crate::api::templates::{EventsTemplate, MsgEventTemplate, MsgSendTemplate};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

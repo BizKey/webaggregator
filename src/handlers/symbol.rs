@@ -1,5 +1,5 @@
-use crate::models::Symbol;
-use crate::templates::SymbolsTemplate;
+use crate::api::models::Symbol;
+use crate::api::templates::SymbolsTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

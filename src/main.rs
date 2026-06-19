@@ -2,11 +2,6 @@ use actix_web::{App, HttpServer, middleware, web};
 use dotenvy::dotenv;
 use sqlx::postgres::PgPoolOptions;
 mod handlers;
-mod models;
-
-use sqlx::Postgres;
-use std::time::Duration;
-mod templates;
 use crate::api::tools::get_env;
 use crate::handlers::balance::balances;
 use crate::handlers::bots::bots;
@@ -20,7 +15,11 @@ use crate::handlers::position::{positionasset, positiondebt, positionratio};
 use crate::handlers::symbol::{symbols, tradeable};
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
+use sqlx::Postgres;
+use std::time::Duration;
 mod api {
+    pub mod models;
+    pub mod templates;
     pub mod tools;
 }
 

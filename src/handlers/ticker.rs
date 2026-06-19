@@ -1,5 +1,5 @@
-use crate::models::Ticker;
-use crate::templates::TickersTemplate;
+use crate::api::models::Ticker;
+use crate::api::templates::TickersTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

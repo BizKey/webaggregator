@@ -1,5 +1,7 @@
-use crate::models::{PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo};
-use crate::templates::PgTemplate;
+use crate::api::models::{
+    PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo,
+};
+use crate::api::templates::PgTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 

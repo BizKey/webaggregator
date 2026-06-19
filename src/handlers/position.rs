@@ -1,5 +1,5 @@
-use crate::models::{PositionAsset, PositionDebt, PositionRatio};
-use crate::templates::{PositinRatioTemplate, PositionAssetTemplate, PositionDebtTemplate};
+use crate::api::models::{PositionAsset, PositionDebt, PositionRatio};
+use crate::api::templates::{PositinRatioTemplate, PositionAssetTemplate, PositionDebtTemplate};
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 use log;
