@@ -9,9 +9,9 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // positionasset
 
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
-    let position_asset: Vec<PositionAsset> =   match sqlx::query_as::<_, PositionAsset>(
+    let position_asset: Vec<PositionAsset> = match sqlx::query_as::<_, PositionAsset>(
         "SELECT exchange, asset_symbol, asset_total, asset_available, asset_hold, updated_at FROM positionasset ORDER BY updated_at DESC LIMIT 1000;",
     )
     .fetch_all(pool.get_ref())
@@ -29,18 +29,20 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
+    let html: String = match template.render() {
+        Ok(html) => html,
+        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }
 pub async fn positiondebt(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // positiondebt
 
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
     let  position_debt: Vec<PositionDebt> =  match sqlx::query_as::<_, PositionDebt>(
         "SELECT exchange, debt_symbol, debt_value, updated_at FROM positiondebt ORDER BY updated_at DESC LIMIT 1000;",
@@ -70,7 +72,7 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // positionratio
 
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
     match sqlx::query_as::<_, PositionRatio>(
         "SELECT exchange, debt_ratio, total_asset, margin_coefficient_total_asset, total_debt, updated_at FROM positionratio ORDER BY updated_at DESC LIMIT 1000;",

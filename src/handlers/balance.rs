@@ -9,26 +9,29 @@ pub async fn balances(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // balances
 
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
-    match sqlx::query_as::<_, Balance>("SELECT exchange, account_id, available, available_change, currency, hold_value, hold_change, relation_event, relation_event_id, event_time, total, symbol, order_id, trade_id, updated_at FROM balance ORDER BY updated_at DESC LIMIT 1000;")
+    let balances: Vec<Balance> =  match sqlx::query_as::<_, Balance>("SELECT exchange, account_id, available, available_change, currency, hold_value, hold_change, relation_event, relation_event_id, event_time, total, symbol, order_id, trade_id, updated_at FROM balance ORDER BY updated_at DESC LIMIT 1000;")
         .fetch_all(pool.get_ref())
         .await {
-            Ok(balances) => {
-                let template = BalanceTemplate {
+            Ok(balances) => balances,
+            Err(e) => {
+                eprintln!("Database error: {}", e);
+                return  Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+            }
+        };
+
+    let template: BalanceTemplate = BalanceTemplate {
         balances: balances,
         elapsed_ms: start.elapsed().as_millis(),
     };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
-            },
-            Err(e) => {
-                eprintln!("Database error: {}", e);
-            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
-            }
-        }
+
+    let html: String = match template.render() {
+        Ok(html) => html,
+        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }

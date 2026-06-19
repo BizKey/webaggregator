@@ -8,7 +8,7 @@ use std::time::Instant;
 
 pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
     match sqlx::query_as::<_, Symbol>(
         "SELECT 
@@ -48,9 +48,9 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
 
 pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
-    match sqlx::query_as::<_, Symbol>(
+    let symbols: Vec<Symbol> = match sqlx::query_as::<_, Symbol>(
         "SELECT exchange, symbol, symbol_name, base_currency, quote_currency, 
         fee_currency, market, base_min_size, quote_min_size, base_max_size, 
         quote_max_size, base_increment, quote_increment, price_increment, price_limit_rate, 
@@ -61,27 +61,30 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .fetch_all(pool.get_ref())
     .await
     {
-        Ok(symbols) => {
-            let symbols_with_index: Vec<(usize, Symbol)> = symbols
-                .into_iter()
-                .enumerate()
-                .map(|(i, symbol)| (i + 1, symbol))
-                .collect();
-
-            let template = SymbolsTemplate {
-                symbols: symbols_with_index,
-                elapsed_ms: start.elapsed().as_millis(),
-            };
-            match template.render() {
-                Ok(html) => Ok(HttpResponse::Ok()
-                    .content_type("text/html; charset=utf-8")
-                    .body(html)),
-                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-            }
-        }
+        Ok(symbols) => symbols,
         Err(e) => {
             eprintln!("Database error: {}", e);
-            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+            return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
         }
-    }
+    };
+
+    let symbols_with_index: Vec<(usize, Symbol)> = symbols
+        .into_iter()
+        .enumerate()
+        .map(|(i, symbol)| (i + 1, symbol))
+        .collect();
+
+    let template: SymbolsTemplate = SymbolsTemplate {
+        symbols: symbols_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+
+    let html: String = match template.render() {
+        Ok(html) => html,
+        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }
