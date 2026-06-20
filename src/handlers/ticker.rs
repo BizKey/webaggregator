@@ -1,5 +1,5 @@
-use crate::models::Ticker;
-use crate::templates::TickersTemplate;
+use crate::api::models::Ticker;
+use crate::api::templates::TickersTemplate;
 use actix_web::{HttpResponse, Result, web};
 use askama::Template;
 
@@ -10,9 +10,9 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // all tickers
 
     // time start
-    let start = Instant::now();
+    let start: Instant = Instant::now();
 
-    match sqlx::query_as::<_, Ticker>(
+    let tickers: Vec<Ticker> = match sqlx::query_as::<_, Ticker>(
         "
         SELECT exchange, symbol, symbol_name, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, updated_at
         FROM ticker
@@ -22,27 +22,30 @@ pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .fetch_all(pool.get_ref())
     .await
     {
-        Ok(tickers) => {
-            let tickers_with_index: Vec<(usize, Ticker)> = tickers
-                .into_iter()
-                .enumerate()
-                .map(|(i, ticker)| (i + 1, ticker))
-                .collect();
-
-            let template = TickersTemplate {
-                tickers: tickers_with_index,
-                elapsed_ms: start.elapsed().as_millis(),
-            };
-            match template.render() {
-                Ok(html) => Ok(HttpResponse::Ok()
-                    .content_type("text/html; charset=utf-8")
-                    .body(html)),
-                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-            }
-        }
+        Ok(tickers) => tickers,
         Err(e) => {
             eprintln!("Database error: {}", e);
-            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+            return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
         }
-    }
+    };
+
+    let tickers_with_index: Vec<(usize, Ticker)> = tickers
+        .into_iter()
+        .enumerate()
+        .map(|(i, ticker)| (i + 1, ticker))
+        .collect();
+
+    let template: TickersTemplate = TickersTemplate {
+        tickers: tickers_with_index,
+        elapsed_ms: start.elapsed().as_millis(),
+    };
+
+    let html: String = match template.render() {
+        Ok(html) => html,
+        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
+    };
+
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }

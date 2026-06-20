@@ -1,4 +1,4 @@
-use crate::models::{
+use crate::api::models::{
     Balance, Bots, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
     PositionRatio, Symbol, Ticker,

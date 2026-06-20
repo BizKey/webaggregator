@@ -1,14 +1,16 @@
-use crate::templates::IndexTemplate;
+use crate::api::templates::IndexTemplate;
 use actix_web::HttpResponse;
 use askama::Template;
 
 pub async fn index() -> HttpResponse {
-    let template = IndexTemplate {};
+    let template: IndexTemplate = IndexTemplate {};
 
-    match template.render() {
-        Ok(html) => HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html),
-        Err(_) => HttpResponse::InternalServerError().body("Error template render"),
-    }
+    let html: String = match template.render() {
+        Ok(html) => html,
+        Err(_) => return HttpResponse::InternalServerError().body("Error template render"),
+    };
+
+    HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html)
 }
