@@ -71,6 +71,7 @@ pub struct Currency {
     pub currency: String,
     pub currency_name: String,
     pub full_name: String,
+    pub precision: i16,
     pub is_margin_enabled: bool,
     pub is_debit_enabled: bool,
     pub updated_at: chrono::DateTime<chrono::Utc>,
