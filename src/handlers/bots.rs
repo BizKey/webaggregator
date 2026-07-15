@@ -55,7 +55,9 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
     };
 
-    Ok(HttpResponse::Ok()
+    let response: HttpResponse = HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(html);
+
+    Ok(response)
 }

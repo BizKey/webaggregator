@@ -22,22 +22,26 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .fetch_all(pool.get_ref())
     .await {
         Ok(tradeable_symbol) => {
-    let tradeable_symbol_with_index: Vec<(usize, Symbol)> = tradeable_symbol
-        .into_iter()
-        .enumerate()
-        .map(|(i, symbol)| (i + 1, symbol))
-        .collect();
+            let tradeable_symbol_with_index: Vec<(usize, Symbol)> = tradeable_symbol
+                .into_iter()
+                .enumerate()
+                .map(|(i, symbol)| (i + 1, symbol))
+                .collect();
 
-    let template = SymbolsTemplate {
-        symbols: tradeable_symbol_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-    match template.render() {
-        Ok(html) => Ok(HttpResponse::Ok()
-            .content_type("text/html; charset=utf-8")
-            .body(html)),
-        Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
-    }
+            let template: SymbolsTemplate = SymbolsTemplate {
+                symbols: tradeable_symbol_with_index,
+                elapsed_ms: start.elapsed().as_millis(),
+            };
+            match template.render() {
+                Ok(html) => {
+                    let response: HttpResponse = HttpResponse::Ok()
+                        .content_type("text/html; charset=utf-8")
+                        .body(html);
+
+                    Ok(response)
+                },
+                Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
+            }
         },
         Err(e) => {
             let msg: String = format!("Database error: {}", e);
