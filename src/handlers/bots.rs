@@ -40,7 +40,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .sum();
 
     let bots_count = bots_with_index.len();
-    let init_balance_value = (20 * bots_count) as f64;
+    let init_balance_value: f64 = (20 * bots_count) as f64;
 
     let template: BotsTemplate = BotsTemplate {
         bots: bots_with_index,
