@@ -19,7 +19,8 @@ pub async fn events(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     {
         Ok(events) => events,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
         }
     };
@@ -51,7 +52,8 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .await {
         Ok(msgevents) => msgevents,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
         }
     };
@@ -83,7 +85,8 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .await {
         Ok(msgsend) =>msgsend,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
         }
     };

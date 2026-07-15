@@ -19,8 +19,9 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .await {
         Ok(all_currencies) => all_currencies,
         Err(e) => {
-            eprintln!("Database error: {}", e);
-              return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
+            return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
         }
     };
 

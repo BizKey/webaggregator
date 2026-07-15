@@ -17,8 +17,9 @@ pub async fn eventorders(pool: web::Data<PgPool>) -> Result<HttpResponse> {
             .await {
                 Ok(event_orders) => event_orders,
                 Err(e) => {
-                    eprintln!("Database error: {}", e);
-                  return  Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+                    let msg: String = format!("Database error: {}", e);
+                    log::error!("{}", msg);
+                    return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
                 }
             };
 

@@ -40,8 +40,9 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     }
         },
         Err(e) => {
-            eprintln!("Database error: {}", e);
-        Ok(actix_web::error::ErrorInternalServerError("Database error").into())
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
+            Ok(actix_web::error::ErrorInternalServerError("Database error").into())
         }
     }
 }
@@ -63,7 +64,8 @@ pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     {
         Ok(symbols) => symbols,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
         }
     };

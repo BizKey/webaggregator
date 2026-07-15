@@ -22,7 +22,8 @@ pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .await {
         Ok(bots_list) => bots_list,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return  Ok(actix_web::error::ErrorInternalServerError("Database error").into())
         }
     };

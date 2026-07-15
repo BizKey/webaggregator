@@ -19,7 +19,8 @@ pub async fn errors(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     {
         Ok(errors) => errors,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
         }
     };

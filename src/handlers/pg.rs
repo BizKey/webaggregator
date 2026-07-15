@@ -25,7 +25,8 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     {
         Ok(pg_stats_connections) => pg_stats_connections,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Err(actix_web::error::ErrorInternalServerError("Database error"));
         }
     };
@@ -40,7 +41,8 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     .await {
         Ok(pg_stats_table_info) => pg_stats_table_info,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Err(actix_web::error::ErrorInternalServerError("Database error"));
         }
     };
@@ -56,7 +58,8 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     {
         Ok(pg_stats_table_index) => pg_stats_table_index,
         Err(e) => {
-            eprintln!("Database error: {}", e);
+            let msg: String = format!("Database error: {}", e);
+            log::error!("{}", msg);
             return Err(actix_web::error::ErrorInternalServerError("Database error"));
         }
     };
@@ -68,8 +71,9 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .await {
             Ok(pg_stat_statements) => pg_stat_statements,
             Err(e) => {
-                  eprintln!("Database error: {}", e);
-            return Err(actix_web::error::ErrorInternalServerError("Database error"));
+                let msg: String = format!("Database error: {}", e);
+                log::error!("{}", msg);
+                return Err(actix_web::error::ErrorInternalServerError("Database error"));
             }
         };
 
@@ -83,7 +87,8 @@ pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .await {
             Ok(pg_stat_table_size ) => pg_stat_table_size,
             Err(e) => {
-                eprintln!("Database error: {}", e);
+                let msg: String = format!("Database error: {}", e);
+                log::error!("{}", msg);
                 return Err(actix_web::error::ErrorInternalServerError("Database error"))
             }
         };
