@@ -5,6 +5,7 @@ use askama::Template;
 use log;
 use sqlx::PgPool;
 use std::time::Instant;
+
 pub async fn positionasset(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // positionasset
 

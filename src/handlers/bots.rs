@@ -5,6 +5,7 @@ use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
+
 pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // bots
 

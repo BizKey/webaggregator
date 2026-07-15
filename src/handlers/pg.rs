@@ -7,6 +7,7 @@ use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
+
 pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // pg
 

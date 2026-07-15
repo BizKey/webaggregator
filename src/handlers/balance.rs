@@ -5,6 +5,7 @@ use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
+
 pub async fn balances(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // balances
 
