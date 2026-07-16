@@ -12,7 +12,7 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     // time start
     let start: Instant = Instant::now();
 
-    let all_currencies: Vec<Currency> =  match sqlx::query_as::<_, Currency>(
+    let all_currencies: Vec<Currency> = match sqlx::query_as::<_, Currency>(
         "SELECT exchange, currency, currency_name, full_name, precision, is_margin_enabled, is_debit_enabled, updated_at FROM currency ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
@@ -41,7 +41,9 @@ pub async fn currencies(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
     };
 
-    Ok(HttpResponse::Ok()
+    let response: HttpResponse = HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(html);
+
+    Ok(response)
 }
