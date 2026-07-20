@@ -19,9 +19,10 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = 'USDT' AND base_currency <> 'USDC' AND base_currency <> 'KCS' ORDER BY updated_at DESC;",
     )
     .fetch_all(pool.get_ref())
-    .await.map_err(|e|{
+    .await
+    .map_err(|e|{
         log::error!("Database error: {}", e);
-            actix_web::error::ErrorInternalServerError("Template render error")
+        actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
     let tradeable_symbol_with_index: Vec<(usize, Symbol)> = tradeable_symbol
@@ -32,12 +33,12 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let template: SymbolsTemplate = SymbolsTemplate {
+    let html: String = SymbolsTemplate {
         symbols: tradeable_symbol_with_index,
         elapsed_ms,
-    };
-
-    let html: String = template.render().map_err(|e| {
+    }
+    .render()
+    .map_err(|e| {
         log::error!("Template render error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;

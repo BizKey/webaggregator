@@ -9,7 +9,7 @@ use std::time::Instant;
 pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
-    let bots_list: Vec<Bots> =  match sqlx::query_as::<_, Bots>(
+    let bots_list: Vec<Bots> = sqlx::query_as::<_, Bots>(
         "
         SELECT exchange, entry_client_oid, exit_tp_order_id, exit_tp_client_oid, exit_sl_order_id, exit_sl_client_oid, symbol, balance, updated_at
         FROM bots
@@ -17,14 +17,11 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         ",
     )
     .fetch_all(pool.get_ref())
-    .await {
-        Ok(bots_list) => bots_list,
-        Err(e) => {
-            let msg: String = format!("Database error: {}", e);
-            log::error!("{}", msg);
-            return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
-        }
-    };
+    .await
+    .map_err(|e|{
+        log::error!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
     let bots_with_index: Vec<(usize, Bots)> = bots_list
         .into_iter()
@@ -42,21 +39,19 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let template: BotsTemplate = BotsTemplate {
+    let html: String = BotsTemplate {
         bots: bots_with_index,
         init_balance: init_balance_value,
         final_balance: final_balance,
         elapsed_ms,
-    };
+    }
+    .render()
+    .map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
-
-    let response: HttpResponse = HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html);
-
-    Ok(response)
+        .body(html))
 }
