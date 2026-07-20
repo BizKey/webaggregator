@@ -81,21 +81,21 @@ pub async fn pg(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = PgTemplate {
-        pg_stats_connections,
-        pg_stats_table_info,
-        pg_stats_table_index,
-        pg_stat_statements,
-        pg_stat_table_size,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            PgTemplate {
+                pg_stats_connections,
+                pg_stats_table_info,
+                pg_stats_table_index,
+                pg_stat_statements,
+                pg_stat_table_size,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }

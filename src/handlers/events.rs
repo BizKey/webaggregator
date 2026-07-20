@@ -26,16 +26,16 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = EventsTemplate { events, elapsed_ms }
-        .render()
-        .map_err(|e| {
-            log::error!("Template render error: {}", e);
-            actix_web::error::ErrorInternalServerError("Template render error")
-        })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            EventsTemplate { events, elapsed_ms }
+                .render()
+                .map_err(|e| {
+                    log::error!("Template render error: {}", e);
+                    actix_web::error::ErrorInternalServerError("Template render error")
+                })?,
+        ))
 }
 
 pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
@@ -58,19 +58,19 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = MsgEventTemplate {
-        msgevents,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            MsgEventTemplate {
+                msgevents,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }
 
 pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
@@ -93,17 +93,17 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = MsgSendTemplate {
-        msgsend,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            MsgSendTemplate {
+                msgsend,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }

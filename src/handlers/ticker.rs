@@ -31,17 +31,17 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = TickersTemplate {
-        tickers,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            TickersTemplate {
+                tickers,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }

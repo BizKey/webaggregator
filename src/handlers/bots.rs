@@ -39,19 +39,19 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = BotsTemplate {
-        bots,
-        init_balance,
-        final_balance,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            BotsTemplate {
+                bots,
+                init_balance,
+                final_balance,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }

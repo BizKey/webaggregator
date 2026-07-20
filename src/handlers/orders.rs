@@ -24,17 +24,17 @@ pub async fn eventorders(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = EventOrderTemplate {
-        event_orders,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            EventOrderTemplate {
+                event_orders,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }

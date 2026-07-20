@@ -26,19 +26,19 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = PositionAssetTemplate {
-        position_asset,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            PositionAssetTemplate {
+                position_asset,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }
 pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
@@ -60,19 +60,19 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = PositionDebtTemplate {
-        position_debt,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            PositionDebtTemplate {
+                position_debt,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }
 pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
@@ -94,17 +94,17 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = PositinRatioTemplate {
-        position_ratio,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            PositinRatioTemplate {
+                position_ratio,
+                elapsed_ms,
+            }
+            .render()
+            .map_err(|e| {
+                log::error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
+        ))
 }
