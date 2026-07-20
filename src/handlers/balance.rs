@@ -23,14 +23,16 @@ pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let template: BalanceTemplate = BalanceTemplate {
-        balances: balances,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
+    let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = template.render().map_err(|e| {
+    let html: String = BalanceTemplate {
+        balances,
+        elapsed_ms,
+    }
+    .render()
+    .map_err(|e| {
         log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Error template render")
+        actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
     Ok(HttpResponse::Ok()

@@ -7,9 +7,6 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // events
-
-    // time start
     let start: Instant = Instant::now();
 
     let events: Vec<Event> = match sqlx::query_as::<_, Event>(
@@ -31,21 +28,17 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
-    let response: HttpResponse = HttpResponse::Ok()
-        .content_type("text/html; charset=utf-8")
-        .body(html);
+    let html: String = template.render().map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
-    Ok(response)
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(html))
 }
 
 pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // msgevent
-
-    // time start
     let start: Instant = Instant::now();
 
     let msgevents =  match sqlx::query_as::<_, MsgEvent>(
@@ -66,22 +59,17 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
+    let html: String = template.render().map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
-    let response: HttpResponse = HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html);
-
-    Ok(response)
+        .body(html))
 }
 
 pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // msgsend
-
-    // time start
     let start: Instant = Instant::now();
 
     let msgsend: Vec<MsgSend> =  match sqlx::query_as::<_, MsgSend>(
@@ -102,14 +90,12 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
+    let html: String = template.render().map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
-    let response: HttpResponse = HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html);
-
-    Ok(response)
+        .body(html))
 }

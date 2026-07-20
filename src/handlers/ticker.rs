@@ -7,12 +7,9 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // all tickers
-
-    // time start
     let start: Instant = Instant::now();
 
-    let tickers: Vec<Ticker> = match sqlx::query_as::<_, Ticker>(
+    let tickers: Vec<Ticker> =  sqlx::query_as::<_, Ticker>(
         "
         SELECT exchange, symbol, symbol_name, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, updated_at
         FROM ticker
@@ -21,14 +18,10 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     )
     .fetch_all(pool.get_ref())
     .await
-    {
-        Ok(tickers) => tickers,
-        Err(e) => {
-            let msg: String = format!("Database error: {}", e);
-            log::error!("{}", msg);
-            return Ok(actix_web::error::ErrorInternalServerError("Database error").into())
-        }
-    };
+    .map_err(|e|{
+        log::error!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
     let tickers_with_index: Vec<(usize, Ticker)> = tickers
         .into_iter()
@@ -41,14 +34,12 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
+    let html: String = template.render().map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
-    let response: HttpResponse = HttpResponse::Ok()
+    Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html);
-
-    Ok(response)
+        .body(html))
 }

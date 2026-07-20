@@ -7,7 +7,6 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // time start
     let start: Instant = Instant::now();
 
     match sqlx::query_as::<_, Symbol>(
@@ -52,10 +51,9 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 }
 
 pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // time start
     let start: Instant = Instant::now();
 
-    let symbols: Vec<Symbol> = match sqlx::query_as::<_, Symbol>(
+    let symbols: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
         "SELECT exchange, symbol, symbol_name, base_currency, quote_currency, 
         fee_currency, market, base_min_size, quote_min_size, base_max_size, 
         quote_max_size, base_increment, quote_increment, price_increment, price_limit_rate, 
@@ -65,14 +63,10 @@ pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     )
     .fetch_all(pool.get_ref())
     .await
-    {
-        Ok(symbols) => symbols,
-        Err(e) => {
-            let msg: String = format!("Database error: {}", e);
-            log::error!("{}", msg);
-            return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
-        }
-    };
+    .map_err(|e| {
+        log::error!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
     let symbols_with_index: Vec<(usize, Symbol)> = symbols
         .into_iter()
@@ -80,15 +74,15 @@ pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .map(|(i, symbol)| (i + 1, symbol))
         .collect();
 
-    let template: SymbolsTemplate = SymbolsTemplate {
+    let html: String = SymbolsTemplate {
         symbols: symbols_with_index,
         elapsed_ms: start.elapsed().as_millis(),
-    };
-
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
+    }
+    .render()
+    .map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

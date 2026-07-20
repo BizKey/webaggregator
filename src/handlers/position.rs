@@ -7,9 +7,6 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // positionasset
-
-    // time start
     let start: Instant = Instant::now();
 
     let position_asset: Vec<PositionAsset> = match sqlx::query_as::<_, PositionAsset>(
@@ -40,9 +37,6 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         .body(html))
 }
 pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // positiondebt
-
-    // time start
     let start: Instant = Instant::now();
 
     let  position_debt: Vec<PositionDebt> =  match sqlx::query_as::<_, PositionDebt>(
@@ -62,6 +56,7 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
         position_debt: position_debt,
         elapsed_ms: start.elapsed().as_millis(),
     };
+
     match template.render() {
         Ok(html) => Ok(HttpResponse::Ok()
             .content_type("text/html; charset=utf-8")
@@ -70,9 +65,6 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
     }
 }
 pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    // positionratio
-
-    // time start
     let start: Instant = Instant::now();
 
     let position_ratio = match sqlx::query_as::<_, PositionRatio>(
@@ -93,10 +85,10 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         elapsed_ms: start.elapsed().as_millis(),
     };
 
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
+    let html: String = template.render().map_err(|e| {
+        log::error!("Template render error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
