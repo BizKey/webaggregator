@@ -10,11 +10,11 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
     let bots_list: Vec<Bots> = sqlx::query_as::<_, Bots>(
-        "
+        r#"
         SELECT exchange, entry_client_oid, exit_tp_order_id, exit_tp_client_oid, exit_sl_order_id, exit_sl_client_oid, symbol, balance, updated_at
         FROM bots
         ORDER BY updated_at DESC;
-        ",
+        "#,
     )
     .fetch_all(pool.as_ref())
     .await

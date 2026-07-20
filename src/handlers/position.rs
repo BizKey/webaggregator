@@ -10,11 +10,16 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
     let start: Instant = Instant::now();
 
     let position_asset: Vec<PositionAsset> = sqlx::query_as::<_, PositionAsset>(
-        "SELECT exchange, asset_symbol, asset_total, asset_available, asset_hold, updated_at FROM positionasset ORDER BY updated_at DESC LIMIT 1000;",
+        r#"
+        SELECT exchange, asset_symbol, asset_total, asset_available, asset_hold, updated_at
+        FROM positionasset
+        ORDER BY updated_at
+        DESC LIMIT 1000;
+        "#,
     )
     .fetch_all(pool.as_ref())
     .await
-    .map_err(|e|{
+    .map_err(|e| {
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
@@ -39,11 +44,16 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
     let start: Instant = Instant::now();
 
     let position_debt: Vec<PositionDebt> = sqlx::query_as::<_, PositionDebt>(
-        "SELECT exchange, debt_symbol, debt_value, updated_at FROM positiondebt ORDER BY updated_at DESC LIMIT 1000;",
+        r#"
+        SELECT exchange, debt_symbol, debt_value, updated_at
+        FROM positiondebt
+        ORDER BY updated_at
+        DESC LIMIT 1000;
+        "#,
     )
     .fetch_all(pool.as_ref())
     .await
-    .map_err(|e|{
+    .map_err(|e| {
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;

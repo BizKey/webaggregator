@@ -10,7 +10,12 @@ pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
     let errors: Vec<Error> = sqlx::query_as::<_, Error>(
-        "SELECT exchange, msg, updated_at FROM errors ORDER BY updated_at DESC LIMIT 1000;",
+        r#"
+        SELECT exchange, msg, updated_at
+        FROM errors
+        ORDER BY updated_at
+        DESC LIMIT 1000;
+        "#,
     )
     .fetch_all(pool.as_ref())
     .await

@@ -10,11 +10,11 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
     let tickers: Vec<Ticker> =  sqlx::query_as::<_, Ticker>(
-        "
+        r#"
         SELECT exchange, symbol, symbol_name, taker_fee_rate, maker_fee_rate, taker_coefficient, maker_coefficient, updated_at
         FROM ticker
         ORDER BY updated_at DESC;
-        ",
+        "#,
     )
     .fetch_all(pool.as_ref())
     .await
