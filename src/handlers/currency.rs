@@ -31,9 +31,11 @@ pub async fn currencies(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .map(|(i, currency)| (i + 1, currency))
         .collect();
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: CurrenciesTemplate = CurrenciesTemplate {
         currencies: currencies_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = match template.render() {

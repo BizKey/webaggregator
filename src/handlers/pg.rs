@@ -94,13 +94,15 @@ pub async fn pg(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             }
         };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: PgTemplate = PgTemplate {
         pg_stats_connections: pg_stats_connections,
         pg_stats_table_info: pg_stats_table_info,
         pg_stats_table_index: pg_stats_table_index,
         pg_stat_statements: pg_stat_statements,
         pg_stat_table_size: pg_stat_table_size,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = match template.render() {

@@ -22,9 +22,11 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         Ok(position_asset ) => position_asset,
     };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: PositionAssetTemplate = PositionAssetTemplate {
         position_asset: position_asset,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = match template.render() {
@@ -52,9 +54,11 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
         Ok(position_debt ) =>  position_debt
     };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: PositionDebtTemplate = PositionDebtTemplate {
         position_debt: position_debt,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     match template.render() {
@@ -80,9 +84,11 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         }
     };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: PositinRatioTemplate = PositinRatioTemplate {
         position_ratio: position_ratio,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = template.render().map_err(|e| {

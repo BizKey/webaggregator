@@ -29,9 +29,11 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .map(|(i, ticker)| (i + 1, ticker))
         .collect();
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: TickersTemplate = TickersTemplate {
         tickers: tickers_with_index,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = template.render().map_err(|e| {

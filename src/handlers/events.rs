@@ -23,9 +23,11 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         }
     };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: EventsTemplate = EventsTemplate {
         events: events,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = template.render().map_err(|e| {
@@ -54,9 +56,11 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         }
     };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: MsgEventTemplate = MsgEventTemplate {
         msgevents: msgevents,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = template.render().map_err(|e| {
@@ -85,9 +89,11 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         }
     };
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: MsgSendTemplate = MsgSendTemplate {
         msgsend: msgsend,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = template.render().map_err(|e| {

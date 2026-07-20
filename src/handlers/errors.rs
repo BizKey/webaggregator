@@ -25,10 +25,11 @@ pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
         }
     };
+    let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let template: ErrorsTemplate = ErrorsTemplate {
         errors: errors,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = match template.render() {

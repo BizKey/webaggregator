@@ -40,11 +40,13 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let bots_count = bots_with_index.len();
     let init_balance_value: f64 = (20 * bots_count) as f64;
 
+    let elapsed_ms: u128 = start.elapsed().as_millis();
+
     let template: BotsTemplate = BotsTemplate {
         bots: bots_with_index,
         init_balance: init_balance_value,
         final_balance: final_balance,
-        elapsed_ms: start.elapsed().as_millis(),
+        elapsed_ms,
     };
 
     let html: String = match template.render() {
