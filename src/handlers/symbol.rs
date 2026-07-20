@@ -28,7 +28,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let symbols: Vec<(usize, Symbol)> = symbols
         .into_iter()
         .enumerate()
-        .map(|(i, symbol)| (i + 1, symbol))
+        .map(|(i, v)| (i + 1, v))
         .collect();
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
@@ -69,7 +69,7 @@ pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let symbols: Vec<(usize, Symbol)> = symbols
         .into_iter()
         .enumerate()
-        .map(|(i, symbol)| (i + 1, symbol))
+        .map(|(i, v)| (i + 1, v))
         .collect();
 
     let elapsed_ms: u128 = start.elapsed().as_millis();

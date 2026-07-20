@@ -26,7 +26,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let bots: Vec<(usize, Bots)> = bots_list
         .into_iter()
         .enumerate()
-        .map(|(i, bot)| (i + 1, bot))
+        .map(|(i, v)| (i + 1, v))
         .collect();
 
     let final_balance: f64 = bots

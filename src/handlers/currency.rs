@@ -26,7 +26,7 @@ pub async fn currencies(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let currencies: Vec<(usize, Currency)> = currencies
         .into_iter()
         .enumerate()
-        .map(|(i, c)| (i + 1, c))
+        .map(|(i, v)| (i + 1, v))
         .collect();
 
     let elapsed_ms: u128 = start.elapsed().as_millis();

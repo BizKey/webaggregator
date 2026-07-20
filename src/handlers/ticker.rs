@@ -26,7 +26,7 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let tickers: Vec<(usize, Ticker)> = tickers
         .into_iter()
         .enumerate()
-        .map(|(i, ticker)| (i + 1, ticker))
+        .map(|(i, v)| (i + 1, v))
         .collect();
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
