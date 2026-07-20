@@ -1,7 +1,7 @@
 FROM rust:1.97.1-alpine3.24 AS builder
 
 RUN apk add --no-cache musl-dev pkgconfig
-
+ENV RUSTFLAGS="-C target-cpu=x86-64-v3"
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
