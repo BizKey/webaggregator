@@ -16,33 +16,33 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         ORDER BY updated_at DESC;
         ",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let bots_with_index: Vec<(usize, Bots)> = bots_list
+    let bots: Vec<(usize, Bots)> = bots_list
         .into_iter()
         .enumerate()
         .map(|(i, bot)| (i + 1, bot))
         .collect();
 
-    let final_balance: f64 = bots_with_index
+    let final_balance: f64 = bots
         .iter()
         .filter_map(|(_, bot)| bot.balance.as_ref().and_then(|s| s.parse::<f64>().ok()))
         .sum();
 
-    let bots_count = bots_with_index.len();
-    let init_balance_value: f64 = (20 * bots_count) as f64;
+    let bots_count = bots.len();
+    let init_balance: f64 = (20 * bots_count) as f64;
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = BotsTemplate {
-        bots: bots_with_index,
-        init_balance: init_balance_value,
-        final_balance: final_balance,
+        bots,
+        init_balance,
+        final_balance,
         elapsed_ms,
     }
     .render()

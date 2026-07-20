@@ -12,7 +12,7 @@ pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let errors: Vec<Error> = sqlx::query_as::<_, Error>(
         "SELECT exchange, msg, updated_at FROM errors ORDER BY updated_at DESC LIMIT 1000;",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e| {
         log::error!("Database error: {}", e);
@@ -21,15 +21,12 @@ pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = ErrorsTemplate {
-        errors: errors,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
+    let html: String = ErrorsTemplate { errors, elapsed_ms }
+        .render()
+        .map_err(|e| {
+            log::error!("Template render error: {}", e);
+            actix_web::error::ErrorInternalServerError("Template render error")
+        })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

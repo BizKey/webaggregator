@@ -12,7 +12,7 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let events: Vec<Event> = sqlx::query_as::<_, Event>(
         "SELECT exchange, msg, updated_at FROM events ORDER BY updated_at DESC LIMIT 1000;",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e| {
         log::error!("Database error: {}", e);
@@ -21,15 +21,12 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
-    let html: String = EventsTemplate {
-        events: events,
-        elapsed_ms,
-    }
-    .render()
-    .map_err(|e| {
-        log::error!("Template render error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
+    let html: String = EventsTemplate { events, elapsed_ms }
+        .render()
+        .map_err(|e| {
+            log::error!("Template render error: {}", e);
+            actix_web::error::ErrorInternalServerError("Template render error")
+        })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
@@ -42,7 +39,7 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let msgevents: Vec<MsgEvent> = sqlx::query_as::<_, MsgEvent>(
         "SELECT exchange, msg, code, borrow_size, client_oid, order_id, loan_apply_id, limit_rate, reset_rate, remaining_rate, in_time, out_time, updated_at FROM msgevent ORDER BY updated_at DESC LIMIT 1000;",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
         log::error!("Database error: {}", e);
@@ -52,7 +49,7 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = MsgEventTemplate {
-        msgevents: msgevents,
+        msgevents,
         elapsed_ms,
     }
     .render()
@@ -72,7 +69,7 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let msgsend: Vec<MsgSend> =  sqlx::query_as::<_, MsgSend>(
         "SELECT exchange, args_symbol, args_side, args_size, args_funds, args_price, args_time_in_force, args_type, args_auto_borrow, args_auto_repay, args_client_oid, args_order_id, updated_at FROM msgsend ORDER BY updated_at DESC LIMIT 1000;",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
         log::error!("Database error: {}", e);
@@ -82,7 +79,7 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = MsgSendTemplate {
-        msgsend: msgsend,
+        msgsend,
         elapsed_ms,
     }
     .render()

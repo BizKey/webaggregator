@@ -9,7 +9,7 @@ use std::time::Instant;
 pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
-    let tradeable_symbol =  sqlx::query_as::<_, Symbol>(
+    let symbols =  sqlx::query_as::<_, Symbol>(
         "SELECT 
                 exchange, symbol, symbol_name, base_currency, quote_currency, fee_currency, 
                 market, base_min_size, quote_min_size, base_max_size, quote_max_size, 
@@ -18,14 +18,14 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
                 maker_fee_coefficient, taker_fee_coefficient, st, updated_at
             FROM symbol WHERE is_margin_enabled = true AND enable_trading = true AND fee_category = 1 AND quote_currency = 'USDT' AND base_currency <> 'USDC' AND base_currency <> 'KCS' ORDER BY updated_at DESC;",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let tradeable_symbol_with_index: Vec<(usize, Symbol)> = tradeable_symbol
+    let symbols: Vec<(usize, Symbol)> = symbols
         .into_iter()
         .enumerate()
         .map(|(i, symbol)| (i + 1, symbol))
@@ -34,7 +34,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = SymbolsTemplate {
-        symbols: tradeable_symbol_with_index,
+        symbols,
         elapsed_ms,
     }
     .render()
@@ -59,14 +59,14 @@ pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         taker_fee_coefficient, st, updated_at
             FROM symbol ORDER BY updated_at DESC;",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e| {
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let symbols_with_index: Vec<(usize, Symbol)> = symbols
+    let symbols: Vec<(usize, Symbol)> = symbols
         .into_iter()
         .enumerate()
         .map(|(i, symbol)| (i + 1, symbol))
@@ -75,7 +75,7 @@ pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = SymbolsTemplate {
-        symbols: symbols_with_index,
+        symbols,
         elapsed_ms,
     }
     .render()

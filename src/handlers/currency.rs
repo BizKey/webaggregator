@@ -9,26 +9,30 @@ use std::time::Instant;
 pub async fn currencies(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
-    let all_currencies: Vec<Currency> = sqlx::query_as::<_, Currency>(
-        "SELECT exchange, currency, currency_name, full_name, precision, is_margin_enabled, is_debit_enabled, updated_at FROM currency ORDER BY updated_at DESC;",
+    let currencies: Vec<Currency> = sqlx::query_as::<_, Currency>(
+        r#"
+        SELECT exchange, currency, currency_name, full_name, precision, is_margin_enabled, is_debit_enabled, updated_at
+        FROM currency
+        ORDER BY updated_at DESC;
+        "#,
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let currencies_with_index: Vec<(usize, Currency)> = all_currencies
+    let currencies: Vec<(usize, Currency)> = currencies
         .into_iter()
         .enumerate()
-        .map(|(i, currency)| (i + 1, currency))
+        .map(|(i, c)| (i + 1, c))
         .collect();
 
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = CurrenciesTemplate {
-        currencies: currencies_with_index,
+        currencies,
         elapsed_ms,
     }
     .render()

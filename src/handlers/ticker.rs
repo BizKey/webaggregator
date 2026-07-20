@@ -16,14 +16,14 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         ORDER BY updated_at DESC;
         ",
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
         log::error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let tickers_with_index: Vec<(usize, Ticker)> = tickers
+    let tickers: Vec<(usize, Ticker)> = tickers
         .into_iter()
         .enumerate()
         .map(|(i, ticker)| (i + 1, ticker))
@@ -32,7 +32,7 @@ pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let elapsed_ms: u128 = start.elapsed().as_millis();
 
     let html: String = TickersTemplate {
-        tickers: tickers_with_index,
+        tickers,
         elapsed_ms,
     }
     .render()
