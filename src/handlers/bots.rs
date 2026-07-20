@@ -1,15 +1,12 @@
 use crate::api::models::Bots;
 use crate::api::templates::BotsTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn bots(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // bots
-
-    // time start
+pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
     let bots_list: Vec<Bots> =  match sqlx::query_as::<_, Bots>(

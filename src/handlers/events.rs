@@ -1,12 +1,12 @@
 use crate::api::models::{Event, MsgEvent, MsgSend};
 use crate::api::templates::{EventsTemplate, MsgEventTemplate, MsgSendTemplate};
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn events(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // events
 
     // time start
@@ -42,7 +42,7 @@ pub async fn events(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     Ok(response)
 }
 
-pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // msgevent
 
     // time start
@@ -78,7 +78,7 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     Ok(response)
 }
 
-pub async fn msgsend(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // msgsend
 
     // time start

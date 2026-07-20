@@ -1,12 +1,12 @@
 use crate::api::models::Ticker;
 use crate::api::templates::TickersTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn tickers(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // all tickers
 
     // time start

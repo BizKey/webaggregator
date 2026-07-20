@@ -1,12 +1,12 @@
 use crate::api::models::Error;
 use crate::api::templates::ErrorsTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn errors(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // errors
 
     // time start

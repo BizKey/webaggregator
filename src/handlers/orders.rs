@@ -1,12 +1,12 @@
 use crate::api::models::EventOrder;
 use crate::api::templates::EventOrderTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn eventorders(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn eventorders(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // eventorders
 
     // time start

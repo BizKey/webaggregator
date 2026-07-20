@@ -2,13 +2,13 @@ use crate::api::models::{
     PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo,
 };
 use crate::api::templates::PgTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn pg(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn pg(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // pg
 
     // time start

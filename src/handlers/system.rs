@@ -1,6 +1,6 @@
-use actix_web::{HttpResponse, Result};
+use actix_web::{HttpResponse, Result as ActixResult};
 
-pub async fn serve_css() -> Result<HttpResponse, std::io::Error> {
+pub async fn serve_css() -> ActixResult<HttpResponse, std::io::Error> {
     let content: String = match std::fs::read_to_string("./static/style.css") {
         Ok(content) => content,
         Err(e) => return Err(e),
@@ -12,7 +12,7 @@ pub async fn serve_css() -> Result<HttpResponse, std::io::Error> {
         .body(content))
 }
 
-pub async fn favicon() -> Result<HttpResponse, std::io::Error> {
+pub async fn favicon() -> ActixResult<HttpResponse, std::io::Error> {
     let content: Vec<u8> = match std::fs::read("./static/favicon.png") {
         Ok(content) => content,
         Err(e) => return Err(e),

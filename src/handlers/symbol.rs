@@ -1,12 +1,12 @@
 use crate::api::models::Symbol;
 use crate::api::templates::SymbolsTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // time start
     let start: Instant = Instant::now();
 
@@ -51,7 +51,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> Result<HttpResponse> {
     }
 }
 
-pub async fn symbols(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // time start
     let start: Instant = Instant::now();
 

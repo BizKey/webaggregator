@@ -1,12 +1,12 @@
 use crate::api::models::{PositionAsset, PositionDebt, PositionRatio};
 use crate::api::templates::{PositinRatioTemplate, PositionAssetTemplate, PositionDebtTemplate};
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use log;
 use sqlx::PgPool;
 use std::time::Instant;
 
-pub async fn positionasset(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // positionasset
 
     // time start
@@ -39,7 +39,7 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         .content_type("text/html; charset=utf-8")
         .body(html))
 }
-pub async fn positiondebt(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // positiondebt
 
     // time start
@@ -69,7 +69,7 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> Result<HttpResponse> {
         Err(_) => Ok(HttpResponse::InternalServerError().body("Error template render")),
     }
 }
-pub async fn positionratio(pool: web::Data<PgPool>) -> Result<HttpResponse> {
+pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     // positionratio
 
     // time start
