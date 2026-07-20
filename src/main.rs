@@ -18,19 +18,20 @@ use crate::handlers::symbol::{symbols, tradeable};
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
 use actix_web::{App, HttpServer, middleware, web};
+use anyhow::{Context, Result};
 use dotenvy::dotenv;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use std::time::Duration;
 
 #[actix_web::main]
-async fn main() -> Result<(), String> {
+async fn main() -> Result<()> {
     env_logger::init();
     dotenv().ok();
 
-    let database_url: String = get_env("DATABASE_URL")?;
+    let database_url: String = get_env("DATABASE_URL").context("Don't find ENV")?;
 
-    let pool: PgPool = match PgPoolOptions::new()
+    let pool: PgPool = PgPoolOptions::new()
         .max_connections(10)
         .min_connections(5)
         .acquire_timeout(Duration::from_secs(10))
@@ -38,16 +39,11 @@ async fn main() -> Result<(), String> {
         .max_lifetime(Duration::from_secs(1800))
         .connect(&database_url)
         .await
-    {
-        Ok(pool) => pool,
-        Err(e) => {
-            let msg: String = format!("Failed to create pg pool:{}", e);
-            log::error!("{}", msg);
-            return Err(msg);
-        }
-    };
+        .context("Failed to create pg pool")?;
 
-    let server = match HttpServer::new(move || {
+    log::info!("DB connected");
+
+    let server = HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .wrap(middleware::Compress::default())
@@ -87,21 +83,11 @@ async fn main() -> Result<(), String> {
             .route("/favicon.png", web::get().to(favicon))
     })
     .bind("0.0.0.0:8080")
-    {
-        Ok(server) => server,
-        Err(e) => {
-            let msg: String = format!("Failed start server:{}", e);
-            log::error!("{}", msg);
-            return Err(msg);
-        }
-    };
+    .context("Failed start server 0.0.0.0:8080")?;
 
-    match server.run().await {
-        Ok(_) => Ok(()),
-        Err(e) => {
-            let msg: String = format!("Failed start server:{}", e);
-            log::error!("{}", msg);
-            return Err(msg);
-        }
-    }
+    log::info!("Server started: http://0.0.0.0:8080");
+
+    server.run().await.context("Fail http server")?;
+
+    Ok(())
 }
