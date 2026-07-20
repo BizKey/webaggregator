@@ -1,12 +1,8 @@
+use anyhow::{Context, Result};
 use std::env;
 
-pub fn get_env(key: &str) -> Result<String, String> {
-    match env::var(key) {
-        Ok(value) => Ok(value.trim().to_string()),
-        Err(e) => {
-            let msg: String = format!("Don't find ENV:{} {}", key, e);
-            log::error!("{}", msg);
-            Err(msg)
-        }
-    }
+pub fn get_env(key: &str) -> Result<String> {
+    env::var(key)
+        .map(|value| value.trim().to_string())
+        .with_context(|| format!("Don't find ENV:{}", key))
 }

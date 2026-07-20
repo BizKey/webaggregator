@@ -1,40 +1,39 @@
 use crate::api::models::Error;
 use crate::api::templates::ErrorsTemplate;
-use actix_web::{HttpResponse, Result, web};
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 
 use sqlx::PgPool;
 use std::time::Instant;
-pub async fn errors(pool: web::Data<PgPool>) -> Result<HttpResponse> {
-    // errors
 
-    // time start
+pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
 
-    let errors: Vec<Error> = match sqlx::query_as::<_, Error>(
-        "SELECT exchange, msg, updated_at FROM errors ORDER BY updated_at DESC LIMIT 1000;",
+    let errors: Vec<Error> = sqlx::query_as::<_, Error>(
+        r#"
+        SELECT exchange, msg, updated_at
+        FROM errors
+        ORDER BY updated_at
+        DESC LIMIT 1000;
+        "#,
     )
-    .fetch_all(pool.get_ref())
+    .fetch_all(pool.as_ref())
     .await
-    {
-        Ok(errors) => errors,
-        Err(e) => {
-            eprintln!("Database error: {}", e);
-            return Ok(actix_web::error::ErrorInternalServerError("Database error").into());
-        }
-    };
+    .map_err(|e| {
+        log::error!("Database error: {}", e);
+        actix_web::error::ErrorInternalServerError("Template render error")
+    })?;
 
-    let template: ErrorsTemplate = ErrorsTemplate {
-        errors: errors,
-        elapsed_ms: start.elapsed().as_millis(),
-    };
-
-    let html: String = match template.render() {
-        Ok(html) => html,
-        Err(_) => return Ok(HttpResponse::InternalServerError().body("Error template render")),
-    };
+    let elapsed_ms: u128 = start.elapsed().as_millis();
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(html))
+        .body(
+            ErrorsTemplate { errors, elapsed_ms }
+                .render()
+                .map_err(|e| {
+                    log::error!("Template render error: {}", e);
+                    actix_web::error::ErrorInternalServerError("Template render error")
+                })?,
+        ))
 }

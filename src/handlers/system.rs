@@ -1,10 +1,10 @@
-use actix_web::{HttpResponse, Result};
+use actix_web::{HttpResponse, Result as ActixResult};
 
-pub async fn serve_css() -> Result<HttpResponse, std::io::Error> {
-    let content: String = match std::fs::read_to_string("./static/style.css") {
-        Ok(content) => content,
-        Err(e) => return Err(e),
-    };
+pub async fn serve_css() -> ActixResult<HttpResponse> {
+    let content = std::fs::read_to_string("./static/style.css").map_err(|e| {
+        log::error!("Fail read ./static/style.css: {}", e);
+        actix_web::error::ErrorInternalServerError("Fail")
+    })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/css; charset=utf-8")
@@ -12,11 +12,11 @@ pub async fn serve_css() -> Result<HttpResponse, std::io::Error> {
         .body(content))
 }
 
-pub async fn favicon() -> Result<HttpResponse, std::io::Error> {
-    let content: Vec<u8> = match std::fs::read("./static/favicon.png") {
-        Ok(content) => content,
-        Err(e) => return Err(e),
-    };
+pub async fn favicon() -> ActixResult<HttpResponse> {
+    let content: Vec<u8> = std::fs::read("./static/favicon.png").map_err(|e| {
+        log::error!("Fail read ./static/favicon.png: {}", e);
+        actix_web::error::ErrorInternalServerError("Fail")
+    })?;
 
     Ok(HttpResponse::Ok()
         .content_type("image/png")
