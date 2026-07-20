@@ -2,6 +2,7 @@ FROM rust:1.97.1-alpine3.24 AS builder
 
 RUN apk add --no-cache musl-dev pkgconfig
 ENV RUSTFLAGS="-C target-cpu=x86-64-v3"
+
 WORKDIR /app
 
 COPY Cargo.toml Cargo.lock ./
@@ -27,5 +28,7 @@ COPY --from=builder /app/target/release/webaggregator /app/webaggregator
 COPY --chown=myuser:myuser static ./static
 
 USER myuser
+
+ENV RUST_LOG=INFO
 
 CMD ["/app/webaggregator"]
