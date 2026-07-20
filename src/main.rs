@@ -1,6 +1,8 @@
-use actix_web::{App, HttpServer, middleware, web};
-use dotenvy::dotenv;
-use sqlx::postgres::PgPoolOptions;
+mod api {
+    pub mod models;
+    pub mod templates;
+    pub mod tools;
+}
 mod handlers;
 use crate::api::tools::get_env;
 use crate::handlers::balance::balances;
@@ -15,13 +17,11 @@ use crate::handlers::position::{positionasset, positiondebt, positionratio};
 use crate::handlers::symbol::{symbols, tradeable};
 use crate::handlers::system::{favicon, serve_css};
 use crate::handlers::ticker::tickers;
-use sqlx::Postgres;
+use actix_web::{App, HttpServer, middleware, web};
+use dotenvy::dotenv;
+use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use std::time::Duration;
-mod api {
-    pub mod models;
-    pub mod templates;
-    pub mod tools;
-}
 
 #[actix_web::main]
 async fn main() -> Result<(), String> {
@@ -30,7 +30,7 @@ async fn main() -> Result<(), String> {
 
     let database_url: String = get_env("DATABASE_URL")?;
 
-    let pool: sqlx::Pool<Postgres> = match PgPoolOptions::new()
+    let pool: PgPool = match PgPoolOptions::new()
         .max_connections(10)
         .min_connections(5)
         .acquire_timeout(Duration::from_secs(10))
