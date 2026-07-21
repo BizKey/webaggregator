@@ -40,7 +40,7 @@ async fn create_db_pool() -> Result<PgPool> {
 
     PgPoolOptions::new()
         .max_connections(10)
-        .min_connections(5)
+        .min_connections(1)
         .acquire_timeout(Duration::from_secs(10))
         .idle_timeout(Duration::from_secs(600))
         .max_lifetime(Duration::from_secs(1800))
