@@ -2,9 +2,9 @@ use crate::api::models::{PositionAsset, PositionDebt, PositionRatio};
 use crate::api::templates::{PositinRatioTemplate, PositionAssetTemplate, PositionDebtTemplate};
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
-use log;
 use sqlx::PgPool;
 use std::time::Instant;
+use tracing::error;
 
 pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start: Instant = Instant::now();
@@ -20,7 +20,7 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
     .fetch_all(pool.as_ref())
     .await
     .map_err(|e| {
-        log::error!("Database error: {}", e);
+        error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
@@ -35,7 +35,7 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
             }
             .render()
             .map_err(|e| {
-                log::error!("Template render error: {}", e);
+                error!("Template render error: {}", e);
                 actix_web::error::ErrorInternalServerError("Template render error")
             })?,
         ))
@@ -54,7 +54,7 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
     .fetch_all(pool.as_ref())
     .await
     .map_err(|e| {
-        log::error!("Database error: {}", e);
+        error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
@@ -69,7 +69,7 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
             }
             .render()
             .map_err(|e| {
-                log::error!("Template render error: {}", e);
+                error!("Template render error: {}", e);
                 actix_web::error::ErrorInternalServerError("Template render error")
             })?,
         ))
@@ -88,7 +88,7 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
     .fetch_all(pool.as_ref())
     .await
     .map_err(|e|{
-        log::error!("Database error: {}", e);
+        error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
@@ -103,7 +103,7 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
             }
             .render()
             .map_err(|e| {
-                log::error!("Template render error: {}", e);
+                error!("Template render error: {}", e);
                 actix_web::error::ErrorInternalServerError("Template render error")
             })?,
         ))

@@ -24,12 +24,16 @@ use actix_web::{App, HttpServer, middleware, web};
 use anyhow::{Context, Result};
 use dotenvy::dotenv;
 use sqlx::{PgPool, postgres::PgPoolOptions};
-
 use std::time::Duration;
+use tracing::info;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
-    env_logger::init();
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .with_target(true)
+        .with_thread_ids(true)
+        .init();
     dotenv().ok();
 
     let database_url: String = get_env("DATABASE_URL").context("DATABASE_URL not set")?;
@@ -44,7 +48,7 @@ async fn main() -> Result<()> {
         .await
         .context("Failed to connect to PostgreSQL")?;
 
-    log::info!("Database connected");
+    info!("Database connected");
 
     let server = HttpServer::new(move || {
         App::new()
@@ -55,7 +59,7 @@ async fn main() -> Result<()> {
     .bind("0.0.0.0:8080")
     .context("Failed to bind server to 0.0.0.0:8080")?;
 
-    log::info!("Server running on http://0.0.0.0:8080");
+    info!("Server running on http://0.0.0.0:8080");
 
     server.run().await.context("Server crashed")?;
 

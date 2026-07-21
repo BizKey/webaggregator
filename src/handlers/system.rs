@@ -1,8 +1,9 @@
 use actix_web::{HttpResponse, Result as ActixResult};
+use tracing::error;
 
 pub async fn serve_css() -> ActixResult<HttpResponse> {
     let content = std::fs::read_to_string("./static/style.css").map_err(|e| {
-        log::error!("Fail read ./static/style.css: {}", e);
+        error!("Fail read ./static/style.css: {}", e);
         actix_web::error::ErrorInternalServerError("Fail")
     })?;
 
@@ -14,7 +15,7 @@ pub async fn serve_css() -> ActixResult<HttpResponse> {
 
 pub async fn favicon() -> ActixResult<HttpResponse> {
     let content: Vec<u8> = std::fs::read("./static/favicon.png").map_err(|e| {
-        log::error!("Fail read ./static/favicon.png: {}", e);
+        error!("Fail read ./static/favicon.png: {}", e);
         actix_web::error::ErrorInternalServerError("Fail")
     })?;
 
