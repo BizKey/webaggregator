@@ -29,6 +29,4 @@ COPY --chown=myuser:myuser static ./static
 
 USER myuser
 
-ENV RUST_LOG=INFO
-
 CMD ["/app/webaggregator"]

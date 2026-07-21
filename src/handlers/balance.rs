@@ -2,6 +2,7 @@ use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use sqlx::PgPool;
 use std::time::Instant;
+use tracing::error;
 
 use crate::api::models::Balance;
 use crate::api::templates::BalanceTemplate;
@@ -19,7 +20,7 @@ pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .fetch_all(pool.as_ref())
         .await
         .map_err(|e| {
-            log::error!("Database error in balances handler: {}", e);
+            error!("Database error in balances handler: {}", e);
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
@@ -34,7 +35,7 @@ pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             }
             .render()
             .map_err(|e| {
-                log::error!("Template render error: {}", e);
+                error!("Template render error: {}", e);
                 actix_web::error::ErrorInternalServerError("Template render error")
             })?,
         ))

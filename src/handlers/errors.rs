@@ -2,6 +2,7 @@ use crate::api::models::Error;
 use crate::api::templates::ErrorsTemplate;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
+use tracing::error;
 
 use sqlx::PgPool;
 use std::time::Instant;
@@ -20,7 +21,7 @@ pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     .fetch_all(pool.as_ref())
     .await
     .map_err(|e| {
-        log::error!("Database error: {}", e);
+        error!("Database error: {}", e);
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
@@ -32,7 +33,7 @@ pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             ErrorsTemplate { errors, elapsed_ms }
                 .render()
                 .map_err(|e| {
-                    log::error!("Template render error: {}", e);
+                    error!("Template render error: {}", e);
                     actix_web::error::ErrorInternalServerError("Template render error")
                 })?,
         ))
