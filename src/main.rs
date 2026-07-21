@@ -27,18 +27,18 @@ use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
 use tracing::info;
 
-#[actix_web::main]
-async fn main() -> Result<()> {
+fn init_tracing() {
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .with_target(true)
         .with_thread_ids(true)
         .init();
-    dotenv().ok();
+}
 
-    let database_url: String = get_env("DATABASE_URL").context("DATABASE_URL not set")?;
+async fn create_db_pool() -> Result<PgPool> {
+    let database_url = get_env("DATABASE_URL").context("DATABASE_URL not set")?;
 
-    let pool: PgPool = PgPoolOptions::new()
+    PgPoolOptions::new()
         .max_connections(10)
         .min_connections(5)
         .acquire_timeout(Duration::from_secs(10))
@@ -46,8 +46,39 @@ async fn main() -> Result<()> {
         .max_lifetime(Duration::from_secs(1800))
         .connect(&database_url)
         .await
-        .context("Failed to connect to PostgreSQL")?;
+        .context("Failed to connect to PostgreSQL")
+}
 
+fn routes(cfg: &mut web::ServiceConfig) {
+    use web::get;
+    cfg.route("/", get().to(index))
+        .route("/pg", get().to(pg))
+        .route("/events", get().to(events))
+        .route("/errors", get().to(errors))
+        .route("/balance", get().to(balances))
+        .route("/eventorder", get().to(eventorders))
+        .route("/positiondebt", get().to(positiondebt))
+        .route("/msgevent", get().to(msgevent))
+        .route("/msgsend", get().to(msgsend))
+        .route("/positionasset", get().to(positionasset))
+        .route("/positionratio", get().to(positionratio))
+        .route("/tradeable", get().to(tradeable))
+        .route("/tickers", get().to(tickers))
+        .route("/currencies", get().to(currencies))
+        .route("/symbols", get().to(symbols))
+        .route("/bots", get().to(bots))
+        .route("/static/style.css", get().to(serve_css))
+        .route("/favicon.png", get().to(favicon));
+}
+
+const SERVER_ADDR: &str = "0.0.0.0:8080";
+
+#[actix_web::main]
+async fn main() -> Result<()> {
+    init_tracing();
+    dotenv().ok();
+
+    let pool = create_db_pool().await?;
     info!("Database connected");
 
     let server = HttpServer::new(move || {
@@ -56,33 +87,12 @@ async fn main() -> Result<()> {
             .wrap(middleware::Compress::default())
             .configure(routes)
     })
-    .bind("0.0.0.0:8080")
-    .context("Failed to bind server to 0.0.0.0:8080")?;
+    .bind(SERVER_ADDR)
+    .with_context(|| format!("Failed to bind server to {}", SERVER_ADDR))?;
 
     info!("Server running on http://0.0.0.0:8080");
 
     server.run().await.context("Server crashed")?;
 
     Ok(())
-}
-
-fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.route("/", web::get().to(index))
-        .route("/pg", web::get().to(pg))
-        .route("/events", web::get().to(events))
-        .route("/errors", web::get().to(errors))
-        .route("/balance", web::get().to(balances))
-        .route("/eventorder", web::get().to(eventorders))
-        .route("/positiondebt", web::get().to(positiondebt))
-        .route("/msgevent", web::get().to(msgevent))
-        .route("/msgsend", web::get().to(msgsend))
-        .route("/positionasset", web::get().to(positionasset))
-        .route("/positionratio", web::get().to(positionratio))
-        .route("/tradeable", web::get().to(tradeable))
-        .route("/tickers", web::get().to(tickers))
-        .route("/currencies", web::get().to(currencies))
-        .route("/symbols", web::get().to(symbols))
-        .route("/bots", web::get().to(bots))
-        .route("/static/style.css", web::get().to(serve_css))
-        .route("/favicon.png", web::get().to(favicon));
 }
