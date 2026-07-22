@@ -5,7 +5,6 @@ edition = "2024"
 
 [dependencies]
 actix-web = { version = "4", default-features = false, features = ["macros", "compress-gzip"] }
-
 sqlx = { version = "0.9", default-features = false,  features = ["postgres", "runtime-tokio", "chrono", "tls-rustls", "macros"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 tokio = { version = "1.53", default-features = false, features = ["rt-multi-thread", "macros"] }
