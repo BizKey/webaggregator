@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn tickers(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let tickers: Vec<Ticker> = sqlx::query_as::<_, Ticker>(
         r#"

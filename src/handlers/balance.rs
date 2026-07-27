@@ -8,7 +8,7 @@ use crate::api::models::Balance;
 use crate::api::templates::BalanceTemplate;
 
 pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let balances: Vec<Balance> = sqlx::query_as::<_, Balance>(
         r#"

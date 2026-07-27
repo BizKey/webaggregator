@@ -7,7 +7,7 @@ use std::time::Instant;
 use tracing::error;
 
 pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let position_asset: Vec<PositionAsset> = sqlx::query_as::<_, PositionAsset>(
         r#"
@@ -39,7 +39,7 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         ))
 }
 pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let position_debt: Vec<PositionDebt> = sqlx::query_as::<_, PositionDebt>(
         r#"
@@ -71,7 +71,7 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
         ))
 }
 pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let position_ratio = sqlx::query_as::<_, PositionRatio>(
         r#"

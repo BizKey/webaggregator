@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn eventorders(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let event_orders: Vec<EventOrder> = sqlx::query_as::<_, EventOrder>(
         r#"

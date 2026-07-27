@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let errors: Vec<Error> = sqlx::query_as::<_, Error>(
         r#"

@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let events: Vec<Event> = sqlx::query_as::<_, Event>(
         r#"
@@ -41,7 +41,7 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 }
 
 pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let msgevents: Vec<MsgEvent> = sqlx::query_as::<_, MsgEvent>(
         r#"
@@ -74,7 +74,7 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 }
 
 pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let msgsend: Vec<MsgSend> =  sqlx::query_as::<_, MsgSend>(
         r#"

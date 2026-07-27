@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let symbols =  sqlx::query_as::<_, Symbol>(
         r#"
@@ -50,7 +50,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 }
 
 pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let symbols: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
         r#"
