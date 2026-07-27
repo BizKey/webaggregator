@@ -24,14 +24,12 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             PositionAssetTemplate {
                 position_asset,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {
@@ -58,14 +56,12 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             PositionDebtTemplate {
                 position_debt,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {
@@ -92,14 +88,12 @@ pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             PositinRatioTemplate {
                 position_ratio,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {

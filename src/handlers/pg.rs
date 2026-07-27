@@ -80,8 +80,6 @@ pub async fn pg(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Template render error")
         })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
@@ -91,7 +89,7 @@ pub async fn pg(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
                 pg_stats_table_index,
                 pg_stat_statements,
                 pg_stat_table_size,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {

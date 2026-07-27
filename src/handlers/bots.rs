@@ -38,8 +38,6 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let bots_count = bots.len();
     let init_balance: f64 = (20 * bots_count) as f64;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
@@ -47,7 +45,7 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
                 bots,
                 init_balance,
                 final_balance,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {

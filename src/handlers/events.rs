@@ -25,17 +25,18 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
-            EventsTemplate { events, elapsed_ms }
-                .render()
-                .map_err(|e| {
-                    error!("Template render error: {}", e);
-                    actix_web::error::ErrorInternalServerError("Template render error")
-                })?,
+            EventsTemplate {
+                events,
+                elapsed_ms: start.elapsed().as_millis(),
+            }
+            .render()
+            .map_err(|e| {
+                error!("Template render error: {}", e);
+                actix_web::error::ErrorInternalServerError("Template render error")
+            })?,
         ))
 }
 
@@ -57,14 +58,12 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             MsgEventTemplate {
                 msgevents,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {
@@ -92,14 +91,12 @@ pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         actix_web::error::ErrorInternalServerError("Template render error")
     })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             MsgSendTemplate {
                 msgsend,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {
