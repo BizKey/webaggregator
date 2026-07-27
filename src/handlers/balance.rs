@@ -8,7 +8,7 @@ use crate::api::models::Balance;
 use crate::api::templates::BalanceTemplate;
 
 pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let balances: Vec<Balance> = sqlx::query_as::<_, Balance>(
         r#"
@@ -24,14 +24,12 @@ pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
             actix_web::error::ErrorInternalServerError("Database error")
         })?;
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             BalanceTemplate {
                 balances,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {

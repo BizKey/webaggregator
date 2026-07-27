@@ -8,7 +8,7 @@ use sqlx::PgPool;
 use std::time::Instant;
 
 pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let symbols =  sqlx::query_as::<_, Symbol>(
         r#"
@@ -34,14 +34,12 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .map(|(i, v)| (i + 1, v))
         .collect();
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             SymbolsTemplate {
                 symbols,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {
@@ -52,7 +50,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 }
 
 pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
-    let start: Instant = Instant::now();
+    let start = Instant::now();
 
     let symbols: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
         r#"
@@ -78,14 +76,12 @@ pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .map(|(i, v)| (i + 1, v))
         .collect();
 
-    let elapsed_ms: u128 = start.elapsed().as_millis();
-
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             SymbolsTemplate {
                 symbols,
-                elapsed_ms,
+                elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
             .map_err(|e| {
