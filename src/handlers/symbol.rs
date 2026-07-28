@@ -52,7 +52,7 @@ pub async fn tradeable(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 pub async fn symbols(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let symbols: Vec<Symbol> = sqlx::query_as::<_, Symbol>(
+    let symbols = sqlx::query_as::<_, Symbol>(
         r#"
         SELECT exchange, symbol, symbol_name, base_currency, quote_currency, 
         fee_currency, market, base_min_size, quote_min_size, base_max_size, 

@@ -10,7 +10,7 @@ use crate::api::templates::BalanceTemplate;
 pub async fn balances(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let balances: Vec<Balance> = sqlx::query_as::<_, Balance>(
+    let balances = sqlx::query_as::<_, Balance>(
         r#"
         SELECT exchange, account_id, available, available_change, currency, hold_value, hold_change, relation_event, relation_event_id, event_time, total, symbol, order_id, trade_id, updated_at
         FROM balance

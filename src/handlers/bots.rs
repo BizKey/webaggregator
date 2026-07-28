@@ -10,7 +10,7 @@ use std::time::Instant;
 pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let bots_list: Vec<Bots> = sqlx::query_as::<_, Bots>(
+    let bots_list = sqlx::query_as::<_, Bots>(
         r#"
         SELECT exchange, entry_client_oid, exit_tp_order_id, exit_tp_client_oid, exit_sl_order_id, exit_sl_client_oid, symbol, balance, updated_at
         FROM bots
@@ -30,13 +30,13 @@ pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
         .map(|(i, v)| (i + 1, v))
         .collect();
 
-    let final_balance: f64 = bots
+    let final_balance = bots
         .iter()
         .filter_map(|(_, bot)| bot.balance.as_ref().and_then(|s| s.parse::<f64>().ok()))
         .sum();
 
     let bots_count = bots.len();
-    let init_balance: f64 = (20 * bots_count) as f64;
+    let init_balance = (20 * bots_count) as f64;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

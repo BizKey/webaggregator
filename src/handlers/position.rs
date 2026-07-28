@@ -9,7 +9,7 @@ use tracing::error;
 pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let position_asset: Vec<PositionAsset> = sqlx::query_as::<_, PositionAsset>(
+    let position_asset = sqlx::query_as::<_, PositionAsset>(
         r#"
         SELECT exchange, asset_symbol, asset_total, asset_available, asset_hold, updated_at
         FROM positionasset
@@ -41,7 +41,7 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
 pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let position_debt: Vec<PositionDebt> = sqlx::query_as::<_, PositionDebt>(
+    let position_debt = sqlx::query_as::<_, PositionDebt>(
         r#"
         SELECT exchange, debt_symbol, debt_value, updated_at
         FROM positiondebt

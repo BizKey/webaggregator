@@ -10,7 +10,7 @@ use std::time::Instant;
 pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let events: Vec<Event> = sqlx::query_as::<_, Event>(
+    let events = sqlx::query_as::<_, Event>(
         r#"
         SELECT exchange, msg, updated_at
         FROM events
@@ -43,7 +43,7 @@ pub async fn events(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let msgevents: Vec<MsgEvent> = sqlx::query_as::<_, MsgEvent>(
+    let msgevents = sqlx::query_as::<_, MsgEvent>(
         r#"
         SELECT exchange, msg, code, borrow_size, client_oid, order_id, loan_apply_id, limit_rate, reset_rate, remaining_rate, in_time, out_time, updated_at
         FROM msgevent
@@ -76,7 +76,7 @@ pub async fn msgevent(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
 pub async fn msgsend(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let msgsend: Vec<MsgSend> =  sqlx::query_as::<_, MsgSend>(
+    let msgsend =  sqlx::query_as::<_, MsgSend>(
         r#"
         SELECT exchange, args_symbol, args_side, args_size, args_funds, args_price, args_time_in_force, args_type, args_auto_borrow, args_auto_repay, args_client_oid, args_order_id, updated_at
         FROM msgsend

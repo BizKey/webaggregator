@@ -10,7 +10,7 @@ use std::time::Instant;
 pub async fn errors(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let errors: Vec<Error> = sqlx::query_as::<_, Error>(
+    let errors = sqlx::query_as::<_, Error>(
         r#"
         SELECT exchange, msg, updated_at
         FROM errors
