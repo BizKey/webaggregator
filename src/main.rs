@@ -2,12 +2,18 @@ mod application;
 mod domain;
 mod infrastructure;
 
-use crate::application::services::*;
-use crate::domain::repositories::*;
+use crate::application::services::{
+    BalanceService, BotService, CurrencyService, ErrorService, EventService, OrderService,
+    PgStatService, PositionService, SymbolService, TickerService,
+};
 use crate::infrastructure::config::AppConfig;
 use crate::infrastructure::db::postgres::repositories::*;
 use crate::infrastructure::logging::init_tracing;
-use crate::infrastructure::web::handlers::*;
+use crate::infrastructure::web::handlers::{
+    favicon, get_balances, get_bots, get_currencies, get_errors, get_events, get_index,
+    get_msg_events, get_msg_sends, get_orders, get_pg_stats, get_position_assets,
+    get_position_debts, get_position_ratios, get_symbols, get_tickers, serve_css,
+};
 use actix_web::{App, HttpServer, middleware, web};
 use anyhow::{Context, Result};
 use dotenvy::dotenv;
