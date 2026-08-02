@@ -97,29 +97,17 @@ async fn main() -> Result<()> {
     let pool = create_db_pool(&config).await?;
     info!("Database connected");
 
-    // Create repositories
-    let ticker_repo = PostgresTickerRepository::new(pool.clone());
-    let symbol_repo = PostgresSymbolRepository::new(pool.clone());
-    let currency_repo = PostgresCurrencyRepository::new(pool.clone());
-    let balance_repo = PostgresBalanceRepository::new(pool.clone());
-    let position_repo = PostgresPositionRepository::new(pool.clone());
-    let order_repo = PostgresOrderRepository::new(pool.clone());
-    let bot_repo = PostgresBotRepository::new(pool.clone());
-    let event_repo = PostgresEventRepository::new(pool.clone());
-    let error_repo = PostgresErrorRepository::new(pool.clone());
-    let pg_stat_repo = PostgresPgStatRepository::new(pool.clone());
-
     // Create services
-    let ticker_service = TickerService::new(ticker_repo);
-    let symbol_service = SymbolService::new(symbol_repo);
-    let currency_service = CurrencyService::new(currency_repo);
-    let balance_service = BalanceService::new(balance_repo);
-    let position_service = PositionService::new(position_repo);
-    let order_service = OrderService::new(order_repo);
-    let bot_service = BotService::new(bot_repo);
-    let event_service = EventService::new(event_repo);
-    let error_service = ErrorService::new(error_repo);
-    let pg_stat_service = PgStatService::new(pg_stat_repo);
+    let ticker_service = TickerService::new(PostgresTickerRepository::new(pool.clone()));
+    let symbol_service = SymbolService::new(PostgresSymbolRepository::new(pool.clone()));
+    let currency_service = CurrencyService::new(PostgresCurrencyRepository::new(pool.clone()));
+    let balance_service = BalanceService::new(PostgresBalanceRepository::new(pool.clone()));
+    let position_service = PositionService::new(PostgresPositionRepository::new(pool.clone()));
+    let order_service = OrderService::new(PostgresOrderRepository::new(pool.clone()));
+    let bot_service = BotService::new(PostgresBotRepository::new(pool.clone()));
+    let event_service = EventService::new(PostgresEventRepository::new(pool.clone()));
+    let error_service = ErrorService::new(PostgresErrorRepository::new(pool.clone()));
+    let pg_stat_service = PgStatService::new(PostgresPgStatRepository::new(pool.clone()));
 
     let server = HttpServer::new(move || {
         App::new()
