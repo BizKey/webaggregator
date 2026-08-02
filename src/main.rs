@@ -1,24 +1,13 @@
-mod api {
-    pub mod models;
-    pub mod templates;
-    pub mod tools;
-}
-mod handlers;
-use crate::api::tools::get_env;
-use crate::handlers::{
-    balance::balances,
-    bots::bots,
-    currency::currencies,
-    errors::errors,
-    events::{events, msgevent, msgsend},
-    index::index,
-    orders::eventorders,
-    pg::pg,
-    position::{positionasset, positiondebt, positionratio},
-    symbol::{symbols, tradeable},
-    system::{favicon, serve_css},
-    ticker::tickers,
-};
+mod application;
+mod domain;
+mod infrastructure;
+
+use crate::application::services::*;
+use crate::domain::repositories::*;
+use crate::infrastructure::config::AppConfig;
+use crate::infrastructure::db::postgres::repositories::*;
+use crate::infrastructure::logging::init_tracing;
+use crate::infrastructure::web::handlers::*;
 use actix_web::{App, HttpServer, middleware, web};
 use anyhow::{Context, Result};
 use dotenvy::dotenv;
@@ -26,72 +15,125 @@ use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
 use tracing::info;
 
-fn init_tracing() {
-    tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-        .with_target(true)
-        .with_thread_ids(true)
-        .init();
-}
-
-async fn create_db_pool() -> Result<PgPool> {
-    let database_url = get_env("DATABASE_URL")?;
-
+async fn create_db_pool(config: &AppConfig) -> Result<PgPool> {
     Ok(PgPoolOptions::new()
-        .max_connections(10)
-        .min_connections(1)
+        .max_connections(config.max_connections)
+        .min_connections(config.min_connections)
         .acquire_timeout(Duration::from_secs(10))
         .idle_timeout(Duration::from_secs(600))
         .max_lifetime(Duration::from_secs(1800))
-        .connect(&database_url)
+        .connect(&config.database_url)
         .await
         .context("Failed to connect to PostgreSQL")?)
 }
 
 fn routes(cfg: &mut web::ServiceConfig) {
     use web::get;
-    cfg.route("/", get().to(index))
-        .route("/pg", get().to(pg))
-        .route("/events", get().to(events))
-        .route("/errors", get().to(errors))
-        .route("/balance", get().to(balances))
-        .route("/eventorder", get().to(eventorders))
-        .route("/positiondebt", get().to(positiondebt))
-        .route("/msgevent", get().to(msgevent))
-        .route("/msgsend", get().to(msgsend))
-        .route("/positionasset", get().to(positionasset))
-        .route("/positionratio", get().to(positionratio))
-        .route("/tradeable", get().to(tradeable))
-        .route("/tickers", get().to(tickers))
-        .route("/currencies", get().to(currencies))
-        .route("/symbols", get().to(symbols))
-        .route("/bots", get().to(bots))
+    cfg.route("/", get().to(get_index))
+        .route(
+            "/tickers",
+            get().to(get_tickers::<PostgresTickerRepository>),
+        )
+        .route(
+            "/symbols",
+            get().to(get_symbols::<PostgresSymbolRepository>),
+        )
+        .route(
+            "/currencies",
+            get().to(get_currencies::<PostgresCurrencyRepository>),
+        )
+        .route(
+            "/balance",
+            get().to(get_balances::<PostgresBalanceRepository>),
+        )
+        .route(
+            "/positionasset",
+            get().to(get_position_assets::<PostgresPositionRepository>),
+        )
+        .route(
+            "/positiondebt",
+            get().to(get_position_debts::<PostgresPositionRepository>),
+        )
+        .route(
+            "/positionratio",
+            get().to(get_position_ratios::<PostgresPositionRepository>),
+        )
+        .route(
+            "/eventorder",
+            get().to(get_orders::<PostgresOrderRepository>),
+        )
+        .route("/bots", get().to(get_bots::<PostgresBotRepository>))
+        .route("/events", get().to(get_events::<PostgresEventRepository>))
+        .route(
+            "/msgevent",
+            get().to(get_msg_events::<PostgresEventRepository>),
+        )
+        .route(
+            "/msgsend",
+            get().to(get_msg_sends::<PostgresEventRepository>),
+        )
+        .route("/errors", get().to(get_errors::<PostgresErrorRepository>))
+        .route("/pg", get().to(get_pg_stats::<PostgresPgStatRepository>))
         .route("/static/style.css", get().to(serve_css))
         .route("/favicon.png", get().to(favicon));
 }
-
-const SERVER_ADDR: &str = "0.0.0.0:8080";
 
 #[actix_web::main]
 async fn main() -> Result<()> {
     init_tracing();
     dotenv().ok();
 
-    let pool = create_db_pool().await?;
+    let config = AppConfig::from_env().map_err(|e| anyhow::anyhow!(e))?;
+
+    info!("Configuration loaded");
+    info!("Server address: {}", config.server_addr);
+
+    let pool = create_db_pool(&config).await?;
     info!("Database connected");
+
+    // Create repositories
+    let ticker_repo = PostgresTickerRepository::new(pool.clone());
+    let symbol_repo = PostgresSymbolRepository::new(pool.clone());
+    let currency_repo = PostgresCurrencyRepository::new(pool.clone());
+    let balance_repo = PostgresBalanceRepository::new(pool.clone());
+    let position_repo = PostgresPositionRepository::new(pool.clone());
+    let order_repo = PostgresOrderRepository::new(pool.clone());
+    let bot_repo = PostgresBotRepository::new(pool.clone());
+    let event_repo = PostgresEventRepository::new(pool.clone());
+    let error_repo = PostgresErrorRepository::new(pool.clone());
+    let pg_stat_repo = PostgresPgStatRepository::new(pool.clone());
+
+    // Create services
+    let ticker_service = TickerService::new(ticker_repo);
+    let symbol_service = SymbolService::new(symbol_repo);
+    let currency_service = CurrencyService::new(currency_repo);
+    let balance_service = BalanceService::new(balance_repo);
+    let position_service = PositionService::new(position_repo);
+    let order_service = OrderService::new(order_repo);
+    let bot_service = BotService::new(bot_repo);
+    let event_service = EventService::new(event_repo);
+    let error_service = ErrorService::new(error_repo);
+    let pg_stat_service = PgStatService::new(pg_stat_repo);
 
     let server = HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(ticker_service.clone()))
+            .app_data(web::Data::new(symbol_service.clone()))
+            .app_data(web::Data::new(currency_service.clone()))
+            .app_data(web::Data::new(balance_service.clone()))
+            .app_data(web::Data::new(position_service.clone()))
+            .app_data(web::Data::new(order_service.clone()))
+            .app_data(web::Data::new(bot_service.clone()))
+            .app_data(web::Data::new(event_service.clone()))
+            .app_data(web::Data::new(error_service.clone()))
+            .app_data(web::Data::new(pg_stat_service.clone()))
             .wrap(middleware::Compress::default())
             .configure(routes)
     })
-    .bind(SERVER_ADDR)
-    .with_context(|| format!("Failed to bind server to {SERVER_ADDR}"))?;
+    .bind(&config.server_addr)
+    .with_context(|| format!("Failed to bind server to {}", config.server_addr))?;
 
-    info!("Server running on http://0.0.0.0:8080");
-
+    info!("Server running on http://{}", config.server_addr);
     server.run().await.context("Server crashed")?;
-
     Ok(())
 }
