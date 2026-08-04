@@ -1,7 +1,6 @@
 mod application;
 mod domain;
 mod infrastructure;
-
 use crate::application::services::{
     BalanceService, BotService, CurrencyService, ErrorService, EventService, OrderService,
     PgStatService, PositionService, SymbolService, TickerService,
@@ -19,6 +18,7 @@ use anyhow::{Context, Result};
 use dotenvy::dotenv;
 use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
+use tokio::signal;
 use tracing::info;
 
 async fn create_db_pool(config: &AppConfig) -> Result<PgPool> {
@@ -84,6 +84,31 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .route("/favicon.png", get().to(favicon));
 }
 
+async fn shutdown_signal() {
+    let sigint = async {
+        signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+        info!("Received SIGINT (Ctrl+C)");
+    };
+
+    #[cfg(unix)]
+    let sigterm = async {
+        use tokio::signal::unix::{SignalKind, signal};
+        let mut sig = signal(SignalKind::terminate()).expect("Failed to install SIGTERM handler");
+        sig.recv().await;
+        info!("Received SIGTERM");
+    };
+
+    #[cfg(not(unix))]
+    let sigterm = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = sigint => {},
+        _ = sigterm => {},
+    }
+}
+
 #[actix_web::main]
 async fn main() -> Result<()> {
     init_tracing();
@@ -128,6 +153,19 @@ async fn main() -> Result<()> {
     .with_context(|| format!("Failed to bind server to {}", config.server_addr))?;
 
     info!("Server running on http://{}", config.server_addr);
-    server.run().await.context("Server crashed")?;
+
+    let server_handle = server.run();
+    let server_task = tokio::spawn(server_handle);
+
+    shutdown_signal().await;
+    info!("Initiating graceful shutdown...");
+
+    server_task.abort();
+    info!("HTTP server stopped");
+
+    pool.close().await;
+    info!("Database pool closed");
+
+    info!("Shutdown complete");
     Ok(())
 }

@@ -1,5 +1,4 @@
 use crate::domain::entities::{PositionAsset, PositionDebt, PositionRatio};
-use crate::domain::value_objects::{Money};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -18,9 +17,9 @@ impl From<PositionAssetModel> for PositionAsset {
         Self {
             exchange: model.exchange,
             asset_symbol: model.asset_symbol,
-            asset_total: Money::new(model.asset_total.parse().unwrap_or(0.0)),
-            asset_available: Money::new(model.asset_available.parse().unwrap_or(0.0)),
-            asset_hold: Money::new(model.asset_hold.parse().unwrap_or(0.0)),
+            asset_total: model.asset_total,
+            asset_available: model.asset_available,
+            asset_hold: model.asset_hold,
             updated_at: model.updated_at,
         }
     }
@@ -39,7 +38,7 @@ impl From<PositionDebtModel> for PositionDebt {
         Self {
             exchange: model.exchange,
             debt_symbol: model.debt_symbol,
-            debt_value: Money::new(model.debt_value.parse().unwrap_or(0.0)),
+            debt_value: model.debt_value,
             updated_at: model.updated_at,
         }
     }

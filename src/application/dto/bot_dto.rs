@@ -18,13 +18,13 @@ pub struct BotDto {
 impl From<Bot> for BotDto {
     fn from(bot: Bot) -> Self {
         Self {
-            exchange: bot.exchange.map(|e| e.as_str().to_string()),
+            exchange: bot.exchange,
             entry_client_oid: bot.entry_client_oid,
             exit_tp_order_id: bot.exit_tp_order_id,
             exit_tp_client_oid: bot.exit_tp_client_oid,
             exit_sl_order_id: bot.exit_sl_order_id,
             exit_sl_client_oid: bot.exit_sl_client_oid,
-            symbol: bot.symbol.map(|s| s.as_str().to_string()),
+            symbol: bot.symbol,
             balance: bot.balance,
             updated_at: bot.updated_at,
         }

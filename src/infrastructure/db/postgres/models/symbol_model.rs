@@ -1,5 +1,4 @@
 use crate::domain::entities::Symbol;
-use crate::domain::value_objects::{Money};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -40,22 +39,20 @@ impl From<SymbolModel> for Symbol {
             quote_currency: model.quote_currency,
             fee_currency: model.fee_currency,
             market: model.market,
-            base_min_size: Money::new(model.base_min_size.parse().unwrap_or(0.0)),
-            quote_min_size: Money::new(model.quote_min_size.parse().unwrap_or(0.0)),
-            base_max_size: Money::new(model.base_max_size.parse().unwrap_or(0.0)),
-            quote_max_size: Money::new(model.quote_max_size.parse().unwrap_or(0.0)),
-            base_increment: Money::new(model.base_increment.parse().unwrap_or(0.0)),
-            quote_increment: Money::new(model.quote_increment.parse().unwrap_or(0.0)),
-            price_increment: Money::new(model.price_increment.parse().unwrap_or(0.0)),
+            base_min_size: model.base_min_size,
+            quote_min_size: model.quote_min_size,
+            base_max_size: model.base_max_size,
+            quote_max_size: model.quote_max_size,
+            base_increment: model.base_increment,
+            quote_increment: model.quote_increment,
+            price_increment: model.price_increment,
             price_limit_rate: model.price_limit_rate,
-            min_funds: model
-                .min_funds
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
+            min_funds: model.min_funds,
             is_margin_enabled: model.is_margin_enabled,
             enable_trading: model.enable_trading,
             fee_category: model.fee_category,
-            maker_fee_coefficient: model.maker_fee_coefficient.parse().unwrap_or(0.0),
-            taker_fee_coefficient: model.taker_fee_coefficient.parse().unwrap_or(0.0),
+            maker_fee_coefficient: model.maker_fee_coefficient,
+            taker_fee_coefficient: model.taker_fee_coefficient,
             st: model.st,
             updated_at: model.updated_at,
         }
