@@ -24,6 +24,4 @@ pub use ticker_service::TickerService;
 pub enum ServiceError {
     #[error("Repository error: {0}")]
     Repository(String),
-    #[error("Not found")]
-    NotFound,
 }

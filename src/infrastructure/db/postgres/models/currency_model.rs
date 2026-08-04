@@ -1,5 +1,4 @@
 use crate::domain::entities::Currency;
-use crate::domain::value_objects::Exchange;
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -18,7 +17,7 @@ pub struct CurrencyModel {
 impl From<CurrencyModel> for Currency {
     fn from(model: CurrencyModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
+            exchange: model.exchange,
             currency: model.currency,
             currency_name: model.currency_name,
             full_name: model.full_name,

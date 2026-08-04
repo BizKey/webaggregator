@@ -1,7 +1,4 @@
 use crate::domain::entities::EventOrder;
-use crate::domain::value_objects::{
-    Exchange, Money, OrderSide, OrderStatus, OrderType, SymbolName,
-};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -36,41 +33,27 @@ pub struct EventOrderModel {
 impl From<EventOrderModel> for EventOrder {
     fn from(model: EventOrderModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
-            status: OrderStatus::from(model.status),
+            exchange: model.exchange,
+            status: model.status,
             type_: model.type_,
-            symbol: SymbolName::new(model.symbol),
-            side: OrderSide::from(model.side),
-            order_type: OrderType::from(model.order_type),
+            symbol: model.symbol,
+            side: model.side,
+            order_type: model.order_type,
             fee_type: model.fee_type,
             liquidity: model.liquidity,
-            price: model.price.map(|s| Money::new(s.parse().unwrap_or(0.0))),
+            price: model.price,
             order_id: model.order_id,
             client_oid: model.client_oid,
             trade_id: model.trade_id,
-            origin_size: model
-                .origin_size
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            size: model.size.map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            filled_size: model
-                .filled_size
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            match_size: model
-                .match_size
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            match_price: model
-                .match_price
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            canceled_size: model
-                .canceled_size
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            old_size: model.old_size.map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            remain_size: model
-                .remain_size
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
-            remain_funds: model
-                .remain_funds
-                .map(|s| Money::new(s.parse().unwrap_or(0.0))),
+            origin_size: model.origin_size,
+            size: model.size,
+            filled_size: model.filled_size,
+            match_size: model.match_size,
+            match_price: model.match_price,
+            canceled_size: model.canceled_size,
+            old_size: model.old_size,
+            remain_size: model.remain_size,
+            remain_funds: model.remain_funds,
             order_time: model.order_time,
             ts: model.ts,
             updated_at: model.updated_at,
