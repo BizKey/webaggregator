@@ -1,5 +1,5 @@
 use crate::domain::entities::Symbol;
-use crate::domain::value_objects::{Exchange, Money, Percentage, SymbolName};
+use crate::domain::value_objects::{Exchange, Money, SymbolName};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -47,7 +47,7 @@ impl From<SymbolModel> for Symbol {
             base_increment: Money::new(model.base_increment.parse().unwrap_or(0.0)),
             quote_increment: Money::new(model.quote_increment.parse().unwrap_or(0.0)),
             price_increment: Money::new(model.price_increment.parse().unwrap_or(0.0)),
-            price_limit_rate: Percentage::new(model.price_limit_rate.parse().unwrap_or(0.0)),
+            price_limit_rate: model.price_limit_rate,
             min_funds: model
                 .min_funds
                 .map(|s| Money::new(s.parse().unwrap_or(0.0))),
