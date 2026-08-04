@@ -1,11 +1,10 @@
-use crate::domain::value_objects::{Exchange, SymbolName};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Ticker {
-    pub exchange: Exchange,
-    pub symbol: SymbolName,
+    pub exchange: String,
+    pub symbol: String,
     pub symbol_name: String,
     pub taker_fee_rate: Option<String>,
     pub maker_fee_rate: Option<String>,
@@ -16,8 +15,8 @@ pub struct Ticker {
 
 impl Ticker {
     pub fn new(
-        exchange: Exchange,
-        symbol: SymbolName,
+        exchange: String,
+        symbol: String,
         symbol_name: String,
         taker_fee_rate: Option<String>,
         maker_fee_rate: Option<String>,

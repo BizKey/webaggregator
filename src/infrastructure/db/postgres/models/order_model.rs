@@ -1,5 +1,5 @@
 use crate::domain::entities::EventOrder;
-use crate::domain::value_objects::{Exchange, Money, OrderStatus, SymbolName};
+use crate::domain::value_objects::{Money};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -34,10 +34,10 @@ pub struct EventOrderModel {
 impl From<EventOrderModel> for EventOrder {
     fn from(model: EventOrderModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
-            status: OrderStatus::from(model.status),
+            exchange: model.exchange,
+            status: model.status,
             type_: model.type_,
-            symbol: SymbolName::new(model.symbol),
+            symbol: model.symbol,
             side: model.side,
             order_type: model.order_type,
             fee_type: model.fee_type,

@@ -1,5 +1,5 @@
 use crate::domain::entities::Balance;
-use crate::domain::value_objects::{Exchange, Money, SymbolName};
+use crate::domain::value_objects::{Money};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -25,7 +25,7 @@ pub struct BalanceModel {
 impl From<BalanceModel> for Balance {
     fn from(model: BalanceModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
+            exchange: model.exchange,
             account_id: model.account_id,
             available: Money::new(model.available.parse().unwrap_or(0.0)),
             available_change: Money::new(model.available_change.parse().unwrap_or(0.0)),
@@ -36,7 +36,7 @@ impl From<BalanceModel> for Balance {
             relation_event_id: model.relation_event_id,
             event_time: model.event_time,
             total: Money::new(model.total.parse().unwrap_or(0.0)),
-            symbol: model.symbol.map(SymbolName::new),
+            symbol: model.symbol,
             order_id: model.order_id,
             trade_id: model.trade_id,
             updated_at: model.updated_at,

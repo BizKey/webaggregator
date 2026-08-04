@@ -1,5 +1,4 @@
 use crate::domain::entities::Error;
-use crate::domain::value_objects::Exchange;
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -13,7 +12,7 @@ pub struct ErrorModel {
 impl From<ErrorModel> for Error {
     fn from(model: ErrorModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
+            exchange: model.exchange,
             msg: model.msg,
             updated_at: model.updated_at,
         }

@@ -1,5 +1,4 @@
 use crate::domain::entities::Ticker;
-use crate::domain::value_objects::{Exchange, SymbolName};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -18,8 +17,8 @@ pub struct TickerModel {
 impl From<TickerModel> for Ticker {
     fn from(model: TickerModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
-            symbol: SymbolName::new(model.symbol),
+            exchange: model.exchange,
+            symbol: model.symbol,
             symbol_name: model.symbol_name,
             taker_fee_rate: model.taker_fee_rate,
             maker_fee_rate: model.maker_fee_rate,

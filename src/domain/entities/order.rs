@@ -1,13 +1,13 @@
-use crate::domain::value_objects::{Exchange, Money, OrderStatus, SymbolName};
+use crate::domain::value_objects::{Money};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EventOrder {
-    pub exchange: Exchange,
-    pub status: OrderStatus,
+    pub exchange: String,
+    pub status: String,
     pub type_: String,
-    pub symbol: SymbolName,
+    pub symbol: String,
     pub side: String,
     pub order_type: String,
     pub fee_type: Option<String>,
@@ -32,10 +32,10 @@ pub struct EventOrder {
 
 impl EventOrder {
     pub fn new(
-        exchange: Exchange,
-        status: OrderStatus,
+        exchange: String,
+        status: String,
         type_: String,
-        symbol: SymbolName,
+        symbol: String,
         side: String,
         order_type: String,
         fee_type: Option<String>,

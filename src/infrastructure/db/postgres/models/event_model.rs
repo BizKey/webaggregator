@@ -1,5 +1,4 @@
 use crate::domain::entities::{Event, MsgEvent, MsgSend};
-use crate::domain::value_objects::Exchange;
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -13,7 +12,7 @@ pub struct EventModel {
 impl From<EventModel> for Event {
     fn from(model: EventModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
+            exchange: model.exchange,
             msg: model.msg,
             updated_at: model.updated_at,
         }
@@ -40,7 +39,7 @@ pub struct MsgEventModel {
 impl From<MsgEventModel> for MsgEvent {
     fn from(model: MsgEventModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
+            exchange: model.exchange,
             msg: model.msg,
             code: model.code,
             borrow_size: model.borrow_size,
@@ -77,7 +76,7 @@ pub struct MsgSendModel {
 impl From<MsgSendModel> for MsgSend {
     fn from(model: MsgSendModel) -> Self {
         Self {
-            exchange: Exchange::new(model.exchange),
+            exchange: model.exchange,
             args_symbol: model.args_symbol,
             args_side: model.args_side,
             args_size: model.args_size,
