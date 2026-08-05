@@ -1,15 +1,16 @@
+use crate::domain::value_objects::Exchange;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Event {
-    pub exchange: String,
+    pub exchange: Exchange,
     pub msg: String,
     pub updated_at: DateTime<Utc>,
 }
 
 impl Event {
-    pub fn new(exchange: String, msg: String, updated_at: DateTime<Utc>) -> Self {
+    pub fn new(exchange: Exchange, msg: String, updated_at: DateTime<Utc>) -> Self {
         Self {
             exchange,
             msg,
@@ -20,7 +21,7 @@ impl Event {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MsgEvent {
-    pub exchange: String,
+    pub exchange: Exchange,
     pub msg: Option<String>,
     pub code: Option<String>,
     pub borrow_size: Option<String>,
@@ -37,7 +38,7 @@ pub struct MsgEvent {
 
 impl MsgEvent {
     pub fn new(
-        exchange: String,
+        exchange: Exchange,
         msg: Option<String>,
         code: Option<String>,
         borrow_size: Option<String>,
@@ -71,7 +72,7 @@ impl MsgEvent {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MsgSend {
-    pub exchange: String,
+    pub exchange: Exchange,
     pub args_symbol: Option<String>,
     pub args_side: Option<String>,
     pub args_size: Option<String>,
@@ -88,7 +89,7 @@ pub struct MsgSend {
 
 impl MsgSend {
     pub fn new(
-        exchange: String,
+        exchange: Exchange,
         args_symbol: Option<String>,
         args_side: Option<String>,
         args_size: Option<String>,

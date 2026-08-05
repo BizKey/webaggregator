@@ -1,10 +1,10 @@
-use crate::domain::value_objects::{Money};
+use crate::domain::value_objects::{Exchange, Money, SymbolName};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Balance {
-    pub exchange: String,
+    pub exchange: Exchange,
     pub account_id: String,
     pub available: Money,
     pub available_change: Money,
@@ -15,7 +15,7 @@ pub struct Balance {
     pub relation_event_id: String,
     pub event_time: String,
     pub total: Money,
-    pub symbol: Option<String>,
+    pub symbol: Option<SymbolName>,
     pub order_id: Option<String>,
     pub trade_id: Option<String>,
     pub updated_at: DateTime<Utc>,
@@ -23,7 +23,7 @@ pub struct Balance {
 
 impl Balance {
     pub fn new(
-        exchange: String,
+        exchange: Exchange,
         account_id: String,
         available: Money,
         available_change: Money,
@@ -34,7 +34,7 @@ impl Balance {
         relation_event_id: String,
         event_time: String,
         total: Money,
-        symbol: Option<String>,
+        symbol: Option<SymbolName>,
         order_id: Option<String>,
         trade_id: Option<String>,
         updated_at: DateTime<Utc>,

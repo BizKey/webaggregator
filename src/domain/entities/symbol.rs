@@ -1,11 +1,11 @@
-use crate::domain::value_objects::{Money};
+use crate::domain::value_objects::{Exchange, Money, SymbolName};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Symbol {
-    pub exchange: String,
-    pub symbol: String,
+    pub exchange: Exchange,
+    pub symbol: SymbolName,
     pub symbol_name: String,
     pub base_currency: String,
     pub quote_currency: String,
@@ -31,8 +31,8 @@ pub struct Symbol {
 
 impl Symbol {
     pub fn new(
-        exchange: String,
-        symbol: String,
+        exchange: Exchange,
+        symbol: SymbolName,
         symbol_name: String,
         base_currency: String,
         quote_currency: String,

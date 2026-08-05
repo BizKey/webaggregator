@@ -1,5 +1,5 @@
 use crate::domain::entities::Symbol;
-use crate::domain::value_objects::{Money};
+use crate::domain::value_objects::{Exchange, Money, SymbolName};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -33,8 +33,8 @@ pub struct SymbolModel {
 impl From<SymbolModel> for Symbol {
     fn from(model: SymbolModel) -> Self {
         Self {
-            exchange: model.exchange,
-            symbol: model.symbol,
+            exchange: Exchange::new(model.exchange),
+            symbol: SymbolName::new(model.symbol),
             symbol_name: model.symbol_name,
             base_currency: model.base_currency,
             quote_currency: model.quote_currency,

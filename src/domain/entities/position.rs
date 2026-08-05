@@ -1,11 +1,11 @@
-use crate::domain::value_objects::{Money};
+use crate::domain::value_objects::{Exchange, Money, SymbolName};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PositionAsset {
-    pub exchange: String,
-    pub asset_symbol: String,
+    pub exchange: Exchange,
+    pub asset_symbol: SymbolName,
     pub asset_total: Money,
     pub asset_available: Money,
     pub asset_hold: Money,
@@ -14,8 +14,8 @@ pub struct PositionAsset {
 
 impl PositionAsset {
     pub fn new(
-        exchange: String,
-        asset_symbol: String,
+        exchange: Exchange,
+        asset_symbol: SymbolName,
         asset_total: Money,
         asset_available: Money,
         asset_hold: Money,
@@ -34,16 +34,16 @@ impl PositionAsset {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PositionDebt {
-    pub exchange: String,
-    pub debt_symbol: String,
+    pub exchange: Exchange,
+    pub debt_symbol: SymbolName,
     pub debt_value: Money,
     pub updated_at: DateTime<Utc>,
 }
 
 impl PositionDebt {
     pub fn new(
-        exchange: String,
-        debt_symbol: String,
+        exchange: Exchange,
+        debt_symbol: SymbolName,
         debt_value: Money,
         updated_at: DateTime<Utc>,
     ) -> Self {
@@ -58,7 +58,7 @@ impl PositionDebt {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PositionRatio {
-    pub exchange: String,
+    pub exchange: Exchange,
     pub debt_ratio: f64,
     pub total_asset: f64,
     pub margin_coefficient_total_asset: String,
@@ -68,7 +68,7 @@ pub struct PositionRatio {
 
 impl PositionRatio {
     pub fn new(
-        exchange: String,
+        exchange: Exchange,
         debt_ratio: f64,
         total_asset: f64,
         margin_coefficient_total_asset: String,

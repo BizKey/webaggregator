@@ -1,9 +1,10 @@
+use crate::domain::value_objects::Exchange;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Currency {
-    pub exchange: String,
+    pub exchange: Exchange,
     pub currency: String,
     pub currency_name: String,
     pub full_name: String,
@@ -15,7 +16,7 @@ pub struct Currency {
 
 impl Currency {
     pub fn new(
-        exchange: String,
+        exchange: Exchange,
         currency: String,
         currency_name: String,
         full_name: String,

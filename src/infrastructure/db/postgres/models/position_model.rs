@@ -1,5 +1,5 @@
 use crate::domain::entities::{PositionAsset, PositionDebt, PositionRatio};
-use crate::domain::value_objects::{Money};
+use crate::domain::value_objects::{Exchange, Money, SymbolName};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -16,8 +16,8 @@ pub struct PositionAssetModel {
 impl From<PositionAssetModel> for PositionAsset {
     fn from(model: PositionAssetModel) -> Self {
         Self {
-            exchange: model.exchange,
-            asset_symbol: model.asset_symbol,
+            exchange: Exchange::new(model.exchange),
+            asset_symbol: SymbolName::new(model.asset_symbol),
             asset_total: Money::new(model.asset_total.parse().unwrap_or(0.0)),
             asset_available: Money::new(model.asset_available.parse().unwrap_or(0.0)),
             asset_hold: Money::new(model.asset_hold.parse().unwrap_or(0.0)),
@@ -37,8 +37,8 @@ pub struct PositionDebtModel {
 impl From<PositionDebtModel> for PositionDebt {
     fn from(model: PositionDebtModel) -> Self {
         Self {
-            exchange: model.exchange,
-            debt_symbol: model.debt_symbol,
+            exchange: Exchange::new(model.exchange),
+            debt_symbol: SymbolName::new(model.debt_symbol),
             debt_value: Money::new(model.debt_value.parse().unwrap_or(0.0)),
             updated_at: model.updated_at,
         }
@@ -58,7 +58,7 @@ pub struct PositionRatioModel {
 impl From<PositionRatioModel> for PositionRatio {
     fn from(model: PositionRatioModel) -> Self {
         Self {
-            exchange: model.exchange,
+            exchange: Exchange::new(model.exchange),
             debt_ratio: model.debt_ratio,
             total_asset: model.total_asset,
             margin_coefficient_total_asset: model.margin_coefficient_total_asset,
