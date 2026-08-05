@@ -1,4 +1,6 @@
-use crate::domain::value_objects::{Exchange, Money, OrderStatus, SymbolName};
+use crate::domain::value_objects::{
+    Exchange, Money, OrderSide, OrderStatus, OrderType, SymbolName,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -8,8 +10,8 @@ pub struct EventOrder {
     pub status: OrderStatus,
     pub type_: String,
     pub symbol: SymbolName,
-    pub side: String,
-    pub order_type: String,
+    pub side: OrderSide,
+    pub order_type: OrderType,
     pub fee_type: Option<String>,
     pub liquidity: Option<String>,
     pub price: Option<Money>,
@@ -36,8 +38,8 @@ impl EventOrder {
         status: OrderStatus,
         type_: String,
         symbol: SymbolName,
-        side: String,
-        order_type: String,
+        side: OrderSide,
+        order_type: OrderType,
         fee_type: Option<String>,
         liquidity: Option<String>,
         price: Option<Money>,

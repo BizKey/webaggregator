@@ -1,5 +1,5 @@
 use crate::domain::entities::Ticker;
-use crate::domain::value_objects::{Exchange, SymbolName};
+use crate::domain::value_objects::{Exchange, Percentage, SymbolName};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -8,8 +8,8 @@ pub struct TickerModel {
     pub exchange: String,
     pub symbol: String,
     pub symbol_name: String,
-    pub taker_fee_rate: Option<String>,
-    pub maker_fee_rate: Option<String>,
+    pub taker_fee_rate: Option<f64>,
+    pub maker_fee_rate: Option<f64>,
     pub taker_coefficient: Option<f64>,
     pub maker_coefficient: Option<f64>,
     pub updated_at: DateTime<Utc>,
@@ -21,8 +21,8 @@ impl From<TickerModel> for Ticker {
             exchange: Exchange::new(model.exchange),
             symbol: SymbolName::new(model.symbol),
             symbol_name: model.symbol_name,
-            taker_fee_rate: model.taker_fee_rate,
-            maker_fee_rate: model.maker_fee_rate,
+            taker_fee_rate: model.taker_fee_rate.map(Percentage::new),
+            maker_fee_rate: model.maker_fee_rate.map(Percentage::new),
             taker_coefficient: model.taker_coefficient,
             maker_coefficient: model.maker_coefficient,
             updated_at: model.updated_at,

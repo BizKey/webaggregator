@@ -1,4 +1,4 @@
-use crate::domain::value_objects::{Exchange, SymbolName};
+use crate::domain::value_objects::{Exchange, Percentage, SymbolName};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -7,8 +7,8 @@ pub struct Ticker {
     pub exchange: Exchange,
     pub symbol: SymbolName,
     pub symbol_name: String,
-    pub taker_fee_rate: Option<String>,
-    pub maker_fee_rate: Option<String>,
+    pub taker_fee_rate: Option<Percentage>,
+    pub maker_fee_rate: Option<Percentage>,
     pub taker_coefficient: Option<f64>,
     pub maker_coefficient: Option<f64>,
     pub updated_at: DateTime<Utc>,
@@ -19,8 +19,8 @@ impl Ticker {
         exchange: Exchange,
         symbol: SymbolName,
         symbol_name: String,
-        taker_fee_rate: Option<String>,
-        maker_fee_rate: Option<String>,
+        taker_fee_rate: Option<Percentage>,
+        maker_fee_rate: Option<Percentage>,
         taker_coefficient: Option<f64>,
         maker_coefficient: Option<f64>,
         updated_at: DateTime<Utc>,

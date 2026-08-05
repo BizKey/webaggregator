@@ -1,4 +1,4 @@
-use crate::domain::value_objects::{Exchange, Money, SymbolName};
+use crate::domain::value_objects::{Exchange, Money, Percentage, SymbolName};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -18,7 +18,7 @@ pub struct Symbol {
     pub base_increment: Money,
     pub quote_increment: Money,
     pub price_increment: Money,
-    pub price_limit_rate: String,
+    pub price_limit_rate: Percentage,
     pub min_funds: Option<Money>,
     pub is_margin_enabled: bool,
     pub enable_trading: bool,
@@ -45,7 +45,7 @@ impl Symbol {
         base_increment: Money,
         quote_increment: Money,
         price_increment: Money,
-        price_limit_rate: String,
+        price_limit_rate: Percentage,
         min_funds: Option<Money>,
         is_margin_enabled: bool,
         enable_trading: bool,
