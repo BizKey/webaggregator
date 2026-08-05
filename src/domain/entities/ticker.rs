@@ -12,3 +12,27 @@ pub struct Ticker {
     pub maker_coefficient: Option<f64>,
     pub updated_at: DateTime<Utc>,
 }
+
+impl Ticker {
+    pub fn new(
+        exchange: String,
+        symbol: String,
+        symbol_name: String,
+        taker_fee_rate: Option<String>,
+        maker_fee_rate: Option<String>,
+        taker_coefficient: Option<f64>,
+        maker_coefficient: Option<f64>,
+        updated_at: DateTime<Utc>,
+    ) -> Self {
+        Self {
+            exchange,
+            symbol,
+            symbol_name,
+            taker_fee_rate,
+            maker_fee_rate,
+            taker_coefficient,
+            maker_coefficient,
+            updated_at,
+        }
+    }
+}

@@ -6,9 +6,9 @@ use serde::Serialize;
 pub struct PositionAssetDto {
     pub exchange: String,
     pub asset_symbol: String,
-    pub asset_total: String,
-    pub asset_available: String,
-    pub asset_hold: String,
+    pub asset_total: f64,
+    pub asset_available: f64,
+    pub asset_hold: f64,
     pub updated_at: DateTime<Utc>,
 }
 
@@ -17,9 +17,9 @@ impl From<PositionAsset> for PositionAssetDto {
         Self {
             exchange: position.exchange.as_str().to_string(),
             asset_symbol: position.asset_symbol.as_str().to_string(),
-            asset_total: position.asset_total,
-            asset_available: position.asset_available,
-            asset_hold: position.asset_hold,
+            asset_total: position.asset_total.value(),
+            asset_available: position.asset_available.value(),
+            asset_hold: position.asset_hold.value(),
             updated_at: position.updated_at,
         }
     }
@@ -29,7 +29,7 @@ impl From<PositionAsset> for PositionAssetDto {
 pub struct PositionDebtDto {
     pub exchange: String,
     pub debt_symbol: String,
-    pub debt_value: String,
+    pub debt_value: f64,
     pub updated_at: DateTime<Utc>,
 }
 
@@ -38,7 +38,7 @@ impl From<PositionDebt> for PositionDebtDto {
         Self {
             exchange: position.exchange.as_str().to_string(),
             debt_symbol: position.debt_symbol.as_str().to_string(),
-            debt_value: position.debt_value,
+            debt_value: position.debt_value.value(),
             updated_at: position.updated_at,
         }
     }

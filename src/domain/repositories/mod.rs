@@ -24,4 +24,6 @@ pub use ticker_repository::*;
 pub enum RepositoryError {
     #[error("Database error: {0}")]
     Database(String),
+    #[error("Not found")]
+    NotFound,
 }

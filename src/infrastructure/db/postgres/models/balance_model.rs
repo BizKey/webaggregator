@@ -1,4 +1,5 @@
 use crate::domain::entities::Balance;
+use crate::domain::value_objects::{Money};
 use chrono::{DateTime, Utc};
 use sqlx::FromRow;
 
@@ -26,15 +27,15 @@ impl From<BalanceModel> for Balance {
         Self {
             exchange: model.exchange,
             account_id: model.account_id,
-            available: model.available,
-            available_change: model.available_change,
+            available: Money::new(model.available.parse().unwrap_or(0.0)),
+            available_change: Money::new(model.available_change.parse().unwrap_or(0.0)),
             currency: model.currency,
-            hold_value: model.hold_value,
-            hold_change: model.hold_change,
+            hold_value: Money::new(model.hold_value.parse().unwrap_or(0.0)),
+            hold_change: Money::new(model.hold_change.parse().unwrap_or(0.0)),
             relation_event: model.relation_event,
             relation_event_id: model.relation_event_id,
             event_time: model.event_time,
-            total: model.total,
+            total: Money::new(model.total.parse().unwrap_or(0.0)),
             symbol: model.symbol,
             order_id: model.order_id,
             trade_id: model.trade_id,
