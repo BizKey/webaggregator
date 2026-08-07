@@ -196,6 +196,7 @@ pub struct MsgSend {
 pub struct Bots {
     pub exchange: Option<String>,
     pub entry_client_oid: Option<String>,
+    pub entry_price: Option<String>,
     pub exit_tp_order_id: Option<String>,
     pub exit_tp_price: Option<String>,
     pub exit_tp_client_oid: Option<String>,
