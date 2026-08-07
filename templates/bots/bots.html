@@ -14,6 +14,7 @@
             <th>exchange</th>
             <th>balance</th>
             <th>entry_client_oid</th>
+            <th>entry_price</th>
             <th>exit_tp_price</th>
             <th>exit_tp_order_id</th>
             <th>exit_tp_client_oid</th>
@@ -41,6 +42,11 @@
             <td>
                 {% if let Some(entry_client_oid) = bot.entry_client_oid %}
                 {{ entry_client_oid }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(entry_price) = bot.entry_price %}
+                {{ entry_price }}
                 {% endif %}
             </td>
             <td>
