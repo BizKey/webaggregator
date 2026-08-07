@@ -14,9 +14,11 @@
             <th>exchange</th>
             <th>balance</th>
             <th>entry_client_oid</th>
+            <th>exit_tp_price</th>
             <th>exit_tp_order_id</th>
             <th>exit_tp_client_oid</th>
             <th>exit_sl_order_id</th>
+            <th>exit_sl_price</th>
             <th>exit_sl_client_oid</th>
             <th>symbol</th>
         </tr>
@@ -42,6 +44,11 @@
                 {% endif %}
             </td>
             <td>
+                {% if let Some(exit_tp_price) = bot.exit_tp_price %}
+                {{ exit_tp_price }}
+                {% endif %}
+            </td>
+            <td>
                 {% if let Some(exit_tp_order_id) = bot.exit_tp_order_id %}
                 {{ exit_tp_order_id }}
                 {% endif %}
@@ -49,6 +56,11 @@
             <td>
                 {% if let Some(exit_tp_client_oid) = bot.exit_tp_client_oid %}
                 {{ exit_tp_client_oid }}
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(exit_sl_price) = bot.exit_sl_price %}
+                {{ exit_sl_price }}
                 {% endif %}
             </td>
             <td>
