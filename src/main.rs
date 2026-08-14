@@ -3,8 +3,12 @@ mod api {
     pub mod templates;
     pub mod tools;
 }
+mod app_state;
 mod handlers;
+mod repositories;
+
 use crate::api::tools::get_env;
+use crate::app_state::AppState;
 use crate::handlers::{
     balance::balances,
     bots::bots,
@@ -80,9 +84,11 @@ async fn main() -> Result<()> {
     let pool = create_db_pool().await?;
     info!("Database connected");
 
+    let app_state = AppState::new(pool);
+
     let server = HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(app_state.clone()))
             .wrap(middleware::Compress::default())
             .configure(routes)
     })

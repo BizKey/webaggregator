@@ -1,28 +1,21 @@
-use crate::api::models::{PositionAsset, PositionDebt, PositionRatio};
 use crate::api::templates::{PositinRatioTemplate, PositionAssetTemplate, PositionDebtTemplate};
+use crate::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
-use sqlx::PgPool;
 use std::time::Instant;
 use tracing::error;
 
-pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
+pub async fn positionasset(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let position_asset = sqlx::query_as::<_, PositionAsset>(
-        r#"
-        SELECT exchange, asset_symbol, asset_total, asset_available, asset_hold, updated_at
-        FROM positionasset
-        ORDER BY updated_at
-        DESC LIMIT 1000;
-        "#,
-    )
-    .fetch_all(pool.as_ref())
-    .await
-    .map_err(|e| {
-        error!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
+    let position_asset = state
+        .position_repo
+        .get_position_assets()
+        .await
+        .map_err(|e| {
+            error!("Repository error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
@@ -38,23 +31,18 @@ pub async fn positionasset(pool: web::Data<PgPool>) -> ActixResult<HttpResponse>
             })?,
         ))
 }
-pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
+
+pub async fn positiondebt(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let position_debt = sqlx::query_as::<_, PositionDebt>(
-        r#"
-        SELECT exchange, debt_symbol, debt_value, updated_at
-        FROM positiondebt
-        ORDER BY updated_at
-        DESC LIMIT 1000;
-        "#,
-    )
-    .fetch_all(pool.as_ref())
-    .await
-    .map_err(|e| {
-        error!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
+    let position_debt = state
+        .position_repo
+        .get_position_debts()
+        .await
+        .map_err(|e| {
+            error!("Repository error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
@@ -70,23 +58,18 @@ pub async fn positiondebt(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> 
             })?,
         ))
 }
-pub async fn positionratio(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
+
+pub async fn positionratio(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let position_ratio = sqlx::query_as::<_, PositionRatio>(
-        r#"
-        SELECT exchange, debt_ratio, total_asset, margin_coefficient_total_asset, total_debt, updated_at
-        FROM positionratio
-        ORDER BY updated_at
-        DESC LIMIT 1000;
-        "#,
-    )
-    .fetch_all(pool.as_ref())
-    .await
-    .map_err(|e|{
-        error!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
-    })?;
+    let position_ratio = state
+        .position_repo
+        .get_position_ratios()
+        .await
+        .map_err(|e| {
+            error!("Repository error: {}", e);
+            actix_web::error::ErrorInternalServerError("Database error")
+        })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

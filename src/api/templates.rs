@@ -1,5 +1,5 @@
 use crate::api::models::{
-    Balance, Bots, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
+    Balance, Bot, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
     PositionRatio, Symbol, Ticker,
 };
@@ -64,7 +64,7 @@ pub struct MsgSendTemplate {
 #[derive(Template)]
 #[template(path = "bots/bots.html")]
 pub struct BotsTemplate {
-    pub bots: Vec<(usize, Bots)>,
+    pub bots: Vec<(usize, Bot)>,
     pub init_balance: f64,
     pub final_balance: f64,
     pub elapsed_ms: u128,

@@ -193,7 +193,7 @@ pub struct MsgSend {
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 #[derive(Debug, Serialize, Deserialize, FromRow)]
-pub struct Bots {
+pub struct Bot {
     pub exchange: Option<String>,
     pub entry_client_oid: Option<String>,
     pub entry_price: Option<String>,

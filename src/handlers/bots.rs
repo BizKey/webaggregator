@@ -1,30 +1,20 @@
-use crate::api::models::Bots;
+use crate::api::models::Bot;
 use crate::api::templates::BotsTemplate;
+use crate::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
+use std::time::Instant;
 use tracing::error;
 
-use sqlx::PgPool;
-use std::time::Instant;
-
-pub async fn bots(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
+pub async fn bots(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let bots_list = sqlx::query_as::<_, Bots>(
-        r#"
-        SELECT exchange, entry_price, entry_client_oid, exit_tp_price, exit_tp_order_id, exit_tp_client_oid, exit_sl_price, exit_sl_order_id, exit_sl_client_oid, symbol, balance, updated_at
-        FROM bots
-        ORDER BY updated_at DESC;
-        "#,
-    )
-    .fetch_all(pool.as_ref())
-    .await
-    .map_err(|e|{
-        error!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
+    let bots_list = state.bot_repo.get_bots().await.map_err(|e| {
+        error!("Repository error: {}", e);
+        actix_web::error::ErrorInternalServerError("Database error")
     })?;
 
-    let bots: Vec<(usize, Bots)> = bots_list
+    let bots: Vec<(usize, Bot)> = bots_list
         .into_iter()
         .enumerate()
         .map(|(i, v)| (i + 1, v))
