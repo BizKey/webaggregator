@@ -1,16 +1,10 @@
 mod api {
     pub mod models;
-    pub mod page;
     pub mod templates;
     pub mod tools;
 }
 mod handlers;
-
-use crate::api::templates::TickersContent;
-use crate::api::templates::{BotsContent, CurrenciesContent, PgContent, TickersContent};
 use crate::api::tools::get_env;
-use crate::api::tools::get_env;
-use crate::handlers::render_page;
 use crate::handlers::{
     balance::balances,
     bots::bots,
@@ -25,18 +19,11 @@ use crate::handlers::{
     system::{favicon, serve_css},
     ticker::tickers,
 };
-use crate::handlers::{favicon, index, render_page, serve_css};
-use actix_web::{App, HttpServer, middleware, web};
 use actix_web::{App, HttpServer, middleware, web};
 use anyhow::{Context, Result};
-use anyhow::{Context, Result};
-use dotenvy::dotenv;
 use dotenvy::dotenv;
 use sqlx::{PgPool, postgres::PgPoolOptions};
-use sqlx::{PgPool, postgres::PgPoolOptions};
 use std::time::Duration;
-use std::time::Duration;
-use tracing::info;
 use tracing::info;
 
 fn init_tracing() {
@@ -63,11 +50,22 @@ async fn create_db_pool() -> Result<PgPool> {
 
 fn routes(cfg: &mut web::ServiceConfig) {
     use web::get;
-    cfg.route("/", get().to(index::index))
-        .route("/tickers", get().to(render_page::<TickersContent>))
-        .route("/currencies", get().to(render_page::<CurrenciesContent>))
-        .route("/bots", get().to(render_page::<BotsContent>))
-        .route("/pg", get().to(render_page::<PgContent>))
+    cfg.route("/", get().to(index))
+        .route("/pg", get().to(pg))
+        .route("/events", get().to(events))
+        .route("/errors", get().to(errors))
+        .route("/balance", get().to(balances))
+        .route("/eventorder", get().to(eventorders))
+        .route("/positiondebt", get().to(positiondebt))
+        .route("/msgevent", get().to(msgevent))
+        .route("/msgsend", get().to(msgsend))
+        .route("/positionasset", get().to(positionasset))
+        .route("/positionratio", get().to(positionratio))
+        .route("/tradeable", get().to(tradeable))
+        .route("/tickers", get().to(tickers))
+        .route("/currencies", get().to(currencies))
+        .route("/symbols", get().to(symbols))
+        .route("/bots", get().to(bots))
         .route("/static/style.css", get().to(serve_css))
         .route("/favicon.png", get().to(favicon));
 }
