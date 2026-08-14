@@ -20,7 +20,7 @@ pub async fn favicon(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     match state.static_service.get_favicon().await {
         Ok(file) => Ok(HttpResponse::Ok()
             .content_type(file.content_type)
-            .insert_header(("Cache-Control", "public, max-age=86400")) // 24 часа
+            .insert_header(("Cache-Control", "public, max-age=86400"))
             .insert_header(("ETag", file.etag))
             .body(file.content)),
         Err(e) => {

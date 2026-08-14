@@ -1,4 +1,3 @@
-// src/services/mod.rs
 pub mod balance_service;
 pub mod bot_service;
 pub mod currency_service;

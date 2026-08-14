@@ -1,4 +1,3 @@
-// src/repositories/mod.rs
 pub mod balance_repository;
 pub mod bot_repository;
 pub mod currency_repository;

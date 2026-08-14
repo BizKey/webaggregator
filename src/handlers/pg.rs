@@ -8,7 +8,6 @@ use tracing::error;
 pub async fn pg(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    // Используем полную статистику из сервиса
     let stats = state.pg_service.get_full_stats().await.map_err(|e| {
         error!("Service error: {}", e);
         actix_web::error::ErrorInternalServerError("Service error")
