@@ -1,6 +1,6 @@
 use crate::api::models::Currency;
 use crate::api::templates::CurrenciesTemplate;
-use crate::app_state::AppState;
+use crate::core::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use std::time::Instant;
@@ -9,9 +9,9 @@ use tracing::error;
 pub async fn currencies(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let currencies = state.currency_repo.get_currencies().await.map_err(|e| {
-        error!("Repository error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
+    let currencies = state.currency_service.get_currencies().await.map_err(|e| {
+        error!("Service error: {}", e);
+        actix_web::error::ErrorInternalServerError("Service error")
     })?;
 
     let currencies: Vec<(usize, Currency)> = currencies

@@ -1,5 +1,5 @@
 use crate::api::templates::EventOrderTemplate;
-use crate::app_state::AppState;
+use crate::core::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use std::time::Instant;
@@ -8,9 +8,9 @@ use tracing::error;
 pub async fn eventorders(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let event_orders = state.order_repo.get_event_orders().await.map_err(|e| {
-        error!("Repository error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
+    let event_orders = state.order_service.get_event_orders().await.map_err(|e| {
+        error!("Service error: {}", e);
+        actix_web::error::ErrorInternalServerError("Service error")
     })?;
 
     Ok(HttpResponse::Ok()

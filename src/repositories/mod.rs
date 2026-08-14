@@ -1,3 +1,4 @@
+// src/repositories/mod.rs
 pub mod balance_repository;
 pub mod bot_repository;
 pub mod currency_repository;
@@ -19,7 +20,10 @@ pub use event_repository::{EventRepository, PostgresEventRepository};
 pub use msgevent_repository::{MsgEventRepository, PostgresMsgEventRepository};
 pub use msgsend_repository::{MsgSendRepository, PostgresMsgSendRepository};
 pub use order_repository::{EventOrderRepository, PostgresEventOrderRepository};
-pub use pg_repository::{PgRepository, PostgresPgRepository};
+pub use pg_repository::{
+    ConnectionStatsRepository, PostgresPgRepository, QueryStatsRepository, TableSizeRepository,
+    TableStatsRepository,
+};
 pub use position_repository::{PositionRepository, PostgresPositionRepository};
 pub use symbol_repository::{PostgresSymbolRepository, SymbolRepository};
 pub use ticker_repository::{PostgresTickerRepository, TickerRepository};

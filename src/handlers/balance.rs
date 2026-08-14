@@ -1,5 +1,5 @@
 use crate::api::templates::BalanceTemplate;
-use crate::app_state::AppState;
+use crate::core::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use std::time::Instant;
@@ -8,10 +8,14 @@ use tracing::error;
 pub async fn balances(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let balances = state.balance_repo.get_balances(1000).await.map_err(|e| {
-        error!("Repository error in balances handler: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
-    })?;
+    let balances = state
+        .balance_service
+        .get_balances(1000)
+        .await
+        .map_err(|e| {
+            error!("Service error: {}", e);
+            actix_web::error::ErrorInternalServerError("Service error")
+        })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")

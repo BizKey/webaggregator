@@ -1,17 +1,34 @@
-use super::RepositoryResult;
 use crate::api::models::{
     PgConnection, PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo,
 };
+use crate::core::error::AppResult;
 use async_trait::async_trait;
 use sqlx::PgPool;
 
 #[async_trait]
-pub trait PgRepository: Send + Sync {
-    async fn get_connections(&self) -> RepositoryResult<Vec<PgConnection>>;
-    async fn get_table_info(&self) -> RepositoryResult<Vec<PgTableInfo>>;
-    async fn get_table_indexes(&self) -> RepositoryResult<Vec<PgTableIndex>>;
-    async fn get_stat_statements(&self) -> RepositoryResult<Vec<PgStatStatements>>;
-    async fn get_table_sizes(&self) -> RepositoryResult<Vec<PgStatTableSize>>;
+pub trait ConnectionStatsRepository: Send + Sync {
+    async fn get_connections(&self) -> AppResult<Vec<PgConnection>>;
+}
+#[async_trait]
+pub trait TableStatsRepository: Send + Sync {
+    async fn get_table_info(&self) -> AppResult<Vec<PgTableInfo>>;
+    async fn get_table_indexes(&self) -> AppResult<Vec<PgTableIndex>>;
+}
+
+#[async_trait]
+pub trait QueryStatsRepository: Send + Sync {
+    async fn get_stat_statements(&self) -> AppResult<Vec<PgStatStatements>>;
+}
+
+#[async_trait]
+pub trait TableSizeRepository: Send + Sync {
+    async fn get_table_sizes(&self) -> AppResult<Vec<PgStatTableSize>>;
+}
+
+#[async_trait]
+pub trait PgRepository:
+    ConnectionStatsRepository + TableStatsRepository + QueryStatsRepository + TableSizeRepository
+{
 }
 
 pub struct PostgresPgRepository {
@@ -25,8 +42,8 @@ impl PostgresPgRepository {
 }
 
 #[async_trait]
-impl PgRepository for PostgresPgRepository {
-    async fn get_connections(&self) -> RepositoryResult<Vec<PgConnection>> {
+impl ConnectionStatsRepository for PostgresPgRepository {
+    async fn get_connections(&self) -> AppResult<Vec<PgConnection>> {
         let connections = sqlx::query_as::<_, PgConnection>(
             r#"
             SELECT count(*) AS total_connections, 
@@ -36,11 +53,13 @@ impl PgRepository for PostgresPgRepository {
         )
         .fetch_all(&self.pool)
         .await?;
-
         Ok(connections)
     }
+}
 
-    async fn get_table_info(&self) -> RepositoryResult<Vec<PgTableInfo>> {
+#[async_trait]
+impl TableStatsRepository for PostgresPgRepository {
+    async fn get_table_info(&self) -> AppResult<Vec<PgTableInfo>> {
         let info = sqlx::query_as::<_, PgTableInfo>(
             r#"
             SELECT schemaname, relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, 
@@ -53,8 +72,7 @@ impl PgRepository for PostgresPgRepository {
 
         Ok(info)
     }
-
-    async fn get_table_indexes(&self) -> RepositoryResult<Vec<PgTableIndex>> {
+    async fn get_table_indexes(&self) -> AppResult<Vec<PgTableIndex>> {
         let indexes = sqlx::query_as::<_, PgTableIndex>(
             r#"
             SELECT schemaname, relname, idx_scan, idx_tup_read, idx_tup_fetch
@@ -66,8 +84,11 @@ impl PgRepository for PostgresPgRepository {
 
         Ok(indexes)
     }
+}
 
-    async fn get_stat_statements(&self) -> RepositoryResult<Vec<PgStatStatements>> {
+#[async_trait]
+impl QueryStatsRepository for PostgresPgRepository {
+    async fn get_stat_statements(&self) -> AppResult<Vec<PgStatStatements>> {
         let statements = sqlx::query_as::<_, PgStatStatements>(
             r#"
             SELECT query, calls, total_exec_time, mean_exec_time, rows
@@ -80,8 +101,11 @@ impl PgRepository for PostgresPgRepository {
 
         Ok(statements)
     }
+}
 
-    async fn get_table_sizes(&self) -> RepositoryResult<Vec<PgStatTableSize>> {
+#[async_trait]
+impl TableSizeRepository for PostgresPgRepository {
+    async fn get_table_sizes(&self) -> AppResult<Vec<PgStatTableSize>> {
         let sizes = sqlx::query_as::<_, PgStatTableSize>(
             r#"
             SELECT schemaname, relname, 
@@ -97,3 +121,6 @@ impl PgRepository for PostgresPgRepository {
         Ok(sizes)
     }
 }
+
+#[async_trait]
+impl PgRepository for PostgresPgRepository {}

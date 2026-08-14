@@ -1,5 +1,5 @@
 use crate::api::templates::{PositinRatioTemplate, PositionAssetTemplate, PositionDebtTemplate};
-use crate::app_state::AppState;
+use crate::core::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use std::time::Instant;
@@ -9,12 +9,12 @@ pub async fn positionasset(state: web::Data<AppState>) -> ActixResult<HttpRespon
     let start = Instant::now();
 
     let position_asset = state
-        .position_repo
+        .position_service
         .get_position_assets()
         .await
         .map_err(|e| {
-            error!("Repository error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
+            error!("Service error: {}", e);
+            actix_web::error::ErrorInternalServerError("Service error")
         })?;
 
     Ok(HttpResponse::Ok()
@@ -36,12 +36,12 @@ pub async fn positiondebt(state: web::Data<AppState>) -> ActixResult<HttpRespons
     let start = Instant::now();
 
     let position_debt = state
-        .position_repo
+        .position_service
         .get_position_debts()
         .await
         .map_err(|e| {
-            error!("Repository error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
+            error!("Service error: {}", e);
+            actix_web::error::ErrorInternalServerError("Service error")
         })?;
 
     Ok(HttpResponse::Ok()
@@ -63,12 +63,12 @@ pub async fn positionratio(state: web::Data<AppState>) -> ActixResult<HttpRespon
     let start = Instant::now();
 
     let position_ratio = state
-        .position_repo
+        .position_service
         .get_position_ratios()
         .await
         .map_err(|e| {
-            error!("Repository error: {}", e);
-            actix_web::error::ErrorInternalServerError("Database error")
+            error!("Service error: {}", e);
+            actix_web::error::ErrorInternalServerError("Service error")
         })?;
 
     Ok(HttpResponse::Ok()

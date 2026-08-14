@@ -1,5 +1,5 @@
 use crate::api::templates::{EventsTemplate, MsgEventTemplate, MsgSendTemplate};
-use crate::app_state::AppState;
+use crate::core::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
 use std::time::Instant;
@@ -8,9 +8,9 @@ use tracing::error;
 pub async fn events(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let events = state.event_repo.get_events().await.map_err(|e| {
-        error!("Repository error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
+    let events = state.event_service.get_events().await.map_err(|e| {
+        error!("Service error: {}", e);
+        actix_web::error::ErrorInternalServerError("Service error")
     })?;
 
     Ok(HttpResponse::Ok()
@@ -31,9 +31,9 @@ pub async fn events(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
 pub async fn msgevent(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let msgevents = state.msgevent_repo.get_msgevents().await.map_err(|e| {
-        error!("Repository error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
+    let msgevents = state.msgevent_service.get_msgevents().await.map_err(|e| {
+        error!("Service error: {}", e);
+        actix_web::error::ErrorInternalServerError("Service error")
     })?;
 
     Ok(HttpResponse::Ok()
@@ -54,16 +54,16 @@ pub async fn msgevent(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
 pub async fn msgsend(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let msgsends = state.msgsend_repo.get_msgsends().await.map_err(|e| {
-        error!("Repository error: {}", e);
-        actix_web::error::ErrorInternalServerError("Database error")
+    let msgsends = state.msgsend_service.get_msgsends().await.map_err(|e| {
+        error!("Service error: {}", e);
+        actix_web::error::ErrorInternalServerError("Service error")
     })?;
 
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(
             MsgSendTemplate {
-                msgsend: msgsends, // Исправлено: поле называется msgsend, а не msgsends
+                msgsend: msgsends,
                 elapsed_ms: start.elapsed().as_millis(),
             }
             .render()
