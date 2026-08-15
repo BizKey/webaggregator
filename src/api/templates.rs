@@ -1,32 +1,29 @@
 use crate::api::models::{
-    Balance, Bots, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
+    Balance, Bot, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
     PositionRatio, Symbol, Ticker,
 };
 use askama::Template;
 
-// Tickers template
 #[derive(Template)]
 #[template(path = "tickers.html")]
 pub struct TickersTemplate {
     pub tickers: Vec<(usize, Ticker)>,
     pub elapsed_ms: u128,
 }
-// Symbols template
 #[derive(Template)]
 #[template(path = "symbols.html")]
 pub struct SymbolsTemplate {
     pub symbols: Vec<(usize, Symbol)>,
     pub elapsed_ms: u128,
 }
-// Currency template
+
 #[derive(Template)]
 #[template(path = "currencies.html")]
 pub struct CurrenciesTemplate {
     pub currencies: Vec<(usize, Currency)>,
     pub elapsed_ms: u128,
 }
-// pg stats
 #[derive(Template)]
 #[template(path = "pg/pg.html")]
 pub struct PgTemplate {
@@ -64,7 +61,7 @@ pub struct MsgSendTemplate {
 #[derive(Template)]
 #[template(path = "bots/bots.html")]
 pub struct BotsTemplate {
-    pub bots: Vec<(usize, Bots)>,
+    pub bots: Vec<(usize, Bot)>,
     pub init_balance: f64,
     pub final_balance: f64,
     pub elapsed_ms: u128,
@@ -99,7 +96,6 @@ pub struct BalanceTemplate {
     pub balances: Vec<Balance>,
     pub elapsed_ms: u128,
 }
-// Index template
 #[derive(Template)]
 #[template(path = "index/index.html")]
 pub struct IndexTemplate {}

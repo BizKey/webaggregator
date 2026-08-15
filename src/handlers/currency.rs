@@ -1,27 +1,17 @@
 use crate::api::models::Currency;
 use crate::api::templates::CurrenciesTemplate;
+use crate::core::app_state::AppState;
 use actix_web::{HttpResponse, Result as ActixResult, web};
 use askama::Template;
+use std::time::Instant;
 use tracing::error;
 
-use sqlx::PgPool;
-use std::time::Instant;
-
-pub async fn currencies(pool: web::Data<PgPool>) -> ActixResult<HttpResponse> {
+pub async fn currencies(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
     let start = Instant::now();
 
-    let currencies: Vec<Currency> = sqlx::query_as::<_, Currency>(
-        r#"
-        SELECT exchange, currency, currency_name, full_name, precision, is_margin_enabled, is_debit_enabled, updated_at
-        FROM currency
-        ORDER BY updated_at DESC;
-        "#,
-    )
-    .fetch_all(pool.as_ref())
-    .await
-    .map_err(|e|{
-        error!("Database error: {}", e);
-        actix_web::error::ErrorInternalServerError("Template render error")
+    let currencies = state.currency_service.get_currencies().await.map_err(|e| {
+        error!("Service error: {}", e);
+        actix_web::error::ErrorInternalServerError("Service error")
     })?;
 
     let currencies: Vec<(usize, Currency)> = currencies

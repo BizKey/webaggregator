@@ -1,0 +1,27 @@
+pub mod balance_service;
+pub mod bot_service;
+pub mod currency_service;
+pub mod error_service;
+pub mod event_service;
+pub mod msgevent_service;
+pub mod msgsend_service;
+pub mod order_service;
+pub mod pg_service;
+pub mod position_service;
+pub mod static_service;
+pub mod symbol_service;
+pub mod ticker_service;
+
+pub use balance_service::BalanceService;
+pub use bot_service::BotService;
+pub use currency_service::CurrencyService;
+pub use error_service::ErrorService;
+pub use event_service::EventService;
+pub use msgevent_service::MsgEventService;
+pub use msgsend_service::MsgSendService;
+pub use order_service::OrderService;
+pub use pg_service::PgService;
+pub use position_service::PositionService;
+pub use static_service::StaticService;
+pub use symbol_service::SymbolService;
+pub use ticker_service::TickerService;

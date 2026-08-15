@@ -1,10 +1,18 @@
 mod api {
     pub mod models;
     pub mod templates;
-    pub mod tools;
 }
+mod core {
+    pub mod app_state;
+    pub mod error;
+}
+mod config;
 mod handlers;
-use crate::api::tools::get_env;
+mod repositories;
+mod services;
+
+use crate::config::AppConfig;
+use crate::core::app_state::AppState;
 use crate::handlers::{
     balance::balances,
     bots::bots,
@@ -22,28 +30,34 @@ use crate::handlers::{
 use actix_web::{App, HttpServer, middleware, web};
 use anyhow::{Context, Result};
 use dotenvy::dotenv;
-use sqlx::{PgPool, postgres::PgPoolOptions};
-use std::time::Duration;
+use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use tracing::info;
 
-fn init_tracing() {
-    tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+fn init_tracing(config: &config::LoggingConfig) {
+    let env_filter = tracing_subscriber::EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&config.level));
+
+    let builder = tracing_subscriber::fmt()
+        .with_env_filter(env_filter)
         .with_target(true)
-        .with_thread_ids(true)
-        .init();
+        .with_thread_ids(true);
+
+    match config.format.as_str() {
+        "json" => builder.json().init(),
+        "text" => builder.init(),
+        _ => builder.init(),
+    }
 }
 
-async fn create_db_pool() -> Result<PgPool> {
-    let database_url = get_env("DATABASE_URL")?;
-
+async fn create_db_pool(config: &config::DatabaseConfig) -> Result<PgPool> {
     Ok(PgPoolOptions::new()
-        .max_connections(10)
-        .min_connections(1)
-        .acquire_timeout(Duration::from_secs(10))
-        .idle_timeout(Duration::from_secs(600))
-        .max_lifetime(Duration::from_secs(1800))
-        .connect(&database_url)
+        .max_connections(config.max_connections)
+        .min_connections(config.min_connections)
+        .acquire_timeout(config.acquire_timeout)
+        .idle_timeout(config.idle_timeout)
+        .max_lifetime(config.max_lifetime)
+        .connect(&config.url)
         .await
         .context("Failed to connect to PostgreSQL")?)
 }
@@ -70,26 +84,34 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .route("/favicon.png", get().to(favicon));
 }
 
-const SERVER_ADDR: &str = "0.0.0.0:8080";
-
 #[actix_web::main]
 async fn main() -> Result<()> {
-    init_tracing();
     dotenv().ok();
 
-    let pool = create_db_pool().await?;
+    let config = AppConfig::from_env()?;
+
+    init_tracing(&config.logging);
+
+    let pool = create_db_pool(&config.database).await?;
     info!("Database connected");
+
+    let app_state = AppState::new(pool);
+
+    let server_addr = config.server_addr();
+    let workers = config.server.workers;
 
     let server = HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(app_state.clone()))
             .wrap(middleware::Compress::default())
             .configure(routes)
     })
-    .bind(SERVER_ADDR)
-    .with_context(|| format!("Failed to bind server to {SERVER_ADDR}"))?;
+    .bind(&server_addr)
+    .with_context(|| format!("Failed to bind server to {}", server_addr))?
+    .workers(workers);
 
-    info!("Server running on http://0.0.0.0:8080");
+    info!("Server running on http://{}", server_addr);
+    info!("Workers: {}", workers);
 
     server.run().await.context("Server crashed")?;
 

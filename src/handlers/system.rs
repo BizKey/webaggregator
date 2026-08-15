@@ -1,22 +1,31 @@
-use actix_web::{HttpResponse, Result as ActixResult};
+use crate::core::app_state::AppState;
+use actix_web::{HttpResponse, Result as ActixResult, web};
 use tracing::error;
 
-pub async fn serve_css() -> ActixResult<HttpResponse> {
-    Ok(HttpResponse::Ok()
-        .content_type("text/css; charset=utf-8")
-        .insert_header(("Cache-Control", "public, max-age=3600"))
-        .body(std::fs::read_to_string("./static/style.css").map_err(|e| {
-            error!("Fail read ./static/style.css: {}", e);
-            actix_web::error::ErrorInternalServerError("Fail")
-        })?))
+pub async fn serve_css(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
+    match state.static_service.get_css().await {
+        Ok(file) => Ok(HttpResponse::Ok()
+            .content_type(file.content_type)
+            .insert_header(("Cache-Control", "public, max-age=3600"))
+            .insert_header(("ETag", file.etag))
+            .body(file.content)),
+        Err(e) => {
+            error!("Failed to serve CSS: {}", e);
+            Ok(HttpResponse::InternalServerError().body("CSS not found"))
+        }
+    }
 }
 
-pub async fn favicon() -> ActixResult<HttpResponse> {
-    Ok(HttpResponse::Ok()
-        .content_type("image/png")
-        .insert_header(("Cache-Control", "public, max-age=3600"))
-        .body(std::fs::read("./static/favicon.png").map_err(|e| {
-            error!("Fail read ./static/favicon.png: {}", e);
-            actix_web::error::ErrorInternalServerError("Fail")
-        })?))
+pub async fn favicon(state: web::Data<AppState>) -> ActixResult<HttpResponse> {
+    match state.static_service.get_favicon().await {
+        Ok(file) => Ok(HttpResponse::Ok()
+            .content_type(file.content_type)
+            .insert_header(("Cache-Control", "public, max-age=86400"))
+            .insert_header(("ETag", file.etag))
+            .body(file.content)),
+        Err(e) => {
+            error!("Failed to serve favicon: {}", e);
+            Ok(HttpResponse::NotFound().finish())
+        }
+    }
 }
