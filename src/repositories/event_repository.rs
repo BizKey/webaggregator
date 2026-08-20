@@ -1,5 +1,5 @@
-use super::RepositoryResult;
 use crate::api::models::Event;
+use crate::repositories::RepositoryResult;
 use async_trait::async_trait;
 use sqlx::PgPool;
 
