@@ -65,15 +65,15 @@
                 {% endif %}
             </td>
             <td>
-                {% if let Some(exit_sl_price) = bot.exit_sl_price %}
-                {{ exit_sl_price }}
-                {% endif %}
-            </td>
-            <td>
                 {% if let Some(exit_sl_order_id) = bot.exit_sl_order_id %}
                 {{ exit_sl_order_id }}
                 {% endif %}
             </td>
+            <td>
+                {% if let Some(exit_sl_price) = bot.exit_sl_price %}
+                {{ exit_sl_price }}
+                {% endif %}
+            </td>            
             <td>
                 {% if let Some(exit_sl_client_oid) = bot.exit_sl_client_oid %}
                 {{ exit_sl_client_oid }}

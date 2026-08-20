@@ -1,5 +1,5 @@
-use super::RepositoryResult;
 use crate::api::models::Ticker;
+use crate::repositories::RepositoryResult;
 use async_trait::async_trait;
 use sqlx::PgPool;
 
