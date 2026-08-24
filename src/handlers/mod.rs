@@ -1,6 +1,7 @@
 pub mod balance;
 pub mod bots;
 pub mod currency;
+pub mod error_clear;
 pub mod errors;
 pub mod events;
 pub mod index;
