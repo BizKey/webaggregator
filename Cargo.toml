@@ -9,6 +9,7 @@ sqlx = { version = "0.9", default-features = false,  features = ["postgres", "ru
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 tokio = { version = "1.53", default-features = false, features = ["rt-multi-thread", "macros"] }
 askama = { version = "0.16", default-features = false, features = ["serde_json", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["std"] }
 chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
 futures = { version = "0.3", default-features = false, features = ["std"] }
 dotenvy =  { version = "0.15", default-features = false }

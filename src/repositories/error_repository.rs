@@ -6,6 +6,7 @@ use sqlx::PgPool;
 #[async_trait]
 pub trait ErrorRepository: Send + Sync {
     async fn get_errors(&self) -> RepositoryResult<Vec<Error>>;
+    async fn clear_errors(&self) -> RepositoryResult<u64>;
 }
 
 pub struct PostgresErrorRepository {
@@ -32,5 +33,13 @@ impl ErrorRepository for PostgresErrorRepository {
         .await?;
 
         Ok(errors)
+    }
+
+    async fn clear_errors(&self) -> RepositoryResult<u64> {
+        let result = sqlx::query("DELETE FROM errors")
+            .execute(&self.pool)
+            .await?;
+
+        Ok(result.rows_affected())
     }
 }

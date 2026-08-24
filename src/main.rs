@@ -17,6 +17,7 @@ use crate::handlers::{
     balance::balances,
     bots::bots,
     currency::currencies,
+    error_clear::clear_errors,
     errors::errors,
     events::{events, msgevent, msgsend},
     index::index,
@@ -63,11 +64,12 @@ async fn create_db_pool(config: &config::DatabaseConfig) -> Result<PgPool> {
 }
 
 fn routes(cfg: &mut web::ServiceConfig) {
-    use web::get;
+    use web::{delete, get};
     cfg.route("/", get().to(index))
         .route("/pg", get().to(pg))
         .route("/events", get().to(events))
         .route("/errors", get().to(errors))
+        .route("/errors/clear", delete().to(clear_errors))
         .route("/balance", get().to(balances))
         .route("/eventorder", get().to(eventorders))
         .route("/positiondebt", get().to(positiondebt))

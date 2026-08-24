@@ -223,3 +223,9 @@ pub struct MsgEvent {
     pub out_time: f64,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ClearErrorsResponse {
+    pub deleted_count: u64,
+    pub message: String,
+}

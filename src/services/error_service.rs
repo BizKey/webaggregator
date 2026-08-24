@@ -14,4 +14,8 @@ impl<R: ErrorRepository> ErrorService<R> {
     pub async fn get_errors(&self) -> AppResult<Vec<Error>> {
         self.repo.get_errors().await.map_err(Into::into)
     }
+
+    pub async fn clear_errors(&self) -> AppResult<u64> {
+        self.repo.clear_errors().await.map_err(Into::into)
+    }
 }
