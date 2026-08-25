@@ -1,3 +1,4 @@
+use crate::api::models::SendOrder;
 use crate::api::models::{
     Balance, Bot, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
@@ -40,6 +41,14 @@ pub struct EventsTemplate {
     pub events: Vec<Event>,
     pub elapsed_ms: u128,
 }
+
+#[derive(Template)]
+#[template(path = "events/sendorders.html")]
+pub struct SendOrderTemplate {
+    pub sendorders: Vec<SendOrder>,
+    pub elapsed_ms: u128,
+}
+
 #[derive(Template)]
 #[template(path = "errors/errors.html")]
 pub struct ErrorsTemplate {

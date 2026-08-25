@@ -229,3 +229,20 @@ pub struct ClearErrorsResponse {
     pub deleted_count: u64,
     pub message: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct SendOrder {
+    pub exchange: String,
+    pub args_symbol: Option<String>,
+    pub args_side: Option<String>,
+    pub args_size: Option<String>,
+    pub args_funds: Option<String>,
+    pub args_price: Option<String>,
+    pub args_time_in_force: Option<String>,
+    pub args_type: Option<String>,
+    pub args_auto_borrow: Option<bool>,
+    pub args_auto_repay: Option<bool>,
+    pub args_client_oid: Option<String>,
+    pub args_order_id: Option<String>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}
