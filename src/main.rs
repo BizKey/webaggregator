@@ -13,6 +13,7 @@ mod services;
 
 use crate::config::AppConfig;
 use crate::core::app_state::AppState;
+
 use crate::handlers::{
     balance::balances,
     bots::bots,
@@ -24,6 +25,7 @@ use crate::handlers::{
     orders::eventorders,
     pg::pg,
     position::{positionasset, positiondebt, positionratio},
+    sendorder::sendorders,
     symbol::{symbols, tradeable},
     system::{favicon, serve_css},
     ticker::tickers,
@@ -72,6 +74,7 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .route("/errors/clear", delete().to(clear_errors))
         .route("/balance", get().to(balances))
         .route("/eventorder", get().to(eventorders))
+        .route("/sendorders", get().to(sendorders))
         .route("/positiondebt", get().to(positiondebt))
         .route("/msgevent", get().to(msgevent))
         .route("/msgsend", get().to(msgsend))

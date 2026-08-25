@@ -1,9 +1,11 @@
+use crate::repositories::PostgresSendOrderRepository;
 use crate::repositories::{
     PostgresBalanceRepository, PostgresBotRepository, PostgresCurrencyRepository,
     PostgresErrorRepository, PostgresEventOrderRepository, PostgresEventRepository,
     PostgresMsgEventRepository, PostgresMsgSendRepository, PostgresPgRepository,
     PostgresPositionRepository, PostgresSymbolRepository, PostgresTickerRepository,
 };
+use crate::services::SendOrderService;
 use crate::services::{
     BalanceService, BotService, CurrencyService, ErrorService, EventService, MsgEventService,
     MsgSendService, OrderService, PgService, PositionService, StaticService, SymbolService,
@@ -26,6 +28,7 @@ pub struct AppState {
     pub symbol_service: Arc<SymbolService<PostgresSymbolRepository>>,
     pub ticker_service: Arc<TickerService<PostgresTickerRepository>>,
     pub static_service: Arc<StaticService>,
+    pub sendorder_service: Arc<SendOrderService<PostgresSendOrderRepository>>,
 }
 
 impl AppState {
@@ -60,8 +63,13 @@ impl AppState {
             symbol_service: Arc::new(SymbolService::new(PostgresSymbolRepository::new(
                 pool.clone(),
             ))),
-            ticker_service: Arc::new(TickerService::new(PostgresTickerRepository::new(pool))),
+            ticker_service: Arc::new(TickerService::new(PostgresTickerRepository::new(
+                pool.clone(),
+            ))),
             static_service: Arc::new(StaticService::new()),
+            sendorder_service: Arc::new(SendOrderService::new(PostgresSendOrderRepository::new(
+                pool.clone(),
+            ))),
         }
     }
 }
