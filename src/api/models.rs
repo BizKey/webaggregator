@@ -233,17 +233,17 @@ pub struct ClearErrorsResponse {
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct SendOrder {
     pub exchange: String,
-    pub args_symbol: Option<String>,
-    pub args_side: Option<String>,
-    pub args_size: Option<String>,
-    pub args_funds: Option<String>,
-    pub args_price: Option<String>,
-    pub args_time_in_force: Option<String>,
-    pub args_type: Option<String>,
-    pub args_auto_borrow: Option<bool>,
-    pub args_auto_repay: Option<bool>,
-    pub args_client_oid: Option<String>,
-    pub args_order_id: Option<String>,
+    pub client_oid: String,
+    pub side: String,
+    pub symbol: String,
+    pub order_type: String,
+    pub size: Option<String>,
+    pub funds: Option<String>,
+    pub price: String,
+    pub time_in_force: String,
+    pub auto_borrow: bool,
+    pub auto_repay: bool,
+    pub order_id: Option<String>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
