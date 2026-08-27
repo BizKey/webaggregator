@@ -27,7 +27,7 @@ impl StopOrderRepository for PostgresStopOrderRepository {
                    stop_price, size, funds, time_in_force, auto_borrow, auto_repay,
                    is_isolated, updated_at
             FROM stoporders
-            ORDER BY created_at DESC
+            ORDER BY updated_at DESC
             LIMIT 1000;
             "#,
         )
