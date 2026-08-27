@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Stop Orders{% endblock %}
+
+{% block content %}
+<p><a href="/">Home</a></p>
+<h2>Stop Orders</h2>
+<table>
+    <thead>
+        <tr>
+            <th>updated_at</th>
+            <th>exchange</th>
+            <th>client_oid</th>
+            <th>side</th>
+            <th>symbol</th>
+            <th>order_type</th>
+            <th>stop_type</th>
+            <th>stop_price</th>
+            <th>size</th>
+            <th>funds</th>
+            <th>time_in_force</th>
+            <th>auto_borrow</th>
+            <th>auto_repay</th>
+            <th>is_isolated</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in stoporders %}
+        <tr>
+            <td>{{ order.updated_at }}</td>
+            <td>{{ order.exchange }}</td>
+            <td>{{ order.client_oid }}</td>
+            <td>{{ order.side }}</td>
+            <td>{{ order.symbol }}</td>
+            <td>{{ order.order_type }}</td>
+            <td>{{ order.stop_type }}</td>
+            <td>{{ order.stop_price }}</td>
+            <td>
+                {% if let Some(size) = order.size %}
+                {{ size }}
+                {% else %}
+                -
+                {% endif %}
+            </td>
+            <td>
+                {% if let Some(funds) = order.funds %}
+                {{ funds }}
+                {% else %}
+                -
+                {% endif %}
+            </td>
+            <td>{{ order.time_in_force }}</td>
+            <td>{{ order.auto_borrow }}</td>
+            <td>{{ order.auto_repay }}</td>
+            <td>{{ order.is_isolated }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pin_time">{{ elapsed_ms }} ms</div>
+{% endblock %}

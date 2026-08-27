@@ -9,6 +9,7 @@ pub mod orders;
 pub mod pg;
 pub mod position;
 pub mod sendorder;
+pub mod stoporders;
 pub mod symbol;
 pub mod system;
 pub mod ticker;

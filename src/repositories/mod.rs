@@ -9,6 +9,7 @@ pub mod order_repository;
 pub mod pg_repository;
 pub mod position_repository;
 pub mod sendorder_repository;
+pub mod stoporder_repository;
 pub mod symbol_repository;
 pub mod ticker_repository;
 
@@ -24,6 +25,7 @@ pub use pg_repository::{
     ConnectionStatsRepository, PostgresPgRepository, QueryStatsRepository, TableSizeRepository,
     TableStatsRepository,
 };
+pub use stoporder_repository::{PostgresStopOrderRepository, StopOrderRepository};
 
 pub use position_repository::{PositionRepository, PostgresPositionRepository};
 pub use sendorder_repository::{PostgresSendOrderRepository, SendOrderRepository};
