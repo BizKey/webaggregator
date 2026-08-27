@@ -4,23 +4,23 @@
 
 {% block content %}
 <p><a href="/">Home</a></p>
-<p>SendOrders</p>
+<h2>SendOrders</h2>
 <table>
     <thead>
         <tr>
             <th>updated_at</th>
             <th>exchange</th>
-            <th>args_symbol</th>
-            <th>args_side</th>
-            <th>args_size</th>
-            <th>args_funds</th>
-            <th>args_price</th>
-            <th>args_time_in_force</th>
-            <th>args_type</th>
-            <th>args_auto_borrow</th>
-            <th>args_auto_repay</th>
-            <th>args_client_oid</th>
-            <th>args_order_id</th>
+            <th>symbol</th>
+            <th>side</th>
+            <th>size</th>
+            <th>funds</th>
+            <th>price</th>
+            <th>time_in_force</th>
+            <th>order_type</th>
+            <th>auto_borrow</th>
+            <th>auto_repay</th>
+            <th>client_oid</th>
+            <th>order_id</th>
         </tr>
     </thead>
     <tbody>
@@ -28,59 +28,27 @@
         <tr>
             <td>{{ event.updated_at }}</td>
             <td>{{ event.exchange }}</td>
+            <td>{{ event.symbol }}</td>
+            <td>{{ event.side }}</td>
             <td>
-                {% if let Some(args_symbol) = event.args_symbol %}
-                {{ args_symbol }}
+                {% if let Some(size) = event.size %}
+                {{ size }}
                 {% endif %}
             </td>
             <td>
-                {% if let Some(args_side) = event.args_side %}
-                {{ args_side }}
+                {% if let Some(funds) = event.funds %}
+                {{ funds }}
                 {% endif %}
             </td>
+            <td>{{ event.price }}</td>
+            <td>{{ event.time_in_force }}</td>
+            <td>{{ event.order_type }}</td>
+            <td>{{ event.auto_borrow }}</td>
+            <td>{{ event.auto_repay }}</td>
+            <td>{{ event.client_oid }}</td>
             <td>
-                {% if let Some(args_size) = event.args_size %}
-                {{ args_size }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_funds) = event.args_funds %}
-                {{ args_funds }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_price) = event.args_price %}
-                {{ args_price }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_time_in_force) = event.args_time_in_force %}
-                {{ args_time_in_force }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_type) = event.args_type %}
-                {{ args_type }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_auto_borrow) = event.args_auto_borrow %}
-                {{ args_auto_borrow }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_auto_repay) = event.args_auto_repay %}
-                {{ args_auto_repay }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_client_oid) = event.args_client_oid %}
-                {{ args_client_oid }}
-                {% endif %}
-            </td>
-            <td>
-                {% if let Some(args_order_id) = event.args_order_id %}
-                {{ args_order_id }}
+                {% if let Some(order_id) = event.order_id %}
+                {{ order_id }}
                 {% endif %}
             </td>
         </tr>
