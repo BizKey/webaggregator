@@ -1,9 +1,9 @@
-use crate::api::models::SendOrder;
 use crate::api::models::{
     Balance, Bot, Currency, Error, Event, EventOrder, MsgEvent, MsgSend, PgConnection,
     PgStatStatements, PgStatTableSize, PgTableIndex, PgTableInfo, PositionAsset, PositionDebt,
-    PositionRatio, Symbol, Ticker,
+    PositionRatio, SendOrder, StopOrder, Symbol, Ticker,
 };
+
 use askama::Template;
 
 #[derive(Template)]
@@ -108,3 +108,10 @@ pub struct BalanceTemplate {
 #[derive(Template)]
 #[template(path = "index/index.html")]
 pub struct IndexTemplate {}
+
+#[derive(Template)]
+#[template(path = "stoporders/stoporders.html")]
+pub struct StopOrdersTemplate {
+    pub stoporders: Vec<StopOrder>,
+    pub elapsed_ms: u128,
+}

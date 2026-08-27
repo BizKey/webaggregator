@@ -246,3 +246,21 @@ pub struct SendOrder {
     pub args_order_id: Option<String>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
+
+#[derive(Debug, Serialize, Deserialize, FromRow)]
+pub struct StopOrder {
+    pub exchange: String,
+    pub client_oid: String,
+    pub side: String,
+    pub symbol: String,
+    pub order_type: String,
+    pub stop_type: String,
+    pub stop_price: String,
+    pub size: Option<String>,
+    pub funds: Option<String>,
+    pub time_in_force: String,
+    pub auto_borrow: bool,
+    pub auto_repay: bool,
+    pub is_isolated: bool,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
+}

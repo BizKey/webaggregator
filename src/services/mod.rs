@@ -10,6 +10,7 @@ pub mod pg_service;
 pub mod position_service;
 pub mod sendorder_service;
 pub mod static_service;
+pub mod stoporder_service;
 pub mod symbol_service;
 pub mod ticker_service;
 
@@ -25,5 +26,6 @@ pub use pg_service::PgService;
 pub use position_service::PositionService;
 pub use sendorder_service::SendOrderService;
 pub use static_service::StaticService;
+pub use stoporder_service::StopOrderService;
 pub use symbol_service::SymbolService;
 pub use ticker_service::TickerService;

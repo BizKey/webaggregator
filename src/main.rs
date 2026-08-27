@@ -26,6 +26,7 @@ use crate::handlers::{
     pg::pg,
     position::{positionasset, positiondebt, positionratio},
     sendorder::sendorders,
+    stoporders::stoporders,
     symbol::{symbols, tradeable},
     system::{favicon, serve_css},
     ticker::tickers,
@@ -75,6 +76,7 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .route("/balance", get().to(balances))
         .route("/eventorder", get().to(eventorders))
         .route("/sendorders", get().to(sendorders))
+        .route("/stoporders", get().to(stoporders))
         .route("/positiondebt", get().to(positiondebt))
         .route("/msgevent", get().to(msgevent))
         .route("/msgsend", get().to(msgsend))
