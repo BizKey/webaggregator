@@ -239,7 +239,7 @@ pub struct SendOrder {
     pub order_type: String,
     pub size: Option<String>,
     pub funds: Option<String>,
-    pub price: String,
+    pub price: Option<String>,
     pub time_in_force: String,
     pub auto_borrow: bool,
     pub auto_repay: bool,

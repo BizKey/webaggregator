@@ -40,7 +40,11 @@
                 {{ funds }}
                 {% endif %}
             </td>
-            <td>{{ event.price }}</td>
+            <td>
+                {% if let Some(price) = event.price %}
+                {{ price }}
+                {% endif %}
+            </td>
             <td>{{ event.time_in_force }}</td>
             <td>{{ event.order_type }}</td>
             <td>{{ event.auto_borrow }}</td>
