@@ -20,7 +20,7 @@ pub use error_repository::{ErrorRepository, PostgresErrorRepository};
 pub use event_repository::{EventRepository, PostgresEventRepository};
 pub use msgevent_repository::{MsgEventRepository, PostgresMsgEventRepository};
 pub use msgsend_repository::{MsgSendRepository, PostgresMsgSendRepository};
-pub use order_repository::{EventOrderRepository, PostgresEventOrderRepository};
+pub use order_repository::{EventOrderRepository, PostgresEventOrderRepository, TradeWithStop};
 pub use pg_repository::{
     ConnectionStatsRepository, PostgresPgRepository, QueryStatsRepository, TableSizeRepository,
     TableStatsRepository,

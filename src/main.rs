@@ -30,6 +30,7 @@ use crate::handlers::{
     symbol::{symbols, tradeable},
     system::{favicon, serve_css},
     ticker::tickers,
+    trade_history::trade_history,
 };
 use actix_web::{App, HttpServer, middleware, web};
 use anyhow::{Context, Result};
@@ -77,6 +78,7 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .route("/eventorder", get().to(eventorders))
         .route("/sendorders", get().to(sendorders))
         .route("/stoporders", get().to(stoporders))
+        .route("/trade_history/{symbol}", get().to(trade_history))
         .route("/positiondebt", get().to(positiondebt))
         .route("/msgevent", get().to(msgevent))
         .route("/msgsend", get().to(msgsend))

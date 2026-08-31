@@ -1,11 +1,38 @@
 use crate::api::models::EventOrder;
 use crate::repositories::RepositoryResult;
 use async_trait::async_trait;
-use sqlx::PgPool;
+use serde::Serialize;
+use sqlx::{FromRow, PgPool};
+
+#[derive(Debug, Serialize, FromRow)]
+pub struct TradeWithStop {
+    // Поля из eventorder
+    pub order_id: String,
+    pub client_oid: Option<String>,
+    pub symbol: String,
+    pub side: String,
+    pub price: Option<String>,
+    pub size: Option<String>,
+    pub filled_size: Option<String>,
+    pub status: String,
+    pub event_updated_at: chrono::DateTime<chrono::Utc>,
+    // Поля из stoporders (могут быть NULL)
+    pub stop_client_oid: Option<String>,
+    pub stop_side: Option<String>,
+    pub stop_type: Option<String>,
+    pub stop_price: Option<String>,
+    pub stop_size: Option<String>,
+    pub stop_updated_at: Option<chrono::DateTime<chrono::Utc>>,
+}
 
 #[async_trait]
 pub trait EventOrderRepository: Send + Sync {
     async fn get_event_orders(&self) -> RepositoryResult<Vec<EventOrder>>;
+    async fn get_trades_with_stops(
+        &self,
+        symbol: &str,
+        limit: i64,
+    ) -> RepositoryResult<Vec<TradeWithStop>>;
 }
 
 pub struct PostgresEventOrderRepository {
@@ -35,5 +62,44 @@ impl EventOrderRepository for PostgresEventOrderRepository {
         .await?;
 
         Ok(event_orders)
+    }
+    async fn get_trades_with_stops(
+        &self,
+        symbol: &str,
+        limit: i64,
+    ) -> RepositoryResult<Vec<TradeWithStop>> {
+        let trades = sqlx::query_as::<_, TradeWithStop>(
+            r#"
+            SELECT 
+                e.order_id,
+                e.client_oid,
+                e.symbol,
+                e.side,
+                e.price,
+                e.size,
+                e.filled_size,
+                e.status,
+                e.updated_at as event_updated_at,
+                s.client_oid as stop_client_oid,
+                s.side as stop_side,
+                s.stop_type,
+                s.stop_price,
+                s.size as stop_size,
+                s.updated_at as stop_updated_at
+            FROM orderevent e
+            LEFT JOIN stoporders s ON 
+                (e.client_oid IS NOT NULL AND e.client_oid = s.client_oid)
+                OR (e.order_id = s.client_oid)
+            WHERE e.symbol = $1
+            ORDER BY e.updated_at DESC
+            LIMIT $2
+            "#,
+        )
+        .bind(symbol)
+        .bind(limit)
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(trades)
     }
 }
