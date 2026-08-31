@@ -52,30 +52,20 @@ pub async fn trade_history(
         .into_iter()
         .map(|t| {
             // Определяем направление по side и stop_type
-            let direction = if let Some(stop) = t.client_oid.as_ref() {
-                let stop_type = t.stop_type.as_ref().unwrap();
+            let direction = if let Some(stop_type) = t.stop_type.as_ref() {
+                match (stop_type.as_str(), t.side.as_str()) {
+                    // Сценарий 1: Купили → sell (закрываем позицию)
+                    ("entry", "sell") => "UP".to_string(), // Тейк-профит: цена выросла
+                    ("loss", "sell") => "DOWN".to_string(), // Стоп-лосс: цена упала
 
-                if stop_type == "loss" {
-                    if t.side == "sell" {
-                        "DOWN".to_string()
-                    } else {
-                        "UP".to_string()
-                    }
-                } else if stop_type == "entry" {
-                    if t.side == "sell" {
-                        "UP".to_string()
-                    } else {
-                        "DOWN".to_string()
-                    }
-                } else {
-                    match t.side.as_ref() {
-                        "buy" | "BUY" => "UP".to_string(),
-                        "sell" | "SELL" => "DOWN".to_string(),
-                        _ => "UNKNOWN".to_string(),
-                    }
+                    // Сценарий 2: Продали → buy (закрываем позицию)
+                    ("entry", "buy") => "DOWN".to_string(), // Тейк-профит: цена упала
+                    ("loss", "buy") => "UP".to_string(),    // Стоп-лосс: цена выросла
+
+                    _ => "UNKNOWN".to_string(),
                 }
             } else {
-                match t.side.as_ref() {
+                match t.side.as_str() {
                     "buy" | "BUY" => "UP".to_string(),
                     "sell" | "SELL" => "DOWN".to_string(),
                     _ => "UNKNOWN".to_string(),
