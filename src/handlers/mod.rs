@@ -13,3 +13,4 @@ pub mod stoporders;
 pub mod symbol;
 pub mod system;
 pub mod ticker;
+pub mod trade_history;
