@@ -28,7 +28,6 @@ pub struct TradeDetail {
 #[derive(Debug, Serialize)]
 pub struct StopDetail {
     pub client_oid: String,
-    pub side: String,
     pub stop_type: String,
     pub stop_price: String,
     pub size: Option<String>,
@@ -64,11 +63,10 @@ pub async fn trade_history(
             // Определяем направление по side и stop_type
             let direction = if let Some(stop) = t.stop_client_oid.as_ref() {
                 let stop_type = t.stop_type.as_ref().unwrap();
-                let stop_side = t.stop_side.as_ref().unwrap();
 
                 // Стоп-лосс: цена пошла против позиции
                 if stop_type == "loss" {
-                    if stop_side == "buy" {
+                    if t.side == "sell" {
                         "DOWN".to_string() // Цена упала, сработал buy stop-loss
                     } else {
                         "UP".to_string() // Цена выросла, сработал sell stop-loss
@@ -76,14 +74,14 @@ pub async fn trade_history(
                 }
                 // Стоп-лимит/вход: цена пошла в направлении входа
                 else if stop_type == "entry" {
-                    if stop_side == "buy" {
+                    if t.side == "sell" {
                         "UP".to_string() // Цена выросла, вход в buy
                     } else {
                         "DOWN".to_string() // Цена упала, вход в sell
                     }
                 } else {
                     // Если тип не распознан, используем side
-                    match t.side.as_str() {
+                    match t.side.as_ref() {
                         "buy" | "BUY" => "UP".to_string(),
                         "sell" | "SELL" => "DOWN".to_string(),
                         _ => "UNKNOWN".to_string(),
@@ -91,7 +89,7 @@ pub async fn trade_history(
                 }
             } else {
                 // Нет stop_order, используем side
-                match t.side.as_str() {
+                match t.side.as_ref() {
                     "buy" | "BUY" => "UP".to_string(),
                     "sell" | "SELL" => "DOWN".to_string(),
                     _ => "UNKNOWN".to_string(),
@@ -109,7 +107,6 @@ pub async fn trade_history(
                 event_time: t.event_updated_at,
                 stop_order: t.stop_client_oid.as_ref().map(|_| StopDetail {
                     client_oid: t.stop_client_oid.clone().unwrap(),
-                    side: t.stop_side.clone().unwrap(),
                     stop_type: t.stop_type.clone().unwrap(),
                     stop_price: t.stop_price.clone().unwrap(),
                     size: t.stop_size.clone(),
