@@ -61,22 +61,36 @@ pub async fn trade_history(
     let trades: Vec<TradeDetail> = trades_with_stops
         .into_iter()
         .map(|t| {
-            // Определяем направление
-            let direction = if let (Some(price), Some(stop_price)) =
-                (t.price.as_ref(), t.stop_price.as_ref())
-            {
-                if let (Ok(p), Ok(sp)) = (price.parse::<f64>(), stop_price.parse::<f64>()) {
-                    if p > sp {
-                        "UP".to_string()
-                    } else if p < sp {
-                        "DOWN".to_string()
+            // Определяем направление по side и stop_type
+            let direction = if let Some(stop) = t.stop_client_oid.as_ref() {
+                let stop_type = t.stop_type.as_ref().unwrap();
+                let stop_side = t.stop_side.as_ref().unwrap();
+
+                // Стоп-лосс: цена пошла против позиции
+                if stop_type == "loss" {
+                    if stop_side == "buy" {
+                        "DOWN".to_string() // Цена упала, сработал buy stop-loss
                     } else {
-                        "EQUAL".to_string()
+                        "UP".to_string() // Цена выросла, сработал sell stop-loss
+                    }
+                }
+                // Стоп-лимит/вход: цена пошла в направлении входа
+                else if stop_type == "entry" {
+                    if stop_side == "buy" {
+                        "UP".to_string() // Цена выросла, вход в buy
+                    } else {
+                        "DOWN".to_string() // Цена упала, вход в sell
                     }
                 } else {
-                    "UNKNOWN".to_string()
+                    // Если тип не распознан, используем side
+                    match t.side.as_str() {
+                        "buy" | "BUY" => "UP".to_string(),
+                        "sell" | "SELL" => "DOWN".to_string(),
+                        _ => "UNKNOWN".to_string(),
+                    }
                 }
             } else {
+                // Нет stop_order, используем side
                 match t.side.as_str() {
                     "buy" | "BUY" => "UP".to_string(),
                     "sell" | "SELL" => "DOWN".to_string(),
