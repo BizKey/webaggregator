@@ -21,17 +21,9 @@ pub struct TradeDetail {
     pub filled_size: Option<String>,
     pub status: String,
     pub event_time: chrono::DateTime<chrono::Utc>,
-    pub stop_order: Option<StopDetail>,
-    pub direction: String, // "UP" или "DOWN"
-}
-
-#[derive(Debug, Serialize)]
-pub struct StopDetail {
-    pub client_oid: String,
     pub stop_type: String,
     pub stop_price: String,
-    pub size: Option<String>,
-    pub updated_at: chrono::DateTime<chrono::Utc>,
+    pub direction: String, // "UP" или "DOWN"
 }
 
 pub async fn trade_history(
@@ -41,10 +33,9 @@ pub async fn trade_history(
     let start = Instant::now();
     let symbol = path.into_inner();
 
-    // Получаем сделки с stop orders
     let trades_with_stops = state
         .order_service
-        .get_trades_with_stops(&symbol, 3)
+        .get_trades_with_stops(&symbol, 100)
         .await
         .map_err(|e| {
             error!("Service error: {}", e);
@@ -61,26 +52,22 @@ pub async fn trade_history(
         .into_iter()
         .map(|t| {
             // Определяем направление по side и stop_type
-            let direction = if let Some(stop) = t.stop_client_oid.as_ref() {
+            let direction = if let Some(stop) = t.client_oid.as_ref() {
                 let stop_type = t.stop_type.as_ref().unwrap();
 
-                // Стоп-лосс: цена пошла против позиции
                 if stop_type == "loss" {
                     if t.side == "sell" {
-                        "DOWN".to_string() // Цена упала, сработал buy stop-loss
+                        "DOWN".to_string()
                     } else {
-                        "UP".to_string() // Цена выросла, сработал sell stop-loss
+                        "UP".to_string()
                     }
-                }
-                // Стоп-лимит/вход: цена пошла в направлении входа
-                else if stop_type == "entry" {
+                } else if stop_type == "entry" {
                     if t.side == "sell" {
-                        "UP".to_string() // Цена выросла, вход в buy
+                        "UP".to_string()
                     } else {
-                        "DOWN".to_string() // Цена упала, вход в sell
+                        "DOWN".to_string()
                     }
                 } else {
-                    // Если тип не распознан, используем side
                     match t.side.as_ref() {
                         "buy" | "BUY" => "UP".to_string(),
                         "sell" | "SELL" => "DOWN".to_string(),
@@ -88,7 +75,6 @@ pub async fn trade_history(
                     }
                 }
             } else {
-                // Нет stop_order, используем side
                 match t.side.as_ref() {
                     "buy" | "BUY" => "UP".to_string(),
                     "sell" | "SELL" => "DOWN".to_string(),
@@ -105,13 +91,8 @@ pub async fn trade_history(
                 filled_size: t.filled_size,
                 status: t.status,
                 event_time: t.event_updated_at,
-                stop_order: t.stop_client_oid.as_ref().map(|_| StopDetail {
-                    client_oid: t.stop_client_oid.clone().unwrap(),
-                    stop_type: t.stop_type.clone().unwrap(),
-                    stop_price: t.stop_price.clone().unwrap(),
-                    size: t.stop_size.clone(),
-                    updated_at: t.stop_updated_at.unwrap(),
-                }),
+                stop_type: t.stop_type.clone().unwrap(),
+                stop_price: t.stop_price.clone().unwrap(),
                 direction,
             }
         })
