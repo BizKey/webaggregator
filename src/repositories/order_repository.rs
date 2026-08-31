@@ -70,29 +70,30 @@ impl EventOrderRepository for PostgresEventOrderRepository {
     ) -> RepositoryResult<Vec<TradeWithStop>> {
         let trades = sqlx::query_as::<_, TradeWithStop>(
             r#"
-            SELECT 
+            SELECT DISTINCT ON (s.client_oid)
+                s.client_oid as stop_client_oid,
+                s.side as stop_side,
+                s.symbol,
+                s.stop_type,
+                s.stop_price,
+                s.size as stop_size,
+                s.updated_at as stop_updated_at,
+                -- Данные из orderevent
                 e.order_id,
                 e.client_oid,
-                e.symbol,
                 e.side,
                 e.price,
                 e.size,
                 e.filled_size,
                 e.status,
-                e.updated_at as event_updated_at,
-                s.client_oid as stop_client_oid,
-                s.side as stop_side,
-                s.stop_type,
-                s.stop_price,
-                s.size as stop_size,
-                s.updated_at as stop_updated_at
-            FROM orderevent e
-            LEFT JOIN stoporders s ON 
-                (e.client_oid IS NOT NULL AND e.client_oid = s.client_oid)
-                OR (e.order_id = s.client_oid)
-            WHERE e.symbol = $1
-            ORDER BY e.updated_at DESC
-            LIMIT $2
+                e.updated_at as event_updated_at
+            FROM stoporders s
+            INNER JOIN orderevent e ON 
+                e.client_oid IS NOT NULL 
+                AND e.client_oid = s.client_oid
+            WHERE s.symbol = $1
+            ORDER BY s.client_oid, e.updated_at DESC
+            LIMIT $2;
             "#,
         )
         .bind(symbol)
