@@ -18,7 +18,6 @@ pub struct TradeWithStop {
     pub event_updated_at: chrono::DateTime<chrono::Utc>,
     // Поля из stoporders (могут быть NULL)
     pub stop_client_oid: Option<String>,
-    pub stop_side: Option<String>,
     pub stop_type: Option<String>,
     pub stop_price: Option<String>,
     pub stop_size: Option<String>,
@@ -72,7 +71,6 @@ impl EventOrderRepository for PostgresEventOrderRepository {
             r#"
             SELECT DISTINCT ON (s.client_oid)
                 s.client_oid as stop_client_oid,
-                s.side as stop_side,
                 s.symbol,
                 s.stop_type,
                 s.stop_price,
