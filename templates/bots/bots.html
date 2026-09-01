@@ -19,8 +19,8 @@
             <th>exit_tp_price</th>
             <th>exit_tp_order_id</th>
             <th>exit_tp_client_oid</th>
-            <th>exit_sl_order_id</th>
             <th>exit_sl_price</th>
+            <th>exit_sl_order_id</th>
             <th>exit_sl_client_oid</th>
             <th>symbol</th>
         </tr>
@@ -66,15 +66,15 @@
                 {% endif %}
             </td>
             <td>
-                {% if let Some(exit_sl_order_id) = bot.exit_sl_order_id %}
-                {{ exit_sl_order_id }}
-                {% endif %}
-            </td>
-            <td>
                 {% if let Some(exit_sl_price) = bot.exit_sl_price %}
                 {{ exit_sl_price }}
                 {% endif %}
-            </td>            
+            </td>
+            <td>
+                {% if let Some(exit_sl_order_id) = bot.exit_sl_order_id %}
+                {{ exit_sl_order_id }}
+                {% endif %}
+            </td>  
             <td>
                 {% if let Some(exit_sl_client_oid) = bot.exit_sl_client_oid %}
                 {{ exit_sl_client_oid }}
