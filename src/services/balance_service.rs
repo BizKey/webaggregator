@@ -14,4 +14,8 @@ impl<R: BalanceRepository> BalanceService<R> {
     pub async fn get_balances(&self, limit: i64) -> AppResult<Vec<Balance>> {
         self.repo.get_balances(limit).await.map_err(Into::into)
     }
+
+    pub async fn clear_balances(&self) -> AppResult<u64> {
+        self.repo.clear_balances().await.map_err(Into::into)
+    }
 }

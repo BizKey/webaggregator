@@ -16,6 +16,7 @@ use crate::core::app_state::AppState;
 
 use crate::handlers::{
     balance::balances,
+    balance_clear::clear_balances,
     bots::bots,
     currency::currencies,
     error_clear::clear_errors,
@@ -75,6 +76,7 @@ fn routes(cfg: &mut web::ServiceConfig) {
         .route("/errors", get().to(errors))
         .route("/errors/clear", delete().to(clear_errors))
         .route("/balance", get().to(balances))
+        .route("/balance/clear", delete().to(clear_balances))
         .route("/eventorder", get().to(eventorders))
         .route("/sendorders", get().to(sendorders))
         .route("/stoporders", get().to(stoporders))

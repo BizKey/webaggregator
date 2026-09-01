@@ -230,6 +230,12 @@ pub struct ClearErrorsResponse {
     pub message: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ClearBalancesResponse {
+    pub deleted_count: u64,
+    pub message: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct SendOrder {
     pub exchange: String,
