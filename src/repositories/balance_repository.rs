@@ -6,6 +6,7 @@ use sqlx::PgPool;
 #[async_trait]
 pub trait BalanceRepository: Send + Sync {
     async fn get_balances(&self, limit: i64) -> RepositoryResult<Vec<Balance>>;
+    async fn clear_balances(&self) -> RepositoryResult<u64>;
 }
 
 pub struct PostgresBalanceRepository {
@@ -36,5 +37,12 @@ impl BalanceRepository for PostgresBalanceRepository {
         .await?;
 
         Ok(balances)
+    }
+    async fn clear_balances(&self) -> RepositoryResult<u64> {
+        let result = sqlx::query("DELETE FROM balance")
+            .execute(&self.pool)
+            .await?;
+
+        Ok(result.rows_affected())
     }
 }
