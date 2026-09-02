@@ -61,8 +61,8 @@ pub async fn trade_history(
                     ("loss", "sell") => "DOWN".to_string(), // Стоп-лосс: цена упала
 
                     // Сценарий 2: Продали → buy (закрываем позицию)
-                    ("entry", "buy") => "DOWN".to_string(), // Тейк-профит: цена упала
-                    ("loss", "buy") => "UP".to_string(),    // Стоп-лосс: цена выросла
+                    ("entry", "buy") => "UP".to_string(), // Тейк-профит: цена упала
+                    ("loss", "buy") => "DOWN".to_string(), // Стоп-лосс: цена выросла
 
                     _ => "UNKNOWN".to_string(),
                 }
