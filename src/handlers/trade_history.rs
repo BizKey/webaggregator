@@ -33,7 +33,7 @@ pub async fn trade_history(
     let start = Instant::now();
     let symbol = path.into_inner();
 
-    let trades_with_stops = state
+    let mut trades_with_stops = state
         .order_service
         .get_trades_with_stops(&symbol, 100)
         .await
