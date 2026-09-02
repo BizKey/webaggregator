@@ -42,6 +42,8 @@ pub async fn trade_history(
             actix_web::error::ErrorInternalServerError("Service error")
         })?;
 
+    trades_with_stops.sort_by_key(|t| t.event_updated_at);
+
     if trades_with_stops.is_empty() {
         return Ok(HttpResponse::NotFound().json(serde_json::json!({
             "error": format!("No trades found for symbol: {}", symbol)
