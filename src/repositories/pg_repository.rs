@@ -25,12 +25,6 @@ pub trait TableSizeRepository: Send + Sync {
     async fn get_table_sizes(&self) -> AppResult<Vec<PgStatTableSize>>;
 }
 
-#[async_trait]
-pub trait PgRepository:
-    ConnectionStatsRepository + TableStatsRepository + QueryStatsRepository + TableSizeRepository
-{
-}
-
 pub struct PostgresPgRepository {
     pool: PgPool,
 }
@@ -121,6 +115,3 @@ impl TableSizeRepository for PostgresPgRepository {
         Ok(sizes)
     }
 }
-
-#[async_trait]
-impl PgRepository for PostgresPgRepository {}
