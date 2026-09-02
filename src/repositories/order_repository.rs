@@ -86,7 +86,7 @@ impl EventOrderRepository for PostgresEventOrderRepository {
                 e.client_oid IS NOT NULL 
                 AND e.client_oid = s.client_oid
             WHERE s.symbol = $1
-            ORDER BY s.client_oid, e.updated_at DESC
+            ORDER BY e.updated_at DESC
             LIMIT $2;
             "#,
         )
